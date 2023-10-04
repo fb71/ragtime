@@ -66,7 +66,7 @@ public class RagtimeApp
             new RagtimeApp().createUI( rootWindow -> {
                 rootWindow.size.defaultsTo( () -> {
                     var body = Window.current().getDocument().getBody();
-                    var size = Size.of( body.getClientWidth(), body.getClientHeight() - 100 );
+                    var size = Size.of( body.getClientWidth(), body.getClientHeight() );
                     LOG.debug( "BODY: " + size );
                     return size;
                 });

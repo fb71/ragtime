@@ -17,9 +17,11 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Size;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
 
@@ -41,6 +43,7 @@ public class FrontPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Start" );
 
+        ui.body.layout.set( RowLayout.filled().margins( Size.of( 10, 10 ) ));
         ui.body.add( new Text() {{
             content.set( "New plans, new horizons... :)" );
         }});
