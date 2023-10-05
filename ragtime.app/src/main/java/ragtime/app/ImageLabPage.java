@@ -54,7 +54,7 @@ public class ImageLabPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Bild bauen ..." );
+        ui.init( parent ).title.set( "Imaginieren ..." );
 
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{

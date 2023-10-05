@@ -17,9 +17,9 @@
       </filter-mapping-->
 
       <!-- HTTP -->
-      <!--servlet>
+      <servlet>
         <servlet-name>HttpForwardServlet</servlet-name>
-        <servlet-class>areca.app.service.http.HttpForwardServlet2</servlet-class>
+        <servlet-class>ragtime.http.HttpForwardServlet2</servlet-class>
       </servlet>
       <servlet-mapping>
          <servlet-name>HttpForwardServlet</servlet-name>
@@ -28,6 +28,6 @@
 
     <session-config>
         <session-timeout>30</session-timeout>
-    </session-config-->
+    </session-config>
   
 </web-app>

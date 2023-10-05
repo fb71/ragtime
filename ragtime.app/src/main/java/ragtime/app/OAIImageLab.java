@@ -37,7 +37,7 @@ public class OAIImageLab
 
     private static final Log LOG = LogFactory.getLog( OAIImageLab.class );
 
-    public static final String KEY = "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";
+    public static final String KEY = "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";
 
     // instance *******************************************
 
@@ -53,7 +53,7 @@ public class OAIImageLab
     @Override
     public Promise<String> generateImage( String prompt, int n ) {
         var t = Timer.start();
-        return Platform.xhr( "POST", "https://api.openai.com/v1/images/generations" )
+        return Platform.xhr( "POST", "http?uri=https://api.openai.com/v1/images/generations" )
                 .addHeader( "Content-Type", "application/json" )
                 .addHeader( "Authorization", "Bearer " + apikey )
                 .submit( JSON.stringify( GenerateImageRequestBody.defaults( prompt ) ) )
