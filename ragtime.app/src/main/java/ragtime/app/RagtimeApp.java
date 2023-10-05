@@ -33,6 +33,7 @@ import areca.rt.teavm.TeaPlatform;
 import areca.rt.teavm.ui.UIComponentRenderer;
 import areca.ui.App;
 import areca.ui.Size;
+import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 
 /**
@@ -73,7 +74,8 @@ public class RagtimeApp
 
                 LOG.info( "URI path: %s", Window.current().getLocation().getPathName() );
                 Pageflow.start( rootWindow )
-                        .create( new FrontPage() )
+                        .create( new SelfAwarenessPage() )
+                        .putContext( new OAIImageLab( OAIImageLab.KEY ), Page.Context.DEFAULT_SCOPE )
                         .open();
             });
         }
@@ -132,15 +134,7 @@ public class RagtimeApp
             return callable.call();
         }
         catch (Throwable e) {
-            LOG.warn( "Exception: " + e );
-            Throwable rootCause = Platform.rootCause( e );
-            LOG.warn( "Root cause: " + rootCause, rootCause );
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException)rootCause;
-            }
-            else {
-                throw (RuntimeException)rootCause; // XXX
-            }
+            throw rootCauseForTeaVM( e );
         }
     }
 
@@ -153,13 +147,27 @@ public class RagtimeApp
                 LOG.info( "Operation cancelled." );
             }
             else if (debug) {
-                // get a meaningfull stracktrace in TeaVM
-                throw (RuntimeException)e;
+                throw rootCauseForTeaVM( e );
             }
             else {
                 //Pageflow.current().open( new GeneralErrorPage( e ), null );
             }
         };
+    }
+
+    /**
+     * get a meaningfull stracktrace in TeaVM
+     */
+    private static RuntimeException rootCauseForTeaVM( Throwable e ) {
+        LOG.warn( "Exception: " + e );
+        Throwable rootCause = Platform.rootCause( e );
+        LOG.warn( "Root cause: " + rootCause, rootCause );
+        if (e instanceof RuntimeException) {
+            return (RuntimeException)rootCause;
+        }
+        else {
+            return (RuntimeException)rootCause; // XXX
+        }
     }
 
 }
