@@ -54,6 +54,7 @@ public class RagtimeApp
         debug = Window.current().getLocation().getSearch().contains( "debug" );
         LOG.info( "Debug: %s", debug );
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
+        LogFactory.setClassLevel( RagtimeApp.class, Level.INFO );
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
         Platform.impl = new TeaPlatform();
@@ -75,7 +76,7 @@ public class RagtimeApp
                 String pathName = Window.current().getLocation().getPathName();
                 var apikey = (String)null;
                 if (pathName.equals( "/ragtime/" )) {
-                    LOG.info( "URI path: %s -> using KEY_BUILD", pathName );
+                    LOG.warn( "URI path: " + pathName + " -> using KEY_BUILD" );
                     apikey = OAIImageLab.KEY_BUILD;
                 }
                 else {
