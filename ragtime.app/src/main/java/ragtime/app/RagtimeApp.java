@@ -72,10 +72,19 @@ public class RagtimeApp
                     return size;
                 });
 
-                LOG.info( "URI path: %s", Window.current().getLocation().getPathName() );
+                String pathName = Window.current().getLocation().getPathName();
+                var apikey = (String)null;
+                if (pathName.equals( "/ragtime/" )) {
+                    LOG.info( "URI path: %s -> using KEY_BUILD", pathName );
+                    apikey = OAIImageLab.KEY_BUILD;
+                }
+                else {
+                    LOG.info( "URI path: %s -> using KEY_DEV", pathName );
+                    apikey = OAIImageLab.KEY_DEV;
+                }
                 Pageflow.start( rootWindow )
                         .create( new SelfAwarenessPage() )
-                        .putContext( new OAIImageLab( OAIImageLab.KEY ), Page.Context.DEFAULT_SCOPE )
+                        .putContext( new OAIImageLab( apikey ), Page.Context.DEFAULT_SCOPE )
                         .open();
             });
         }
