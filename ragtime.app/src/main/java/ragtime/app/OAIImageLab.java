@@ -37,7 +37,7 @@ public class OAIImageLab
 
     private static final Log LOG = LogFactory.getLog( OAIImageLab.class );
 
-    public static final String KEY = "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";
+    public static final String KEY = "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";
 
     // instance *******************************************
 

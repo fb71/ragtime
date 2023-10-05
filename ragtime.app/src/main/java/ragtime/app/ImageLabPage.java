@@ -54,7 +54,7 @@ public class ImageLabPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Bild ..." );
+        ui.init( parent ).title.set( "Bild bauen ..." );
 
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{
@@ -70,7 +70,7 @@ public class ImageLabPage {
                 events.on( EventType.SELECT, ev -> generateImage() );
             }});
             imageBtn = add( new Button() {{
-                layoutConstraints.set( RowConstraints.height( 400 ) );
+                layoutConstraints.set( RowConstraints.height( 360 ) );
                 bordered.set( false );
                 //label.set( "..." );
             }});
