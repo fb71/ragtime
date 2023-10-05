@@ -58,9 +58,9 @@ public class ImageLabPage {
 
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{
-            layout.set( RowLayout.filled().orientation( VERTICAL ).spacing( 15 ) );
+            layout.set( RowLayout.filled().orientation( VERTICAL ).spacing( 20 ) );
             promptField = add( new TextField() {{
-                layoutConstraints.set( RowConstraints.height( 40 ) );
+                layoutConstraints.set( RowConstraints.height( 38 ) );
                 content.set( "three little cats in the south of spain");
             }});
             add( new Button() {{

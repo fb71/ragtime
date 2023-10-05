@@ -53,7 +53,7 @@ public class SelfAwarenessPage {
 
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{
-            layout.set( RasterLayout.withComponentSize( 150, 50 ).spacing( 15 ) );
+            layout.set( RasterLayout.withComponentSize( 170, 50 ).spacing( 15 ) );
             add( new Button() {{
                 label.set( "Ziele" );
                 events.on( SELECT, ev -> {
