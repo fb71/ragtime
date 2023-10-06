@@ -60,7 +60,9 @@ public class ImageLabPage {
         ui.body.add( new UIComposite() {{
             layout.set( RowLayout.filled().orientation( VERTICAL ).spacing( 20 ) );
             promptField = add( new TextField() {{
-                layoutConstraints.set( RowConstraints.height( 38 ) );
+                layoutConstraints.set( RowConstraints.height( 75 ) );
+                multiline.set( true );
+                tooltip.set( "Beschreiben Sie ein Bild" );
                 content.set( "three little cats in the south of spain");
             }});
             add( new Button() {{

@@ -2,6 +2,7 @@
 $bg1_color: #323334;
 $bg2_color: darken($bg1_color, 6%);
 $bg3_color: darken($bg1_color, 12%);
+$light_bg_color: lighten($bg1_color, 6%);
 
 $font_color: #d0d0d0;
 $link_color: rgb(127, 180, 232);

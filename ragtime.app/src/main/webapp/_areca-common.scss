@@ -139,16 +139,22 @@ pre.Text {
     font-family: inherit;
     font-size: inherit;
     color: inherit;
-    //background-color: $bg2_color;
     background-color: inherit;
-    padding: 0px 7px;
     border-bottom: 1px solid $accent_color;
-    border-radius: 2px;
 }
 .TextField:focus {
     border-bottom: 2px solid $accent_color;
     color: lighten($font_color, 10%);
     outline: none;    
+}
+input.TextField {
+    padding: 0px 7px;
+    border-radius: 2px;
+}
+textarea.TextField {
+    padding: 7px 7px;
+    background-color: $light_bg_color;
+    resize: none;
 }
 
 .ListCell {
