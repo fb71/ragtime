@@ -14,18 +14,16 @@
 package ragtime.app;
 
 import static areca.ui.Orientation.VERTICAL;
-import static areca.ui.component2.Events.EventType.SELECT;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.Size;
-import areca.ui.component2.Button;
+import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
-import areca.ui.layout.RasterLayout;
 import areca.ui.layout.RowLayout;
+import areca.ui.layout.SwitcherLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
 import ragtime.app.RagtimeApp.PendingUnitOfWork;
@@ -41,55 +39,42 @@ public class SelfAwarenessPage {
 
     public static final ClassInfo<SelfAwarenessPage> INFO = SelfAwarenessPageClassInfo.instance();
 
-    @Page.Part
-    protected PageContainer     ui;
-
     @Page.Context
-    protected Page.PageSite     site;
+    protected Page.PageSite     psite;
 
     @Page.Context
     protected PendingUnitOfWork puow;
 
+    @Page.Part
+    protected PageContainer     ui;
 
-    @Page.Init
-    protected void init() {
-        puow.whenAvailable( uow -> {
-            LOG.info( "UnitOfWork: %s ", uow );
-        });
-    }
+    @Page.Part
+    protected EmotionsView      emotionsView;
+
+    private SwitcherLayout      switcher;
 
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Selbstbewusstsein" );
+        ui.init( parent ).title.set( "Bewusst-sein" );
 
-        ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
+        ui.body.layout.set( RowLayout.filled().orientation( VERTICAL )/*.margins( Size.of( 15, 15 ) )*/ );
+
+        // switcher
         ui.body.add( new UIComposite() {{
-            layout.set( RasterLayout.withComponentSize( 170, 50 ).spacing( 15 ) );
-            add( new Button() {{
-                label.set( "Ziele" );
-                events.on( SELECT, ev -> {
-                    site.createPage( new ImageLabPage() ).open();
-                });
-            }});
-            add( new Button() {{
-                label.set( "Bedürfnisse" );
-            }});
-            add( new Button() {{
-                label.set( "Werte" );
-            }});
+            layout.set( switcher = SwitcherLayout.defaults() );
+            //bgColor.set( Color.rgb( 34, 35, 36 ) ); // rotate over dark background
 
-            add( new Button() {{
-                label.set( "Gefühle" );
-            }});
-            add( new Button() {{
-                label.set( "Stärken" );
-            }});
-            add( new Button() {{
-                label.set( "Schwächen" );
+            add( emotionsView.create() );
+            add( new Text() {{
+                content.set( "Bedürfnisse" );
             }});
         }});
         return ui;
     }
 
+
+    public void flip() {
+        switcher.next();
+    }
 }

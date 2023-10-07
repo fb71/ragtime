@@ -29,6 +29,7 @@ import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
+import ragtime.app.model.GeneratedImage;
 
 /**
  *
@@ -46,6 +47,9 @@ public class ImageLabPage {
 
     @Page.Context
     protected ImageLab          imageLab;
+
+    @Page.Context(required = false)
+    protected GeneratedImage    image;
 
     protected Button            imageBtn;
 
