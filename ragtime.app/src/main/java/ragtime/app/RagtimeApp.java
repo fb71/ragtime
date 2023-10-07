@@ -13,13 +13,22 @@
  */
 package ragtime.app;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.teavm.jso.browser.Window;
+
+import org.polymap.model2.runtime.EntityRepository;
+import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.store.tidbstore.IDBStore;
+
 import areca.common.Platform;
 import areca.common.ProgressMonitor;
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
+import areca.common.base.Supplier.RSupplier;
+import areca.common.event.EventManager;
+import areca.common.event.IdleAsyncEventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
@@ -31,6 +40,7 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import ragtime.app.model.GeneratedImage;
 
 /**
  *
@@ -41,7 +51,21 @@ public class RagtimeApp
 
     private static final Log LOG = LogFactory.getLog( RagtimeApp.class );
 
-    public static boolean   debug;
+    public static boolean           debug;
+
+    private static EntityRepository repo;
+
+    private static UnitOfWork       uow;
+
+    /**
+     *
+     */
+    public static class PendingUnitOfWork extends Pending<UnitOfWork> {
+
+        public PendingUnitOfWork( RSupplier<UnitOfWork> supplier ) {
+            super( supplier );
+        }
+    }
 
     /**
      *
@@ -52,11 +76,24 @@ public class RagtimeApp
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( RagtimeApp.class, Level.INFO );
 
+        EventManager.setInstance( new IdleAsyncEventManager() );
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
         Platform.impl = new TeaPlatform();
         UIComponentRenderer.start();
 
         try {
+            // database
+            EntityRepository.newConfiguration()
+                    .entities.set( List.of( GeneratedImage.INFO ) )
+                    .store.set( new IDBStore( "ragtime.app", 1, true ) )
+                    .create()
+                    .onSuccess( result -> {
+                        LOG.info( "Database and model repo initialized." );
+                        repo = result;
+                        uow = repo.newUnitOfWork();
+                    });
+
+            // UI
             new RagtimeApp().createUI( rootWindow -> {
                 String pathName = Window.current().getLocation().getPathName();
                 LOG.info( "URI path: %s", pathName );
@@ -70,6 +107,7 @@ public class RagtimeApp
                 Pageflow.start( pageflowContainer )
                         .create( new SelfAwarenessPage() )
                         .putContext( new OAIImageLab( OAIImageLab.KEY ), Page.Context.DEFAULT_SCOPE )
+                        .putContext( new PendingUnitOfWork( () -> uow ), Page.Context.DEFAULT_SCOPE )
                         .open();
 
                 SimpleBrowserHistoryStrategy.start( Pageflow.current() );

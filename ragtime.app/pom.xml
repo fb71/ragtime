@@ -27,6 +27,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.polymap</groupId>
+            <artifactId>model2</artifactId>
+            <version>3.0.2-areca-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
