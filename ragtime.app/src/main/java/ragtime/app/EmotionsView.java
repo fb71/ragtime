@@ -55,18 +55,20 @@ public class EmotionsView {
 
             add( new UIComposite() {{
                 layoutConstraints.set( RowConstraints.height( 30 ) );
+                layout.set( RowLayout.filled() );
                 add( new Text() {{
-                    content.set( "<b>Gefühle</b>" );
+                    content.set( "<u><b>Gefühle</b></u>" );
                     format.set( Format.HTML );
                 }});
                 add( new Link() {{
                     content.set( "Bedürfnisse" );
                     events.on( EventType.SELECT, ev -> page.flip() );
+                    styles.add( CssStyle.of( "text-align", "right" ) );
                 }});
             }});
 
             add( new UIComposite() {{
-                layout.set( RasterLayout.withComponentSize( 173, 50 ).spacing( 15 ) );
+                layout.set( RasterLayout.withComponentSize( 170, 50 ).spacing( 15 ) );
                 add( new Button() {{
                     label.set( "Ziele" );
                     events.on( EventType.SELECT, ev -> {
