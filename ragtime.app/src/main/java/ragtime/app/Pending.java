@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2023, the @authors. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -13,8 +13,11 @@
  */
 package ragtime.app;
 
-import areca.common.base.Consumer;
+import areca.common.Platform;
+import areca.common.base.Consumer.RConsumer;
 import areca.common.base.Supplier.RSupplier;
+import areca.common.log.LogFactory;
+import areca.common.log.LogFactory.Log;
 
 /**
  *
@@ -22,15 +25,27 @@ import areca.common.base.Supplier.RSupplier;
  */
 public class Pending<T> {
 
+    static final Log LOG = LogFactory.getLog( Pending.class );
+
     private RSupplier<T>        supplier;
 
-    private T                   cached;
+    private volatile T          cached;
 
     public Pending( RSupplier<T> supplier ) {
         this.supplier = supplier;
     }
 
-    public <E extends Exception> void whenAvailable( Consumer<T,E> consumer ) throws E {
-
+    public void whenAvailable( RConsumer<T> consumer ) {
+        if (cached != null) {
+            consumer.accept( cached );
+        }
+        else {
+            LOG.debug( "WAITING: ..." );
+            Platform.schedule( 100, () -> {
+                cached = supplier.get();
+                whenAvailable( consumer );
+            });
+        }
     }
+
 }

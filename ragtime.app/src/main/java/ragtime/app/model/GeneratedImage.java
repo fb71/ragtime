@@ -13,6 +13,8 @@
  */
 package ragtime.app.model;
 
+import java.util.Date;
+
 import org.polymap.model2.Entity;
 import org.polymap.model2.Property;
 
@@ -29,5 +31,10 @@ public class GeneratedImage
 
     public static final ClassInfo<GeneratedImage> INFO = GeneratedImageClassInfo.instance();
 
+    public Property<Date>       created;
+
     public Property<String>     prompt;
+
+    /** Base64 encoded image data */
+    public Property<String>     imageData;
 }

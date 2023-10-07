@@ -28,6 +28,7 @@ import areca.ui.layout.RasterLayout;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
+import ragtime.app.RagtimeApp.PendingUnitOfWork;
 
 /**
  *
@@ -45,6 +46,17 @@ public class SelfAwarenessPage {
 
     @Page.Context
     protected Page.PageSite     site;
+
+    @Page.Context
+    protected PendingUnitOfWork puow;
+
+
+    @Page.Init
+    protected void init() {
+        puow.whenAvailable( uow -> {
+            LOG.info( "UnitOfWork: %s ", uow );
+        });
+    }
 
 
     @Page.CreateUI

@@ -60,7 +60,8 @@ public class RagtimeApp
     /**
      *
      */
-    public static class PendingUnitOfWork extends Pending<UnitOfWork> {
+    public static class PendingUnitOfWork
+            extends Pending<UnitOfWork> {
 
         public PendingUnitOfWork( RSupplier<UnitOfWork> supplier ) {
             super( supplier );
@@ -85,7 +86,7 @@ public class RagtimeApp
             // database
             EntityRepository.newConfiguration()
                     .entities.set( List.of( GeneratedImage.INFO ) )
-                    .store.set( new IDBStore( "ragtime.app", 1, true ) )
+                    .store.set( new IDBStore( "ragtime.app", 3, true ) )
                     .create()
                     .onSuccess( result -> {
                         LOG.info( "Database and model repo initialized." );
