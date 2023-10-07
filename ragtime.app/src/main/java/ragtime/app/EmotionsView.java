@@ -68,7 +68,8 @@ public class EmotionsView {
             }});
 
             add( new UIComposite() {{
-                layout.set( RasterLayout.withComponentSize( 170, 50 ).spacing( 15 ) );
+                layout.set( RasterLayout.withComponentSize( 108, 100 ).spacing( 15 ) );
+                //layout.set( RasterLayout.withColums( 2 ).spacing( 15 ) );
                 add( new Button() {{
                     label.set( "Ziele" );
                     events.on( EventType.SELECT, ev -> {

@@ -19,6 +19,8 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Action;
+import areca.ui.component2.Events.UIEvent;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
@@ -57,7 +59,6 @@ public class SelfAwarenessPage {
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Bewusst-sein" );
-
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL )/*.margins( Size.of( 15, 15 ) )*/ );
 
         // switcher
@@ -69,6 +70,15 @@ public class SelfAwarenessPage {
             add( new Text() {{
                 content.set( "Bedürfnisse" );
             }});
+        }});
+
+        // actions
+        psite.actions.add( new Action() {{
+            icon.set( "question_mark" );
+            description.set( "Hilfe" );
+            handler.set( (UIEvent ev) -> {
+                //pageSite.createPage( new SimplePage() ).origin( ev.clientPos() ).open();
+            });
         }});
         return ui;
     }
