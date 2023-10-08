@@ -51,6 +51,8 @@ public class RagtimeApp
 
     private static final Log LOG = LogFactory.getLog( RagtimeApp.class );
 
+    private static final int DB_VERSION = 4;
+
     public static boolean           debug;
 
     private static EntityRepository repo;
@@ -86,7 +88,7 @@ public class RagtimeApp
             // database
             EntityRepository.newConfiguration()
                     .entities.set( List.of( GeneratedImage.INFO ) )
-                    .store.set( new IDBStore( "ragtime.app", 3, true ) )
+                    .store.set( new IDBStore( "ragtime.app", DB_VERSION, true ) )
                     .create()
                     .onSuccess( result -> {
                         LOG.info( "Database and model repo initialized." );

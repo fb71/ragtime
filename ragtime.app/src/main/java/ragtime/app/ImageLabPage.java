@@ -15,6 +15,9 @@ package ragtime.app;
 
 import static areca.ui.Orientation.VERTICAL;
 
+import org.polymap.model2.runtime.UnitOfWork;
+
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -30,6 +33,7 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
 import ragtime.app.model.GeneratedImage;
+import ragtime.app.model.ModelUpdateEvent;
 
 /**
  *
@@ -48,8 +52,11 @@ public class ImageLabPage {
     @Page.Context
     protected ImageLab          imageLab;
 
+    @Page.Context
+    protected UnitOfWork        uow;
+
     @Page.Context(required = false)
-    protected GeneratedImage    image;
+    protected GeneratedImage    generatedImage;
 
     protected Button            imageBtn;
 
@@ -63,21 +70,29 @@ public class ImageLabPage {
         ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{
             layout.set( RowLayout.filled().orientation( VERTICAL ).spacing( 20 ) );
+            // prompt
             promptField = add( new TextField() {{
                 layoutConstraints.set( RowConstraints.height( 75 ) );
                 multiline.set( true );
                 tooltip.set( "Beschreiben Sie ein Bild" );
-                content.set( "three little cats in the south of spain");
+                content.set( generatedImage != null
+                        ? generatedImage.prompt.get()
+                        : "three little cats in the south of spain");
             }});
+            // btn
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 50 ) );
                 tooltip.set( "Ein neues Bild generieren" );
                 icon.set( "arrow_circle_down" );
                 events.on( EventType.SELECT, ev -> generateImage() );
             }});
+            // image
             imageBtn = add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 360 ) );
                 bordered.set( false );
+                if (generatedImage != null) {
+                    image.set( generatedImage.imageData.get() );
+                }
                 //label.set( "..." );
             }});
         }});
@@ -86,10 +101,25 @@ public class ImageLabPage {
 
 
     protected void generateImage() {
-        imageLab.generateImage( promptField.content.get(), 1 )
+        String prompt = promptField.content.get();
+        imageLab.generateImage( prompt, 1 )
                 .onSuccess( image -> {
                     LOG.info( "Image: %s bytes", image.length() );
                     imageBtn.image.set( image );
+
+                    if (generatedImage == null) {
+                        generatedImage = uow.createEntity( GeneratedImage.class, proto -> {
+                            proto.prompt.set( prompt );
+                            proto.imageData.set( image );
+                        });
+                    }
+                    else {
+                        generatedImage.prompt.set( prompt );
+                        generatedImage.imageData.set( image );
+                    }
+                    uow.submit();
+
+                    EventManager.instance().publish( new ModelUpdateEvent( uow ) );
                 });
     }
 

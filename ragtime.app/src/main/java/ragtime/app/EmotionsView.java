@@ -13,6 +13,7 @@
  */
 package ragtime.app;
 
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -30,6 +31,9 @@ import areca.ui.layout.RasterLayout;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
+import ragtime.app.RagtimeApp.PendingUnitOfWork;
+import ragtime.app.model.GeneratedImage;
+import ragtime.app.model.ModelUpdateEvent;
 
 /**
  *
@@ -44,6 +48,9 @@ public class EmotionsView {
 
     @Page.Context
     protected Page.PageSite     psite;
+
+    @Page.Context
+    protected PendingUnitOfWork puow;
 
     @Page.Part
     protected SelfAwarenessPage page;
@@ -70,30 +77,62 @@ public class EmotionsView {
             add( new UIComposite() {{
                 layout.set( RasterLayout.withComponentSize( 108, 100 ).spacing( 15 ) );
                 //layout.set( RasterLayout.withColums( 2 ).spacing( 15 ) );
+                add( createImageLabBtn( "Beziehung" ) );
                 add( new Button() {{
-                    label.set( "Ziele" );
-                    events.on( EventType.SELECT, ev -> {
-                        psite.createPage( new ImageLabPage() ).open();
-                    });
+                    label.set( "Familie" );
+                    //icon.set( "family_restroom" );
                 }});
                 add( new Button() {{
-                    label.set( "Bedürfnisse" );
-                }});
-                add( new Button() {{
-                    label.set( "Werte" );
+                    label.set( "Kinder" );
                 }});
 
                 add( new Button() {{
-                    label.set( "Gefühle" );
+                    label.set( "Arbeit" );
                 }});
                 add( new Button() {{
-                    label.set( "Stärken" );
+                    label.set( "Freunde" );
                 }});
                 add( new Button() {{
-                    label.set( "Schwächen" );
+                    icon.set( "add" );
+                    tooltip.set( "Eine andere Situation hinzufügen..." );
                 }});
             }});
         }};
     }
 
+    protected Button createImageLabBtn( String label ) {
+        var btn = new Button() {{
+            cssClasses.add( "ImageBtn" );
+            label.set( "..." );
+        }};
+        puow.whenAvailable( uow -> {
+            uow.query( GeneratedImage.class ).executeCollect().onSuccess( rs -> {
+                if (rs.isEmpty()) {
+                    btn.label.set( label );
+                    btn.events.on( EventType.SELECT, ev -> {
+                        psite.createPage( new ImageLabPage() )
+                                .putContext( uow, Page.Context.DEFAULT_SCOPE )
+                                .open();
+                    });
+                }
+                else {
+                    btn.label.set( null );
+                    btn.image.set( rs.get( 0 ).imageData.get() );
+                    btn.events.on( EventType.SELECT, ev -> {
+                        psite.createPage( new ImageLabPage() )
+                                .putContext( uow, Page.Context.DEFAULT_SCOPE )
+                                .putContext( rs.get( 0 ), Page.Context.DEFAULT_SCOPE )
+                                .open();
+                    });
+                }
+            });
+        });
+        EventManager.instance()
+                .subscribe( (ModelUpdateEvent ev) -> {
+                    btn.label.set( "[updated]" );
+                })
+                .performIf( ev -> ev instanceof ModelUpdateEvent )
+                .unsubscribeIf( () -> btn.isDisposed() );
+        return btn;
+    }
 }

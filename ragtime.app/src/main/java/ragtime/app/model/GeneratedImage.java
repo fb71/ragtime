@@ -13,10 +13,11 @@
  */
 package ragtime.app.model;
 
-import java.util.Date;
-
+import org.polymap.model2.CollectionProperty;
+import org.polymap.model2.Defaults;
 import org.polymap.model2.Entity;
 import org.polymap.model2.Property;
+import org.polymap.model2.Queryable;
 
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
@@ -31,9 +32,15 @@ public class GeneratedImage
 
     public static final ClassInfo<GeneratedImage> INFO = GeneratedImageClassInfo.instance();
 
-    public Property<Date>       created;
+//    @Queryable
+//    public Property<Date>       created;
 
+    @Queryable
     public Property<String>     prompt;
+
+    @Queryable
+    @Defaults
+    public CollectionProperty<String> tags;
 
     /** Base64 encoded image data */
     public Property<String>     imageData;
