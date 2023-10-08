@@ -41,6 +41,8 @@ import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import ragtime.app.model.GeneratedImage;
+import ragtime.app.model.GeneratedImageTag;
+import ragtime.app.model.ModelInitializer;
 
 /**
  *
@@ -51,7 +53,7 @@ public class RagtimeApp
 
     private static final Log LOG = LogFactory.getLog( RagtimeApp.class );
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     public static boolean           debug;
 
@@ -87,12 +89,15 @@ public class RagtimeApp
         try {
             // database
             EntityRepository.newConfiguration()
-                    .entities.set( List.of( GeneratedImage.INFO ) )
+                    .entities.set( List.of( GeneratedImage.INFO, GeneratedImageTag.INFO ) )
                     .store.set( new IDBStore( "ragtime.app", DB_VERSION, true ) )
                     .create()
-                    .onSuccess( result -> {
+                    .then( newRepo -> {
+                        RagtimeApp.repo = newRepo;
+                        return new ModelInitializer().initModel( repo );
+                    })
+                    .onSuccess( __ -> {
                         LOG.info( "Database and model repo initialized." );
-                        repo = result;
                         uow = repo.newUnitOfWork();
                     });
 

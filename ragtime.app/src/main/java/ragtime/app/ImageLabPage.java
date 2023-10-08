@@ -17,6 +17,7 @@ import static areca.ui.Orientation.VERTICAL;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.base.Consumer.RConsumer;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -61,6 +62,17 @@ public class ImageLabPage {
     protected Button            imageBtn;
 
     protected TextField         promptField;
+
+    protected RConsumer<GeneratedImage> initializer;
+
+
+    /** For for reflection only */
+    protected ImageLabPage() {}
+
+
+    public ImageLabPage( RConsumer<GeneratedImage> initializer ) {
+        this.initializer = initializer;
+    }
 
 
     @Page.CreateUI
@@ -111,6 +123,7 @@ public class ImageLabPage {
                         generatedImage = uow.createEntity( GeneratedImage.class, proto -> {
                             proto.prompt.set( prompt );
                             proto.imageData.set( image );
+                            initializer.accept( proto );
                         });
                     }
                     else {

@@ -13,6 +13,10 @@
  */
 package ragtime.app;
 
+import org.polymap.model2.query.Expressions;
+import org.polymap.model2.runtime.UnitOfWork;
+
+import areca.common.base.Consumer.RConsumer;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -33,6 +37,8 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import ragtime.app.RagtimeApp.PendingUnitOfWork;
 import ragtime.app.model.GeneratedImage;
+import ragtime.app.model.GeneratedImageTag;
+import ragtime.app.model.GeneratedImageTag.TagType;
 import ragtime.app.model.ModelUpdateEvent;
 
 /**
@@ -77,55 +83,51 @@ public class EmotionsView {
             add( new UIComposite() {{
                 layout.set( RasterLayout.withComponentSize( 108, 100 ).spacing( 15 ) );
                 //layout.set( RasterLayout.withColums( 2 ).spacing( 15 ) );
-                add( createImageLabBtn( "Beziehung" ) );
-                add( new Button() {{
-                    label.set( "Familie" );
-                    //icon.set( "family_restroom" );
-                }});
-                add( new Button() {{
-                    label.set( "Kinder" );
-                }});
 
-                add( new Button() {{
-                    label.set( "Arbeit" );
-                }});
-                add( new Button() {{
-                    label.set( "Freunde" );
-                }});
-                add( new Button() {{
-                    icon.set( "add" );
-                    tooltip.set( "Eine andere Situation hinzufügen..." );
-                }});
+                puow.whenAvailable( uow -> {
+                    uow.query( GeneratedImageTag.class )
+                            .where( Expressions.eq( GeneratedImageTag.TYPE.type, TagType.EMOTIONAL_CONTEXT ) )
+                            .executeCollect()
+                            .onSuccess( rs -> {
+                                for (var tag : rs) {
+                                    add( createImageLabBtn( uow, tag ) );
+                                }
+                                add( new Button() {{
+                                    icon.set( "add" );
+                                    tooltip.set( "Eine andere Situation hinzufügen..." );
+                                }});
+                                parent().layout();
+                            });
+                });
             }});
         }};
     }
 
-    protected Button createImageLabBtn( String label ) {
+    protected Button createImageLabBtn( UnitOfWork uow, GeneratedImageTag tag ) {
         var btn = new Button() {{
             cssClasses.add( "ImageBtn" );
             label.set( "..." );
         }};
-        puow.whenAvailable( uow -> {
-            uow.query( GeneratedImage.class ).executeCollect().onSuccess( rs -> {
-                if (rs.isEmpty()) {
-                    btn.label.set( label );
-                    btn.events.on( EventType.SELECT, ev -> {
-                        psite.createPage( new ImageLabPage() )
-                                .putContext( uow, Page.Context.DEFAULT_SCOPE )
-                                .open();
-                    });
-                }
-                else {
-                    btn.label.set( null );
-                    btn.image.set( rs.get( 0 ).imageData.get() );
-                    btn.events.on( EventType.SELECT, ev -> {
-                        psite.createPage( new ImageLabPage() )
-                                .putContext( uow, Page.Context.DEFAULT_SCOPE )
-                                .putContext( rs.get( 0 ), Page.Context.DEFAULT_SCOPE )
-                                .open();
-                    });
-                }
-            });
+        RConsumer<GeneratedImage> initializer = proto -> tag.images.add( proto );
+        tag.images.fetchCollect().onSuccess( rs -> {
+            if (rs.isEmpty()) {
+                btn.label.set( tag.label.get() );
+                btn.events.on( EventType.SELECT, ev -> {
+                    psite.createPage( new ImageLabPage( initializer ) )
+                            .putContext( uow, Page.Context.DEFAULT_SCOPE )
+                            .open();
+                } );
+            }
+            else {
+                btn.label.set( null );
+                btn.image.set( rs.get( 0 ).imageData.get() );
+                btn.events.on( EventType.SELECT, ev -> {
+                    psite.createPage( new ImageLabPage( initializer ) )
+                            .putContext( uow, Page.Context.DEFAULT_SCOPE )
+                            .putContext( rs.get( 0 ), Page.Context.DEFAULT_SCOPE )
+                            .open();
+                } );
+            }
         });
         EventManager.instance()
                 .subscribe( (ModelUpdateEvent ev) -> {

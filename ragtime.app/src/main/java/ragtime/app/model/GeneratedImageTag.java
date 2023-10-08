@@ -14,6 +14,7 @@
 package ragtime.app.model;
 
 import org.polymap.model2.Entity;
+import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 
@@ -25,14 +26,23 @@ import areca.common.reflect.RuntimeInfo;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class GeneratedImage
+public class GeneratedImageTag
         extends Entity {
 
-    public static final ClassInfo<GeneratedImage> INFO = GeneratedImageClassInfo.instance();
+    public static final ClassInfo<GeneratedImageTag> INFO = GeneratedImageTagClassInfo.instance();
+
+    public static GeneratedImageTag TYPE;
+
+    public enum TagType {
+        EMOTIONAL_CONTEXT
+    }
 
     @Queryable
-    public Property<String>     prompt;
+    public Property<String>     label;
 
-    /** Base64 encoded image data */
-    public Property<String>     imageData;
+    @Queryable
+    public Property<TagType>    type;
+
+    @Queryable
+    public ManyAssociation<GeneratedImage> images;
 }
