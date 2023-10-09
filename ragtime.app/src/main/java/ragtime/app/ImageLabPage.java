@@ -103,7 +103,7 @@ public class ImageLabPage {
                 layoutConstraints.set( RowConstraints.height( 360 ) );
                 bordered.set( false );
                 if (generatedImage != null) {
-                    image.set( generatedImage.imageData.get() );
+                    bgImage.set( generatedImage.imageData.get() );
                 }
                 //label.set( "..." );
             }});
@@ -117,7 +117,7 @@ public class ImageLabPage {
         imageLab.generateImage( prompt, 1 )
                 .onSuccess( image -> {
                     LOG.info( "Image: %s bytes", image.length() );
-                    imageBtn.image.set( image );
+                    imageBtn.bgImage.set( image );
 
                     if (generatedImage == null) {
                         generatedImage = uow.createEntity( GeneratedImage.class, proto -> {

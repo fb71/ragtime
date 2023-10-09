@@ -16,6 +16,7 @@ package ragtime.app;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.Scheduler.Priority;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
@@ -109,7 +110,7 @@ public class EmotionsView {
             label.set( "..." );
         }};
         RConsumer<GeneratedImage> initializer = proto -> tag.images.add( proto );
-        tag.images.fetchCollect().onSuccess( rs -> {
+        tag.images.fetchCollect().priority( Priority.BACKGROUND ).onSuccess( rs -> {
             if (rs.isEmpty()) {
                 btn.label.set( tag.label.get() );
                 btn.events.on( EventType.SELECT, ev -> {
@@ -120,7 +121,7 @@ public class EmotionsView {
             }
             else {
                 btn.label.set( null );
-                btn.image.set( rs.get( 0 ).imageData.get() );
+                btn.bgImage.set( rs.get( 0 ).imageData.get() );
                 btn.events.on( EventType.SELECT, ev -> {
                     psite.createPage( new ImageLabPage( initializer ) )
                             .putContext( uow, Page.Context.DEFAULT_SCOPE )
