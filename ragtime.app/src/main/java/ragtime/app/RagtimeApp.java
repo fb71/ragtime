@@ -40,6 +40,7 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import ragtime.app.ai.OAIImageLab;
 import ragtime.app.model.GeneratedImage;
 import ragtime.app.model.GeneratedImageTag;
 import ragtime.app.model.ModelInitializer;

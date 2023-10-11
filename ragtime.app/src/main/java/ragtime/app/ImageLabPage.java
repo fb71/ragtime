@@ -33,6 +33,7 @@ import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.PageContainer;
+import ragtime.app.ai.ImageLab;
 import ragtime.app.model.GeneratedImage;
 import ragtime.app.model.ModelUpdateEvent;
 
