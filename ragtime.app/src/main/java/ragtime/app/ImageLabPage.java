@@ -130,9 +130,9 @@ public class ImageLabPage {
                         generatedImage.prompt.set( prompt );
                         generatedImage.imageData.set( image );
                     }
-                    uow.submit();
-
-                    EventManager.instance().publish( new ModelUpdateEvent( uow ) );
+                    uow.submit().onSuccess( submitted -> {
+                        EventManager.instance().publish( new ModelUpdateEvent( uow, submitted ) );
+                    });
                 });
     }
 

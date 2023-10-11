@@ -13,11 +13,14 @@
  */
 package ragtime.app;
 
+import java.util.List;
+
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.Scheduler.Priority;
 import areca.common.base.Consumer.RConsumer;
+import areca.common.base.Sequence;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -91,7 +94,7 @@ public class EmotionsView {
                             .executeCollect()
                             .onSuccess( rs -> {
                                 for (var tag : rs) {
-                                    add( createImageLabBtn( uow, tag ) );
+                                    add( new GeneratedImageTagBtn( tag, uow ) );
                                 }
                                 add( new Button() {{
                                     icon.set( "add" );
@@ -104,38 +107,66 @@ public class EmotionsView {
         }};
     }
 
-    protected Button createImageLabBtn( UnitOfWork uow, GeneratedImageTag tag ) {
-        var btn = new Button() {{
+    /**
+     * A Button that represents a {@link GeneratedImageTag}. Opens
+     * {@link ImageLabPage} on select.
+     */
+    public class GeneratedImageTagBtn
+            extends Button {
+
+        private GeneratedImageTag tag;
+
+        private UnitOfWork uow;
+
+        /** Lastly fetched images from {@link #tag} */
+        private List<GeneratedImage> tagImages;
+
+        public GeneratedImageTagBtn( GeneratedImageTag tag, UnitOfWork uow ) {
+            this.tag = tag;
+            this.uow = uow;
+
             cssClasses.add( "ImageBtn" );
             label.set( "..." );
-        }};
-        RConsumer<GeneratedImage> initializer = proto -> tag.images.add( proto );
-        tag.images.fetchCollect().priority( Priority.BACKGROUND ).onSuccess( rs -> {
-            if (rs.isEmpty()) {
-                btn.label.set( tag.label.get() );
-                btn.events.on( EventType.SELECT, ev -> {
-                    psite.createPage( new ImageLabPage( initializer ) )
-                            .putContext( uow, Page.Context.DEFAULT_SCOPE )
-                            .open();
-                } );
+
+            update();
+
+            // listen to DB updates
+            EventManager.instance()
+                    .subscribe( (ModelUpdateEvent ev) -> update() )
+                    .performIf( ModelUpdateEvent.class, ev ->
+                            ev.isUpdated( tag ) || Sequence.of( tagImages ).anyMatches( img -> ev.isUpdated( img ) ) )
+                    .unsubscribeIf( () -> isDisposed() );
+        }
+
+        protected void update() {
+            tag.images.fetchCollect().priority( Priority.BACKGROUND ).onSuccess( rs -> {
+                tagImages = rs;
+                // no images yet
+                if (rs.isEmpty()) {
+                    label.set( tag.label.get() );
+                    // FIXME clear() probably does not actually removes the underlaying handler; so
+                    // after an update multiple handlers are triggered
+                    events.clear().on( EventType.SELECT, ev -> onSelect( null ) );
+                }
+                // image(s) present
+                else {
+                    var entity = rs.get( 0 );
+                    label.set( tag.label.get() );
+                    bgImage.set( entity.imageData.get() );
+                    events.clear().on( EventType.SELECT, ev -> onSelect( entity ) );
+                }
+            });
+        }
+
+        protected void onSelect( GeneratedImage entity) {
+            RConsumer<GeneratedImage> initializer = proto -> tag.images.add( proto );
+            var newPage = psite.createPage( new ImageLabPage( initializer ) )
+                    .putContext( uow, Page.Context.DEFAULT_SCOPE );
+            if (entity != null) {
+                newPage.putContext( entity, Page.Context.DEFAULT_SCOPE );
             }
-            else {
-                btn.label.set( null );
-                btn.bgImage.set( rs.get( 0 ).imageData.get() );
-                btn.events.on( EventType.SELECT, ev -> {
-                    psite.createPage( new ImageLabPage( initializer ) )
-                            .putContext( uow, Page.Context.DEFAULT_SCOPE )
-                            .putContext( rs.get( 0 ), Page.Context.DEFAULT_SCOPE )
-                            .open();
-                } );
-            }
-        });
-        EventManager.instance()
-                .subscribe( (ModelUpdateEvent ev) -> {
-                    btn.label.set( "[updated]" );
-                })
-                .performIf( ev -> ev instanceof ModelUpdateEvent )
-                .unsubscribeIf( () -> btn.isDisposed() );
-        return btn;
+            newPage.open();
+        }
     }
+
 }

@@ -15,7 +15,9 @@ package ragtime.app.model;
 
 import java.util.EventObject;
 
+import org.polymap.model2.Entity;
 import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -30,12 +32,19 @@ public class ModelUpdateEvent
 
     private static final Log LOG = LogFactory.getLog( ModelUpdateEvent.class );
 
-    public ModelUpdateEvent( UnitOfWork source ) {
+    public Submitted submitted;
+
+    public ModelUpdateEvent( UnitOfWork source, Submitted submitted ) {
         super( source );
+        this.submitted = submitted;
     }
 
     @Override
     public UnitOfWork getSource() {
         return (UnitOfWork)super.getSource();
+    }
+
+    public boolean isUpdated( Entity entity ) {
+        return submitted.modifiedIds.contains( entity.id() ) || submitted.removedIds.contains( entity.id() );
     }
 }
