@@ -56,6 +56,8 @@ public class EmotionsView {
 
     public static final ClassInfo<EmotionsView> INFO = EmotionsViewClassInfo.instance();
 
+    public static final String FONT_SIZE_HEAD = "16px";
+
     @Page.Context
     protected Page.PageSite     psite;
 
@@ -71,10 +73,11 @@ public class EmotionsView {
             layout.set( RowLayout.filled().orientation( Orientation.VERTICAL ).margins( Size.of( 15, 15 ) ) );
 
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 30 ) );
+                layoutConstraints.set( RowConstraints.height( 35 ) );
                 layout.set( RowLayout.filled() );
+                styles.add( CssStyle.of( "font-size", FONT_SIZE_HEAD ) );
                 add( new Text() {{
-                    content.set( "<u><b>Gefühle</b></u>" );
+                    content.set( "<u>Gefühle</u>" );
                     format.set( Format.HTML );
                 }});
                 add( new Link() {{

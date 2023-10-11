@@ -58,12 +58,13 @@ public class NeedsView {
             add( new UIComposite() {{
                 layoutConstraints.set( RowConstraints.height( 30 ) );
                 layout.set( RowLayout.filled() );
+                styles.add( CssStyle.of( "font-size", EmotionsView.FONT_SIZE_HEAD ) );
                 add( new Link() {{
                     content.set( "Gefühle" );
                     events.on( EventType.SELECT, ev -> page.flip() );
                 }});
                 add( new Text() {{
-                    content.set( "<u><b>Bedürfnisse</b></u>" );
+                    content.set( "<u>Bedürfnisse</u>" );
                     format.set( Format.HTML );
                     styles.add( CssStyle.of( "text-align", "right" ) );
                 }});

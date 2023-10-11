@@ -74,7 +74,7 @@ public class SelfAwarenessPage {
 
         // actions
         psite.actions.add( new Action() {{
-            icon.set( "question_mark" );
+            icon.set( "help" );
             description.set( "Hilfe" );
             handler.set( (UIEvent ev) -> {
                 //pageSite.createPage( new SimplePage() ).origin( ev.clientPos() ).open();
