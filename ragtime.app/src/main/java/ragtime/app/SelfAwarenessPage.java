@@ -21,7 +21,6 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.component2.Events.UIEvent;
-import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowLayout;
@@ -53,6 +52,9 @@ public class SelfAwarenessPage {
     @Page.Part
     protected EmotionsView      emotionsView;
 
+    @Page.Part
+    protected NeedsView         needsView;
+
     private SwitcherLayout      switcher;
 
 
@@ -67,9 +69,7 @@ public class SelfAwarenessPage {
             //bgColor.set( Color.rgb( 34, 35, 36 ) ); // rotate over dark background
 
             add( emotionsView.create() );
-            add( new Text() {{
-                content.set( "Bedürfnisse" );
-            }});
+            add( needsView.create() );
         }});
 
         // actions
