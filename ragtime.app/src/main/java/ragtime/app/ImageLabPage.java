@@ -80,9 +80,9 @@ public class ImageLabPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Imaginieren ..." );
 
-        ui.body.layout.set( RowLayout.filled().orientation( VERTICAL ).margins( Size.of( 15, 15 ) ) );
+        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 15, 15 ) ) );
         ui.body.add( new UIComposite() {{
-            layout.set( RowLayout.filled().orientation( VERTICAL ).spacing( 20 ) );
+            layout.set( RowLayout.filled().vertical().spacing( 20 ) );
             // prompt
             promptField = add( new TextField() {{
                 layoutConstraints.set( RowConstraints.height( 75 ) );

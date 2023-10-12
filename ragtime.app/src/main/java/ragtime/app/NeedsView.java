@@ -17,7 +17,6 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.Orientation;
 import areca.ui.Size;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
@@ -53,8 +52,9 @@ public class NeedsView {
 
     public UIComponent create() {
         return new ScrollableComposite() {{
-            layout.set( RowLayout.filled().orientation( Orientation.VERTICAL ).margins( Size.of( 15, 15 ) ) );
+            layout.set( RowLayout.filled().vertical().margins( Size.of( 15, 15 ) ) );
 
+            // head / switch
             add( new UIComposite() {{
                 layoutConstraints.set( RowConstraints.height( 30 ) );
                 layout.set( RowLayout.filled() );
@@ -68,6 +68,12 @@ public class NeedsView {
                     format.set( Format.HTML );
                     styles.add( CssStyle.of( "text-align", "right" ) );
                 }});
+            }});
+
+            //
+            add( new UIComposite() {{
+                layout.set( RowLayout.filled().vertical() );
+
             }});
         }};
     }

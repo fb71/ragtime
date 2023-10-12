@@ -61,7 +61,7 @@ public class SelfAwarenessPage {
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Bewusst-sein" );
-        ui.body.layout.set( RowLayout.filled().orientation( VERTICAL )/*.margins( Size.of( 15, 15 ) )*/ );
+        ui.body.layout.set( RowLayout.filled().vertical()/*.margins( Size.of( 15, 15 ) )*/ );
 
         // switcher
         ui.body.add( new UIComposite() {{
