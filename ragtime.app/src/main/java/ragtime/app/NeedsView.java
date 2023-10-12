@@ -57,7 +57,7 @@ public class NeedsView {
 
             // head / switch
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 30 ) );
+                layoutConstraints.set( RowConstraints.height( 40 ) );
                 layout.set( RowLayout.filled() );
                 styles.add( CssStyle.of( "font-size", EmotionsView.FONT_SIZE_HEAD ) );
                 add( new Link() {{
