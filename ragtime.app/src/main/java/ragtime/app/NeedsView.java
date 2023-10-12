@@ -18,6 +18,7 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Size;
+import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
@@ -72,10 +73,34 @@ public class NeedsView {
 
             //
             add( new UIComposite() {{
-                layout.set( RowLayout.filled().vertical() );
+                layout.set( RowLayout.filled().vertical().spacing( 15 ) );
 
+                add( new NeedsButton( "Selbstverwirklichung", "Persönlichkeit entwickeln, Fähigkeiten und Potentiale nutzen" ) {{
+                }});
+                add( new NeedsButton( "Anerkennung", "..." ) {{
+                }});
+                add( new NeedsButton( "Gemeinschaft",
+                        "Familie, Freundschaft, Zugehörigkeit, Kommunikation, sozialer Austausch, gegenseitige Unterstützung" ) {{
+                }});
+                add( new NeedsButton( "Sicherheit", "Schutz, Stabilität, Ordnung" ) {{
+                }});
+                add( new NeedsButton( "Existenz", "Nahrung, Schlaf, Wohnung" ) {{
+                }});
             }});
         }};
+    }
+
+    /**
+     *
+     */
+    protected class NeedsButton
+            extends Button {
+
+        public NeedsButton( String l1, String l2 ) {
+            format.set( Format.HTML );
+            label.set( String.format( "<span style=\"font-weight:bold; font-size:%s; line-height:2em;\">%s</span><br/>%s",
+                    EmotionsView.FONT_SIZE_HEAD, l1, l2 ) );
+        }
     }
 
 }
