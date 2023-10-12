@@ -97,6 +97,7 @@ public class NeedsView {
             extends Button {
 
         public NeedsButton( String l1, String l2 ) {
+            cssClasses.add( "ImageBtn" );
             format.set( Format.HTML );
             label.set( String.format( "<span style=\"font-weight:bold; font-size:%s; line-height:2em;\">%s</span><br/>%s",
                     EmotionsView.FONT_SIZE_HEAD, l1, l2 ) );
