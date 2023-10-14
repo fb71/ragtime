@@ -56,6 +56,9 @@ public class RagtimeApp
 
     private static final int DB_VERSION = 5;
 
+    /** Default space in the UI */
+    public static final int SPACE = 15;
+
     public static boolean           debug;
 
     private static EntityRepository repo;

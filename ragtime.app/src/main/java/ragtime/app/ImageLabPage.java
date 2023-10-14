@@ -13,7 +13,7 @@
  */
 package ragtime.app;
 
-import static areca.ui.Orientation.VERTICAL;
+import static ragtime.app.RagtimeApp.SPACE;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
@@ -80,24 +80,30 @@ public class ImageLabPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Imaginieren ..." );
 
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 15, 15 ) ) );
+        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( SPACE, SPACE ) ) );
         ui.body.add( new UIComposite() {{
-            layout.set( RowLayout.filled().vertical().spacing( 20 ) );
-            // prompt
-            promptField = add( new TextField() {{
-                layoutConstraints.set( RowConstraints.height( 75 ) );
-                multiline.set( true );
-                tooltip.set( "Beschreiben Sie ein Bild" );
-                content.set( generatedImage != null
-                        ? generatedImage.prompt.get()
-                        : "three little cats in the south of spain");
-            }});
-            // btn
-            add( new Button() {{
-                layoutConstraints.set( RowConstraints.height( 50 ) );
-                tooltip.set( "Ein neues Bild generieren" );
-                icon.set( "arrow_circle_down" );
-                events.on( EventType.SELECT, ev -> generateImage() );
+            layout.set( RowLayout.filled().vertical().spacing( SPACE ) );
+
+            add( new UIComposite() {{
+                layoutConstraints.set( RowConstraints.height( 80 ) );
+                layout.set( RowLayout.filled().spacing( 10 ) );
+
+                // prompt
+                promptField = add( new TextField() {{
+                    layoutConstraints.set( RowConstraints.height( 75 ) );
+                    multiline.set( true );
+                    tooltip.set( "Beschreiben Sie ein Bild" );
+                    content.set( generatedImage != null
+                            ? generatedImage.prompt.get()
+                            : "three little cats in the south of spain");
+                }});
+                // btn
+                add( new Button() {{
+                    layoutConstraints.set( RowConstraints.width( 50 ) );
+                    tooltip.set( "Ein neues Bild generieren" );
+                    icon.set( "arrow_circle_down" );
+                    events.on( EventType.SELECT, ev -> generateImage() );
+                }});
             }});
             // image
             imageBtn = add( new Button() {{

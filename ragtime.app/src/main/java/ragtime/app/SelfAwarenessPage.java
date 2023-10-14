@@ -13,8 +13,6 @@
  */
 package ragtime.app;
 
-import static areca.ui.Orientation.VERTICAL;
-
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -74,7 +72,7 @@ public class SelfAwarenessPage {
 
         // actions
         psite.actions.add( new Action() {{
-            icon.set( "help" );
+            icon.set( "emoji_objects" );
             description.set( "Hilfe" );
             handler.set( (UIEvent ev) -> {
                 //pageSite.createPage( new SimplePage() ).origin( ev.clientPos() ).open();
