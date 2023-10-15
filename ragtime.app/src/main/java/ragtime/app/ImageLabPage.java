@@ -84,11 +84,12 @@ public class ImageLabPage {
         ui.body.add( new UIComposite() {{
             layout.set( RowLayout.filled().vertical().spacing( SPACE ) );
 
+            // prompt
             add( new UIComposite() {{
                 layoutConstraints.set( RowConstraints.height( 80 ) );
                 layout.set( RowLayout.filled().spacing( 10 ) );
 
-                // prompt
+                // text
                 promptField = add( new TextField() {{
                     layoutConstraints.set( RowConstraints.height( 75 ) );
                     multiline.set( true );
@@ -105,6 +106,7 @@ public class ImageLabPage {
                     events.on( EventType.SELECT, ev -> generateImage() );
                 }});
             }});
+
             // image
             imageBtn = add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 360 ) );
@@ -114,6 +116,9 @@ public class ImageLabPage {
                 }
                 //label.set( "..." );
             }});
+
+            // button cloud
+            add( new ImageAnnotationsCloud() );
         }});
         return ui;
     }
