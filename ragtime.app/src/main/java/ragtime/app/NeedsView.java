@@ -75,16 +75,18 @@ public class NeedsView {
             add( new UIComposite() {{
                 layout.set( RowLayout.filled().vertical().spacing( 15 ) );
 
-                add( new NeedsButton( "Selbstverwirklichung", "Persönlichkeit entwickeln, Fähigkeiten und Potentiale nutzen" ) {{
+                add( new NeedsBtn( "Selbstverwirklichung", "Persönlichkeit entwickeln, Fähigkeiten und Potentiale nutzen" ) {{
+                    cssClasses.add( "NeedsBtnGood" );
                 }});
-                add( new NeedsButton( "Anerkennung", "..." ) {{
+                add( new NeedsBtn( "Anerkennung", "..." ) {{
                 }});
-                add( new NeedsButton( "Gemeinschaft",
+                add( new NeedsBtn( "Gemeinschaft",
                         "Familie, Freundschaft, Zugehörigkeit, Kommunikation, sozialer Austausch, gegenseitige Unterstützung" ) {{
+                    cssClasses.add( "NeedsBtnBad" );
                 }});
-                add( new NeedsButton( "Sicherheit", "Schutz, Stabilität, Ordnung" ) {{
+                add( new NeedsBtn( "Sicherheit", "Schutz, Stabilität, Ordnung" ) {{
                 }});
-                add( new NeedsButton( "Existenz", "Nahrung, Schlaf, Wohnung" ) {{
+                add( new NeedsBtn( "Existenz", "Nahrung, Schlaf, Wohnung" ) {{
                 }});
             }});
         }};
@@ -93,10 +95,10 @@ public class NeedsView {
     /**
      *
      */
-    protected class NeedsButton
+    protected class NeedsBtn
             extends Button {
 
-        public NeedsButton( String l1, String l2 ) {
+        public NeedsBtn( String l1, String l2 ) {
             cssClasses.add( "ImageBtn" );
             format.set( Format.HTML );
             label.set( String.format( "<span style=\"font-weight:bold; font-size:%s; line-height:2em;\">%s</span><br/>%s",
