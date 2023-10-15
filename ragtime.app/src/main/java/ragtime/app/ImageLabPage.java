@@ -26,6 +26,7 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
@@ -81,7 +82,7 @@ public class ImageLabPage {
         ui.init( parent ).title.set( "Imaginieren ..." );
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( SPACE, SPACE ) ) );
-        ui.body.add( new UIComposite() {{
+        ui.body.add( new ScrollableComposite() {{
             layout.set( RowLayout.filled().vertical().spacing( SPACE ) );
 
             // prompt
@@ -114,7 +115,6 @@ public class ImageLabPage {
                 if (generatedImage != null) {
                     bgImage.set( generatedImage.imageData.get() );
                 }
-                //label.set( "..." );
             }});
 
             // button cloud
