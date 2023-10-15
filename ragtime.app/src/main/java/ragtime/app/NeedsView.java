@@ -79,13 +79,13 @@ public class NeedsView {
                 layout.set( RowLayout.filled().vertical().spacing( 15 ) );
 
                 add( new NeedsBtn( "Selbstverwirklichung", "+Persönlichkeit entwickeln", "Fähigkeiten und Potentiale nutzen" ) {{
-                    cssClasses.add( "NeedsBtnGood" );
+                    //cssClasses.add( "NeedsBtnGood" );
                 }});
                 add( new NeedsBtn( "Anerkennung", "..." ) {{
                 }});
                 add( new NeedsBtn( "Gemeinschaft",
                         "Familie", "Freundschaft", "-Zugehörigkeit", "-Kommunikation", "sozialer Austausch", "gegenseitige Unterstützung" ) {{
-                    cssClasses.add( "NeedsBtnBad" );
+                    //cssClasses.add( "NeedsBtnBad" );
                 }});
                 add( new NeedsBtn( "Sicherheit", "Schutz", "Stabilität", "Ordnung" ) {{
                 }});
