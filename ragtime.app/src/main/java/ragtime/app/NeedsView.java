@@ -13,6 +13,9 @@
  */
 package ragtime.app;
 
+import static java.lang.String.format;
+import static ragtime.app.EmotionsView.FONT_SIZE_HEAD;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -75,18 +78,18 @@ public class NeedsView {
             add( new UIComposite() {{
                 layout.set( RowLayout.filled().vertical().spacing( 15 ) );
 
-                add( new NeedsBtn( "Selbstverwirklichung", "Persönlichkeit entwickeln, Fähigkeiten und Potentiale nutzen" ) {{
+                add( new NeedsBtn( "Selbstverwirklichung", "+Persönlichkeit entwickeln", "Fähigkeiten und Potentiale nutzen" ) {{
                     cssClasses.add( "NeedsBtnGood" );
                 }});
                 add( new NeedsBtn( "Anerkennung", "..." ) {{
                 }});
                 add( new NeedsBtn( "Gemeinschaft",
-                        "Familie, Freundschaft, Zugehörigkeit, Kommunikation, sozialer Austausch, gegenseitige Unterstützung" ) {{
+                        "Familie", "Freundschaft", "-Zugehörigkeit", "-Kommunikation", "sozialer Austausch", "gegenseitige Unterstützung" ) {{
                     cssClasses.add( "NeedsBtnBad" );
                 }});
-                add( new NeedsBtn( "Sicherheit", "Schutz, Stabilität, Ordnung" ) {{
+                add( new NeedsBtn( "Sicherheit", "Schutz", "Stabilität", "Ordnung" ) {{
                 }});
-                add( new NeedsBtn( "Existenz", "Nahrung, Schlaf, Wohnung" ) {{
+                add( new NeedsBtn( "Existenz", "Nahrung", "Schlaf", "Wohnung" ) {{
                 }});
             }});
         }};
@@ -98,11 +101,25 @@ public class NeedsView {
     protected class NeedsBtn
             extends Button {
 
-        public NeedsBtn( String l1, String l2 ) {
+        public NeedsBtn( String l1, String... l2 ) {
             cssClasses.add( "ImageBtn" );
             format.set( Format.HTML );
-            label.set( String.format( "<span style=\"font-weight:bold; font-size:%s; line-height:2em;\">%s</span><br/>%s",
-                    EmotionsView.FONT_SIZE_HEAD, l1, l2 ) );
+
+            var sb = new StringBuilder( 1024 ).append(
+                    format( "<span style=\"font-weight:bold; font-size:%s; line-height:2em;\">%s</span><br/>", FONT_SIZE_HEAD, l1 ) );
+
+            for (int i = 0; i < l2.length; i++) {
+                var color = "#919191";
+                if (l2[i].startsWith( "-" )) {
+                    color = "#d34242";
+                }
+                if (l2[i].startsWith( "+" )) {
+                    color = "#38a331";
+                }
+                sb.append( format( "<span style=\"color:%s;\">%s</span>", color, l2[i] ) );
+                sb.append( i < l2.length-1 ? ", " : "" );
+            }
+            label.set( sb.toString() );
         }
     }
 
