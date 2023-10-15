@@ -38,9 +38,21 @@ public class ImageAnnotationsCloud
 
         add( new AnnotationBtn( "Emotion", "ausgeglichen, leicht") {{
         }});
-        add( new AnnotationBtn( "Zeit", "") {{
-        }});
         add( new AnnotationBtn( "Umfeld", "Urlaub") {{
+        }});
+        add( new AnnotationBtn( "Zeit", "...") {{
+        }});
+        add( new AnnotationBtn( "Ort", "...") {{
+        }});
+        add( new AnnotationBtn( "Nochwas", "") {{
+        }});
+        add( new AnnotationBtn( "???", "") {{
+        }});
+        add( new AnnotationBtn( "??? - ???", "") {{
+        }});
+        add( new AnnotationBtn( "???", "") {{
+        }});
+        add( new AnnotationBtn( "??? - ???", "") {{
         }});
     }
 
@@ -59,7 +71,7 @@ public class ImageAnnotationsCloud
             label.set( String.format( "<span style=\"font-weight:bold;\">%s</span><br/>", l1 ) +
                     String.format( "<span style=color:#e7763f;\">%s</span>", l2 ) );
 
-            if (l2.length() <= 3) {
+            if (l2.length() == 3) {
                 new Tag( this ).icons.add( "help" );
             }
         }
