@@ -48,19 +48,35 @@ public class ModelInitializer {
                 uow.createEntity( GeneratedImageTag.class, proto -> {
                     proto.type.set( TagType.EMOTIONAL_CONTEXT );
                     proto.label.set( "Beziehung" );
-                } );
+                });
                 uow.createEntity( GeneratedImageTag.class, proto -> {
                     proto.type.set( TagType.EMOTIONAL_CONTEXT );
                     proto.label.set( "Familie" );
-                } );
+                });
                 uow.createEntity( GeneratedImageTag.class, proto -> {
                     proto.type.set( TagType.EMOTIONAL_CONTEXT );
                     proto.label.set( "Kinder" );
-                } );
+                });
+                uow.createEntity( GeneratedImageTag.class, proto -> {
+                    proto.type.set( TagType.EMOTIONAL_CONTEXT );
+                    proto.label.set( "Verwandschaft" );
+                });
                 uow.createEntity( GeneratedImageTag.class, proto -> {
                     proto.type.set( TagType.EMOTIONAL_CONTEXT );
                     proto.label.set( "Arbeit" );
-                } );
+                });
+                uow.createEntity( GeneratedImageTag.class, proto -> {
+                    proto.type.set( TagType.EMOTIONAL_CONTEXT );
+                    proto.label.set( "Sport/Verein" );
+                });
+                uow.createEntity( GeneratedImageTag.class, proto -> {
+                    proto.type.set( TagType.EMOTIONAL_CONTEXT );
+                    proto.label.set( "Einsamkeit" );
+                });
+                uow.createEntity( GeneratedImageTag.class, proto -> {
+                    proto.type.set( TagType.EMOTIONAL_CONTEXT );
+                    proto.label.set( "Leere" );
+                });
                 LOG.info( "Default entities created." );
             }
             return uow;

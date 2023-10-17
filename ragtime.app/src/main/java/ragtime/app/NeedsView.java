@@ -78,13 +78,13 @@ public class NeedsView {
             add( new UIComposite() {{
                 layout.set( RowLayout.filled().vertical().spacing( 15 ) );
 
-                add( new NeedsBtn( "Selbstverwirklichung", "+Persönlichkeit entwickeln", "Fähigkeiten und Potentiale nutzen" ) {{
+                add( new NeedsBtn( "Selbstverwirklichung", "Persönlichkeit", "+Fähigkeiten", "Potentiale nutzen" ) {{
                     //cssClasses.add( "NeedsBtnGood" );
                 }});
-                add( new NeedsBtn( "Anerkennung", "..." ) {{
+                add( new NeedsBtn( "Anerkennung", "Gesehen werden, Würdigung, Bla-Bla" ) {{
                 }});
                 add( new NeedsBtn( "Gemeinschaft",
-                        "Familie", "Freundschaft", "-Zugehörigkeit", "-Kommunikation", "sozialer Austausch", "gegenseitige Unterstützung" ) {{
+                        "Familie", "Freundschaft", "-Zugehörigkeit", "+Kommunikation", "sozialer Austausch", "gegenseitige Unterstützung" ) {{
                     //cssClasses.add( "NeedsBtnBad" );
                 }});
                 add( new NeedsBtn( "Sicherheit", "Schutz", "Stabilität", "Ordnung" ) {{
@@ -111,10 +111,10 @@ public class NeedsView {
             for (int i = 0; i < l2.length; i++) {
                 var color = "#919191";
                 if (l2[i].startsWith( "-" )) {
-                    color = "#d34242";
+                    color = "#51a386"; //"#d34242";
                 }
                 if (l2[i].startsWith( "+" )) {
-                    color = "#38a331";
+                    color = "#e7763f"; //"#38a331";
                 }
                 sb.append( format( "<span style=\"color:%s;\">%s</span>", color, l2[i] ) );
                 sb.append( i < l2.length-1 ? ", " : "" );

@@ -54,7 +54,7 @@ public class RagtimeApp
 
     private static final Log LOG = LogFactory.getLog( RagtimeApp.class );
 
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 7;
 
     /** Default space in the UI */
     public static final int SPACE = 15;
