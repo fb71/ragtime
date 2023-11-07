@@ -42,16 +42,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttpForwardServlet2 extends HttpServlet {
 
-    //private SSLContext      sslContext;
-
     @Override
     public void init() throws ServletException {
         log( "" + getClass().getSimpleName() + " init..." );
-//        sslContext = SSLUtils.trustAllSSLContext();
-//        HttpsURLConnection.setDefaultSSLSocketFactory( sslContext.getSocketFactory() );
-//        HttpsURLConnection.setDefaultHostnameVerifier( SSLUtils.DO_NOT_VERIFY );
-
-        // Arrays.stream( Security.getProviders() ).forEach( p -> debug( "Provider: " + p.getInfo() ) );
     }
 
     int c = 0; // ich bin müde :)
