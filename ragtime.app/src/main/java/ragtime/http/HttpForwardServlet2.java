@@ -17,15 +17,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Objects;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
@@ -82,10 +79,9 @@ public class HttpForwardServlet2 extends HttpServlet {
             });
 
             // method -> send
-            setRequestMethod( conn, req.getMethod() );
+            conn.setRequestMethod( req.getMethod() );
             if (Arrays.asList("POST", "REPORT", "PUT").contains( req.getMethod() )) {
                 conn.setDoOutput( true );
-                setRequestMethod( conn, req.getMethod() );
                 copyAndClose( req.getInputStream(), conn.getOutputStream() );
             }
 
@@ -136,41 +132,6 @@ public class HttpForwardServlet2 extends HttpServlet {
                 out.write( buf, 0, c );
             }
             out.flush();
-        }
-    }
-
-
-    protected void setRequestMethod( HttpURLConnection conn, String method ) {
-        try {
-
-            if (conn.getClass().getName().equals( "sun.net.www.protocol.https.HttpsURLConnectionImpl" )) {
-                Field f = conn.getClass().getDeclaredField( "delegate" );
-                f.setAccessible( true );
-                conn = (HttpURLConnection)f.get( conn );
-            }
-            Field f = HttpURLConnection.class.getDeclaredField( "method" );
-            f.setAccessible( true );
-            f.set( conn, method );
-
-            assert Objects.equals( method, f.get( conn ) ); //, "reflection" );
-            assert Objects.equals( method, conn.getRequestMethod() ); //, "getRequestMethod()" );
-
-//            final Class<?> connClass = conn.getClass();
-//            final Class<?> parentClass = connClass.getSuperclass();
-//            final Field field;
-//            // If the implementation class is an HTTPS URL Connection, we
-//            // need to go up one level higher in the heirarchy to modify the
-//            // 'method' field.
-//            if (parentClass == HttpsURLConnection.class) {
-//                field = parentClass.getSuperclass().getDeclaredField( "method" );
-//            } else {
-//                field = parentClass.getDeclaredField( "method" );
-//            }
-//            field.setAccessible( true );
-//            field.set( conn, method);
-        }
-        catch (final Exception e) {
-            throw new RuntimeException( e );
         }
     }
 
