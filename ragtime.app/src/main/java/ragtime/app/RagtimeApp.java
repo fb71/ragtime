@@ -27,15 +27,11 @@ import areca.common.ProgressMonitor;
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.base.Supplier.RSupplier;
-import areca.common.event.EventManager;
-import areca.common.event.IdleAsyncEventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
 import areca.rt.teavm.SimpleBrowserHistoryStrategy;
 import areca.rt.teavm.TeaApp;
-import areca.rt.teavm.TeaPlatform;
-import areca.rt.teavm.ui.UIComponentRenderer;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Page;
@@ -85,12 +81,12 @@ public class RagtimeApp
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( RagtimeApp.class, Level.INFO );
 
-        EventManager.setInstance( new IdleAsyncEventManager() );
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
-        Platform.impl = new TeaPlatform();
-        UIComponentRenderer.start();
 
         try {
+            // init
+            var app = new RagtimeApp();
+
             // database
             EntityRepository.newConfiguration()
                     .entities.set( List.of( GeneratedImage.INFO, GeneratedImageTag.INFO ) )
@@ -106,7 +102,7 @@ public class RagtimeApp
                     });
 
             // UI
-            new RagtimeApp().createUI( rootWindow -> {
+            app.createUI( rootWindow -> {
                 String pathName = Window.current().getLocation().getPathName();
                 LOG.info( "URI path: %s", pathName );
 
