@@ -77,7 +77,7 @@ public class RagtimeApp
      */
     public static void main( String[] args ) throws Exception {
         debug = Window.current().getLocation().getSearch().contains( "debug" );
-        LOG.info( "Debug: %s", debug );
+        LOG.info( "Debug: %s ", debug );
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( RagtimeApp.class, Level.INFO );
 
