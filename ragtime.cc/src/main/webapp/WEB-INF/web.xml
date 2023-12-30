@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+      metadata-complete="true"
+      version="3.1">
+      
+      <!-- UI server -->
+      <servlet>
+        <servlet-name>ArecaUIServer</servlet-name>
+        <servlet-class>areca.rt.server.servlet.ArecaUIServer</servlet-class>
+        <init-param>
+          <param-name>areca.appclass</param-name>
+          <param-value>ragtime.cc.CCApp</param-value>
+        </init-param>
+      </servlet>
+
+      <!-- Resources -->
+      <servlet>
+        <servlet-name>Resources</servlet-name>
+        <servlet-class>areca.rt.server.servlet.ResourceServlet</servlet-class>
+      </servlet>
+
+      <servlet-mapping>
+         <servlet-name>ArecaUIServer</servlet-name>
+        <url-pattern>/ui/*</url-pattern>
+      </servlet-mapping>      
+
+      <servlet-mapping>
+         <servlet-name>Resources</servlet-name>
+        <url-pattern>/res/*</url-pattern>
+      </servlet-mapping>      
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+  
+</web-app>

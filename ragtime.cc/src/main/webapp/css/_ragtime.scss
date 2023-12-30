@@ -1,0 +1,13 @@
+.ImageBtn {
+    background-color: $light_bg_color;
+    padding: 5px;
+}
+.NeedsBtnBad {
+    border: 1px solid #d34242;
+}
+.NeedsBtnGood {
+    border: 1px solid #38a331;
+}
+.AnnotationBtn:after {
+    color: #e7763f;
+}
