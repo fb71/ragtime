@@ -61,8 +61,6 @@ public class CCApp
 
 
     public static void init() throws Exception {
-        ServerApp.init();
-
         LOG.info( "Debug: %s", debug );
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( CCApp.class, Level.INFO );
