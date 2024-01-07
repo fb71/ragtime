@@ -15,7 +15,6 @@ package ragtime.cc;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
-
 import java.io.File;
 
 import org.polymap.model2.runtime.EntityRepository;
@@ -27,6 +26,7 @@ import areca.common.Platform;
 import areca.common.ProgressMonitor;
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
+import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
@@ -53,7 +53,7 @@ public class CCApp
 
     private static boolean debug = true;
 
-    private volatile boolean init;
+    private static RLazy<Boolean> repoInitialized = new RLazy<>();
 
     public static EntityRepository repo;
 
@@ -81,8 +81,7 @@ public class CCApp
     // instance *******************************************
 
     public CCApp() {
-        if (!init) {
-            init = true;
+        repoInitialized.supply( () -> {
             var dir = new File( "/tmp/ragtime.cc" );
             dir.mkdir();
             EntityRepository.newConfiguration()
@@ -99,8 +98,8 @@ public class CCApp
                     .waitForResult( __ -> {
                         LOG.info( "Repo: initialized." );
                     });
-
-        }
+            return true;
+        });
     }
 
 
@@ -142,11 +141,11 @@ public class CCApp
                             proto.content.set( "Hier steht der Text..." );
                         });
                     }
-                    LOG.info( "Repo: Test Article created" );
+                    LOG.debug( "Repo: Test Article created" );
                     return uow2.submit();
                 })
                 .onSuccess( submitted -> {
-                    LOG.info( "Repo: submitted." );
+                    LOG.debug( "Repo: submitted." );
                 });
     }
 
