@@ -13,7 +13,15 @@
  */
 package ragtime.cc;
 
+import java.util.Arrays;
 import java.util.concurrent.Callable;
+
+import java.io.File;
+
+import org.polymap.model2.runtime.EntityRepository;
+import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
+import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Platform;
 import areca.common.ProgressMonitor;
@@ -25,7 +33,9 @@ import areca.common.log.LogFactory.Log;
 import areca.rt.server.ServerApp;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
+import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import ragtime.cc.model.Article;
 
 /**
  *
@@ -43,9 +53,13 @@ public class CCApp
 
     private static boolean debug = true;
 
-    /**
-     *
-     */
+    private volatile boolean init;
+
+    public static EntityRepository repo;
+
+    public static UnitOfWork uow;
+
+
     public static void init() throws Exception {
         ServerApp.init();
 
@@ -54,6 +68,39 @@ public class CCApp
         LogFactory.setClassLevel( CCApp.class, Level.INFO );
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
+    }
+
+
+    public static void dispose() {
+        LOG.warn( "DISPOSE " );
+        if (repo != null) {
+            repo.close();
+        }
+    }
+
+    // instance *******************************************
+
+    public CCApp() {
+        if (!init) {
+            init = true;
+            var dir = new File( "/tmp/ragtime.cc" );
+            dir.mkdir();
+            EntityRepository.newConfiguration()
+                    .entities.set( Arrays.asList( Article.info ) )
+                    .store.set( new No2Store( new File( dir, "main.db" ) ) )
+                    .create()
+                    .then( newRepo -> {
+                        LOG.debug( "Repo: created." );
+                        repo = newRepo;
+                        uow = newRepo.newUnitOfWork(); // .setPriority( priority );
+
+                        return populateRepo();
+                    })
+                    .waitForResult( __ -> {
+                        LOG.info( "Repo: initialized." );
+                    });
+
+        }
     }
 
 
@@ -70,6 +117,7 @@ public class CCApp
 
                 Pageflow.start( pageflowContainer )
                         .create( new FrontPage() )
+                        .putContext( uow, Page.Context.DEFAULT_SCOPE )
                         .open();
 
                 //SimpleBrowserHistoryStrategy.start( Pageflow.current() );
@@ -81,6 +129,25 @@ public class CCApp
             LOG.info( "Root cause: %s : %s", rootCause, rootCause.getMessage() );
             rootCause.printStackTrace();
         }
+    }
+
+
+    protected Promise<Submitted> populateRepo() {
+        var uow2 = repo.newUnitOfWork();
+        return uow2.query( Article.class ).executeCollect()
+                .then( rs -> {
+                    if (rs.size() == 0) {
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "test" );
+                            proto.content.set( "Hier steht der Text..." );
+                        });
+                    }
+                    LOG.info( "Repo: Test Article created" );
+                    return uow2.submit();
+                })
+                .onSuccess( submitted -> {
+                    LOG.info( "Repo: submitted." );
+                });
     }
 
 

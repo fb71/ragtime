@@ -28,6 +28,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.polymap</groupId>
+            <artifactId>model2</artifactId>
+            <version>3.0.2-areca-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -106,7 +111,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>9.4.53.v20231009</version>
                 <configuration>
-                    <scanIntervalSeconds>1</scanIntervalSeconds>
+                    <scanIntervalSeconds>5</scanIntervalSeconds>
                     <!--webAppSourceDirectory>${project.build.directory}/${project.build.finalName}</webAppSourceDirectory-->
                     <webApp>
                         <contextPath>/ragtime.cc</contextPath>
