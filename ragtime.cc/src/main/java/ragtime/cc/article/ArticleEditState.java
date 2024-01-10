@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2024, the @authors. All rights reserved.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3.0 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ */
+package ragtime.cc.article;
+
+import org.polymap.model2.runtime.UnitOfWork;
+
+import areca.common.log.LogFactory;
+import areca.common.log.LogFactory.Log;
+import areca.common.reflect.ClassInfo;
+import areca.common.reflect.RuntimeInfo;
+import areca.ui.pageflow.Page;
+import areca.ui.pageflow.Pageflow;
+import areca.ui.statenaction.State;
+import areca.ui.statenaction.StateAction;
+import ragtime.cc.model.Article;
+
+/**
+ *
+ * @author Falko Bräutigam
+ */
+@RuntimeInfo
+public class ArticleEditState {
+
+    private static final Log LOG = LogFactory.getLog( ArticleEditState.class );
+
+    public static final ClassInfo<ArticleEditState> INFO = ArticleEditStateClassInfo.instance();
+
+    @State.Context
+    protected Pageflow      pageflow;
+
+    protected ArticlePage   page;
+
+    @State.Context
+    protected UnitOfWork    uow;
+
+    @State.Context
+    public Article          article;
+
+    public boolean          edited;
+
+    public boolean          valid;
+
+
+    @State.Init
+    public void initAction() {
+        pageflow.create( page = new ArticlePage() )
+                .putContext( this, Page.Context.DEFAULT_SCOPE )
+                .open();
+    };
+
+
+    @State.Dispose
+    public boolean closeAction() {
+        uow.discard();
+        pageflow.close( page );
+        return true;
+    }
+
+
+    @State.Action
+    public StateAction<Void> submitAction = new StateAction<>() {
+        @Override
+        public boolean canRun() {
+            return edited && valid;
+        }
+        @Override
+        public void run( Void arg ) {
+            uow.submit().onSuccess( __ -> closeAction() );
+        }
+    };
+
+}

@@ -31,7 +31,6 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import ragtime.cc.article.ArticlesPage;
 
 /**
  *
@@ -49,6 +48,10 @@ public class FrontPage {
 
     @Page.Context
     protected PageSite          site;
+
+    @Page.Context
+    protected StartState        state;
+
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
@@ -92,7 +95,7 @@ public class FrontPage {
             icon.set( "feed" );
             description.set( "Artikel" );
             handler.set( ev -> {
-                site.createPage( new ArticlesPage() )/*.origin( ev.clientPos() )*/.open();
+                state.listArticles();
             });
         }});
         return ui;

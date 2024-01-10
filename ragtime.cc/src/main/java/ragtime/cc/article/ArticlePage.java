@@ -13,12 +13,11 @@
  */
 package ragtime.cc.article;
 
-import org.polymap.model2.runtime.UnitOfWork;
-
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.ScrollableComposite;
@@ -30,7 +29,6 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import ragtime.cc.model.Article;
 
 /**
  *
@@ -50,15 +48,23 @@ public class ArticlePage {
     protected PageSite          site;
 
     @Page.Context
-    protected UnitOfWork        uow;
+    protected ArticleEditState  state;
 
-    @Page.Context
-    protected Article           article;
+    protected Action            submitBtn;
 
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( article.title.get() );
+        ui.init( parent ).title.set( state.article.title.get() );
+
+        // header
+        site.actions.add( submitBtn = new Action() {{
+            //icon.set( "done" );
+            description.set( "Speichern" );
+            handler.set( ev -> {
+                state.submitAction.run();
+            });
+        }});
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
@@ -66,13 +72,29 @@ public class ArticlePage {
 
             add( new TextField() {{
                 multiline.set( true );
-                content.set( article.content.get() );
+                content.set( state.article.content.get() );
                 events.on( EventType.TEXT, ev -> {
                     LOG.info( "TEXT: %s", content.get() );
+                    state.article.content.set( content.get() );
+
+                    state.edited = true;
+                    state.valid = true;
+                    updateEnabled();
                 });
             }});
         }});
         return ui;
     }
 
+
+    protected void updateEnabled() {
+        LOG.info( "updateEnabled(): %s", state.submitAction.canRun() );
+        submitBtn.icon.set( state.submitAction.canRun() ? "done" : "cancel" );
+    }
+
+
+    @Page.Close
+    public boolean close() {
+        return state.closeAction();
+    }
 }
