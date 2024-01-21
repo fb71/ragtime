@@ -13,16 +13,21 @@
  */
 package ragtime.cc.article;
 
+import static org.polymap.model2.query.Expressions.matches;
+
+import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
 import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.Assert;
-import areca.common.base.Consumer.RConsumer;
-import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.modeladapter.LazyModelValues;
+import areca.ui.modeladapter.ModelValue;
+import areca.ui.modeladapter.Pojo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
@@ -52,9 +57,36 @@ public class ArticlesState {
 
     protected ArticlesPage  page;
 
-    public String           searchTxt;
+    /**
+     * Model: searchTxt
+     */
+    @State.Model
+    public ModelValue<String>   searchTxt = new Pojo<>( "" );
 
-    public Article          selected;
+    @State.Model
+    public ModelValue<Article>  selected = new Pojo<>();
+
+    /**
+     * Model: articles
+     */
+    @State.Model
+    public LazyModelValues<Article> articles = new QueriedModelValues<>() {
+        {
+            fireIfChanged( searchTxt );
+        }
+        @Override
+        protected Query<Article> query() {
+            var searchTxtMatch = Expressions.TRUE;
+            if (searchTxt.get().length() > 0) {
+                searchTxtMatch = Expressions.or(
+                        matches( Article.TYPE.title, searchTxt.get() + "*" ),
+                        matches( Article.TYPE.content, searchTxt.get() + "*" ) );
+            }
+            return uow.query( Article.class )
+                    .where( searchTxtMatch )
+                    .orderBy( Article.TYPE.modified, Order.DESC );
+        }
+    };
 
 
     @State.Init
@@ -68,6 +100,7 @@ public class ArticlesState {
     @State.Dispose
     public void disposeAction() {
         pageflow.close( page );
+        site.dispose();
     };
 
 
@@ -81,21 +114,16 @@ public class ArticlesState {
     public StateAction<Void> editArticleAction = new StateAction<>() {
         @Override
         public boolean canRun() {
-            return selected != null;
+            return selected.$() != null;
         }
         @Override
         public void run( Void arg ) {
             Assert.that( canRun(), "StateAction: !canRun() " );
             site.createState( new ArticleEditState() )
-                    .putContext( Assert.notNull( selected ), State.Context.DEFAULT_SCOPE )
+                    .putContext( Assert.notNull( selected.$() ), State.Context.DEFAULT_SCOPE )
+                    .onChange( ev -> LOG.info( "STATE CHANGE: %s", ev ) )
                     .activate();
         }
     };
 
-
-    public void articles( RConsumer<Opt<Article>> consumer ) {
-        uow.query( Article.class )
-                .orderBy( Article.TYPE.modified, Order.DESC )
-                .execute().onSuccess( opt -> consumer.accept( opt ) );
-    }
 }

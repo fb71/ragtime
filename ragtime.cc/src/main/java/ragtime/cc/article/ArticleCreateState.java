@@ -31,6 +31,6 @@ public class ArticleCreateState
 
     @State.Init
     public void init() {
-        article = uow.createEntity( Article.class );
+        article.set( uow.createEntity( Article.class ) );
     }
 }

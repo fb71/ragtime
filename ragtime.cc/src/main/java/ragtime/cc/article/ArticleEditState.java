@@ -19,10 +19,12 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.modeladapter.ModelValue;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateAction;
+import areca.ui.statenaction.StateSite;
 import ragtime.cc.model.Article;
 
 /**
@@ -37,6 +39,9 @@ public class ArticleEditState {
     public static final ClassInfo<ArticleEditState> INFO = ArticleEditStateClassInfo.instance();
 
     @State.Context
+    protected StateSite     site;
+
+    @State.Context
     protected Pageflow      pageflow;
 
     protected ArticlePage   page;
@@ -45,7 +50,8 @@ public class ArticleEditState {
     protected UnitOfWork    uow;
 
     @State.Context
-    public Article          article;
+    @State.Model
+    public ModelValue<Article> article = new EntityModelValue<>();
 
     public boolean          edited;
 
@@ -61,9 +67,12 @@ public class ArticleEditState {
 
 
     @State.Dispose
-    public boolean closeAction() {
+    public boolean disposeAction() {
+        if (!page.site.isClosed()) {
+            pageflow.close( page );
+        }
         uow.discard();
-        pageflow.close( page );
+        site.dispose();
         return true;
     }
 
@@ -76,7 +85,7 @@ public class ArticleEditState {
         }
         @Override
         public void run( Void arg ) {
-            uow.submit().onSuccess( __ -> closeAction() );
+            uow.submit().onSuccess( __ -> disposeAction() );
         }
     };
 

@@ -21,9 +21,9 @@ import areca.ui.Size;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
+import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
-import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
@@ -47,24 +47,48 @@ public class ArticlesPage {
     @Page.Context
     protected ArticlesState     state;
 
+    private ScrollableComposite list;
+
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Artikel" );
 
-        ui.body.layout.set( FillLayout.defaults() );
-        ui.body.add( new ScrollableComposite() {{
-            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
-            state.articles( opt -> {
-                opt.ifPresent( article -> {
-                    add( new ArticleListItem( article ) );
-                } );
-                opt.ifAbsent( __ -> {
-                    layout();
-                });
+        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
+
+        // search
+        ui.body.add( new TextField() {{
+            layoutConstraints.set( RowConstraints.height( 35 ) );
+            content.set( state.searchTxt.get() );
+            events.on( EventType.TEXT, ev -> {
+                state.searchTxt.set( content.get() );
             });
         }});
+
+        // list
+        ui.body.add( new ScrollableComposite() {{
+            list = this;
+            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 5 ) );
+            add( new Text() {{
+               content.set( "..." );
+            }});
+            state.articles.onChange( ev -> refreshArticlesList() );
+            refreshArticlesList();
+        }});
         return ui;
+    }
+
+
+    protected void refreshArticlesList() {
+        list.components.disposeAll();
+        state.articles.load( 0, 100 ).onSuccess( opt -> {
+            opt.ifPresent( article -> {
+                list.add( new ArticleListItem( article ) );
+            } );
+            opt.ifAbsent( __ -> {
+                list.layout();
+            });
+        });
     }
 
 
@@ -85,7 +109,7 @@ public class ArticlesPage {
                 content.set( article.content.get() );
             }});
             events.on( EventType.SELECT, ev -> {
-                state.selected = article;
+                state.selected.set( article );
                 state.editArticleAction.run();
             });
         }

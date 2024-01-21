@@ -54,8 +54,8 @@ public class ArticlePage {
 
 
     @Page.CreateUI
-    public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( state.article.title.get() );
+    public UIComponent createUI( UIComposite parent ) {
+        ui.init( parent ).title.set( state.article.$().title.get() );
 
         // header
         site.actions.add( submitBtn = new Action() {{
@@ -72,10 +72,10 @@ public class ArticlePage {
 
             add( new TextField() {{
                 multiline.set( true );
-                content.set( state.article.content.get() );
+                content.set( state.article.$().content.get() );
                 events.on( EventType.TEXT, ev -> {
                     LOG.info( "TEXT: %s", content.get() );
-                    state.article.content.set( content.get() );
+                    state.article.$().content.set( content.get() );
 
                     state.edited = true;
                     state.valid = true;
@@ -94,7 +94,8 @@ public class ArticlePage {
 
 
     @Page.Close
-    public boolean close() {
-        return state.closeAction();
+    public boolean onClose() {
+        LOG.info( "onClose()" );
+        return state.disposeAction();
     }
 }
