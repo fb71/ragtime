@@ -13,6 +13,8 @@
  */
 package ragtime.cc.model;
 
+import static ragtime.cc.model.Format.FormatType.MARKDOWN;
+
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import areca.common.log.LogFactory;
@@ -37,6 +39,7 @@ public class Article
     @Queryable
     public Property<String> title;
 
+    @Format(MARKDOWN)
     public Property<String> content;
 
 }

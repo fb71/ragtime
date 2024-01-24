@@ -13,17 +13,7 @@
  */
 package ragtime.cc;
 
-import java.util.Arrays;
-
-import java.io.File;
-
-import org.polymap.model2.runtime.EntityRepository;
 import org.polymap.model2.runtime.UnitOfWork;
-import org.polymap.model2.runtime.UnitOfWork.Submitted;
-import org.polymap.model2.store.no2.No2Store;
-
-import areca.common.Promise;
-import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -33,7 +23,6 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.article.ArticlesState;
-import ragtime.cc.model.Article;
 
 /**
  * The start {@link State} of the application.
@@ -47,10 +36,6 @@ public class StartState {
 
     public static final ClassInfo<StartState> INFO = StartStateClassInfo.instance();
 
-    private static RLazy<Boolean> repoInitialized = new RLazy<>();
-
-    protected static EntityRepository repo;
-
     protected UnitOfWork    uow;
 
     @State.Context
@@ -62,7 +47,7 @@ public class StartState {
 
     @State.Init
     public void init() {
-        initRepo();
+        var repo = Repositories.mainRepo();
         uow = repo.newUnitOfWork(); // .setPriority( priority );
 
         pageflow.create( new FrontPage() )
@@ -76,47 +61,6 @@ public class StartState {
         site.createState( new ArticlesState() )
                 .putContext( uow, State.Context.DEFAULT_SCOPE )
                 .activate();
-    }
-
-
-    protected void initRepo() {
-        repoInitialized.supply( () -> {
-            var dir = new File( "/tmp/ragtime.cc" );
-            dir.mkdir();
-            EntityRepository.newConfiguration()
-                    .entities.set( Arrays.asList( Article.info ) )
-                    .store.set( new No2Store( new File( dir, "main.db" ) ) )
-                    .create()
-                    .then( newRepo -> {
-                        LOG.debug( "Repo: created." );
-                        repo = newRepo;
-
-                        return populateRepo();
-                    })
-                    .waitForResult( __ -> {
-                        LOG.info( "Repo: initialized." );
-                    });
-            return true;
-        });
-    }
-
-
-    protected Promise<Submitted> populateRepo() {
-        var uow2 = repo.newUnitOfWork();
-        return uow2.query( Article.class ).executeCollect()
-                .then( rs -> {
-                    if (rs.size() == 0) {
-                        uow2.createEntity( Article.class, proto -> {
-                            proto.title.set( "Erster Artikel" );
-                            proto.content.set( "Hier steht der Text..." );
-                        });
-                    }
-                    LOG.debug( "Repo: Test Article created" );
-                    return uow2.submit();
-                })
-                .onSuccess( submitted -> {
-                    LOG.debug( "Repo: submitted." );
-                });
     }
 
 }

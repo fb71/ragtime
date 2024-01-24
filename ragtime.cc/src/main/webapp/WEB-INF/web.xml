@@ -9,22 +9,34 @@
       <servlet>
         <servlet-name>ArecaUIServer</servlet-name>
         <servlet-class>areca.rt.server.servlet.ArecaUIServer</servlet-class>
+        <load-on-startup>1</load-on-startup>
         <init-param>
           <param-name>areca.appclass</param-name>
           <param-value>ragtime.cc.CCApp</param-value>
         </init-param>
       </servlet>
 
-      <!-- Resources -->
-      <servlet>
-        <servlet-name>Resources</servlet-name>
-        <servlet-class>areca.rt.server.servlet.ResourceServlet</servlet-class>
-      </servlet>
-
       <servlet-mapping>
          <servlet-name>ArecaUIServer</servlet-name>
         <url-pattern>/ui/*</url-pattern>
       </servlet-mapping>      
+
+      <!-- Template Servlet -->
+      <servlet>
+        <servlet-name>TemplateServlet</servlet-name>
+        <servlet-class>ragtime.cc.website.template.TemplateServlet</servlet-class>
+      </servlet>
+
+      <servlet-mapping>
+         <servlet-name>TemplateServlet</servlet-name>
+        <url-pattern>/template/*</url-pattern>
+      </servlet-mapping>      
+
+      <!-- ResourceServlet -->
+      <servlet>
+        <servlet-name>Resources</servlet-name>
+        <servlet-class>areca.rt.server.servlet.ResourceServlet</servlet-class>
+      </servlet>
 
       <servlet-mapping>
          <servlet-name>Resources</servlet-name>

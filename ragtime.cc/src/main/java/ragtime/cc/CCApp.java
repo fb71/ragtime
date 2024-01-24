@@ -60,9 +60,7 @@ public class CCApp
 
     public static void dispose() {
         LOG.warn( "DISPOSE " );
-        if (StartState.repo != null) {
-            StartState.repo.close();
-        }
+        Repositories.dispose();
     }
 
     // instance *******************************************
