@@ -14,6 +14,7 @@
 package ragtime.cc;
 
 import java.util.concurrent.Callable;
+
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Platform;
@@ -40,11 +41,7 @@ public class CCApp
 
     private static final int DB_VERSION = 7;
 
-    /** Default space in the UI */
-    public static final int SPACE = 15;
-
     private static boolean debug = true;
-
 
 
     public static void init() throws Exception {
@@ -83,6 +80,7 @@ public class CCApp
 
                 State.start( new StartState() )
                         .putContext( pageflow, State.Context.DEFAULT_SCOPE )
+                        .putContext( new UICommon(), State.Context.DEFAULT_SCOPE )
                         //.putContext( new CCAppStatePageMapping( pageflow ), State.Context.DEFAULT_SCOPE )
                         .activate();
 

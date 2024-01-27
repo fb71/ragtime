@@ -90,12 +90,20 @@ public class FrontPage {
             });
         }});
 
-        // actions
+        // action: settings
+        site.actions.add( new Action() {{
+            icon.set( "settings" );
+            description.set( "Einstellungen" );
+            handler.set( ev -> {
+                state.openSettingsAction();
+            });
+        }});
+        // action: articles
         site.actions.add( new Action() {{
             icon.set( "feed" );
             description.set( "Artikel" );
             handler.set( ev -> {
-                state.listArticles();
+                state.openArticlesAction();
             });
         }});
         return ui;

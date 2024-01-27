@@ -24,7 +24,8 @@ import areca.common.base.Supplier.RSupplier;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.ui.modeladapter.LazyModelValues;
+import areca.ui.viewer.model.LazyListModel;
+import areca.ui.viewer.model.ModelBaseImpl;
 import ragtime.cc.model.EntityLifecycleEvent;
 
 /**
@@ -32,7 +33,8 @@ import ragtime.cc.model.EntityLifecycleEvent;
  * @author Falko Bräutigam
  */
 public class QueriedModelValues<V extends Entity>
-        extends LazyModelValues<V> {
+        extends ModelBaseImpl
+        implements LazyListModel<V> {
 
     private static final Log LOG = LogFactory.getLog( QueriedModelValues.class );
 
@@ -42,17 +44,26 @@ public class QueriedModelValues<V extends Entity>
      * Override {@link #query()}!
      */
     public QueriedModelValues() {
-        EventManager.instance()
-                .subscribe( ev -> fireChangeEvent() )
-                .performIf( EntityLifecycleEvent.class, ev ->
-                        ev.state == State.AFTER_SUBMIT ) // XXX check type or every entity
-                .unsubscribeIf( () -> isDisposed() );
     }
 
+
     public QueriedModelValues( RSupplier<Query<V>> supplier ) {
-        this();
         this.supplier = Assert.notNull( supplier );
     }
+
+
+    /**
+     * Causes this to {@link #fireChangeEvent()} if {@link Entity}s changed.
+     */
+    public QueriedModelValues<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
+        EventManager.instance()
+                .subscribe( ev -> fireChangeEvent() )
+                // XXX check type on every entity
+                .performIf( EntityLifecycleEvent.class, ev -> ev.state == State.AFTER_SUBMIT )
+                .unsubscribeIf( unsubscribeIf );
+        return this;
+    }
+
 
     protected Query<V> query() {
         return Assert.notNull( supplier, "Override #query() or provide a Supplier in the ctor!" ).supply();

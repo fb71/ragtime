@@ -1,11 +1,11 @@
 <#--
-The main page layout. 
+  The main page layout. 
 -->
 <#macro layout title>
 <html>
 <head>
     <title>${title}</title>
-    <meta charset="utf-8">
+    <meta charset="iso-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
@@ -15,8 +15,8 @@ The main page layout.
     <header class="py-3 bg-light border-bottom">
         <div class="container">
             <div class="text-center my-5">
-                <h1 class="fw-bolder">Praxis für Psychotherapie</h1>
-                <p class="lead mb-0">Dipl.-Psych. Friederike Gienke</p>
+                <h1 class="fw-bolder">${config.page.title}</h1>
+                <p class="lead mb-0">${config.page.title2}</p>
             </div>
         </div>
     </header>
@@ -28,7 +28,7 @@ The main page layout.
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <#list config.nav_items as item>
+                    <#list config.navItems as item>
                         <li class="nav-item"><a class="nav-link" href="${item.href}">${item.title}</a></li>
                     </#list>
 
@@ -49,7 +49,7 @@ The main page layout.
     <footer class="py-2 bg-light">
         <div class="container">
             <p class="m-0 text-center small">
-            Copyright &copy; Praxis für Psychotherapie&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a href="">Wizard & Falko</a>
+            ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a href="">Wizard & Crew</a>
             </p>
         </div>
     </footer>    

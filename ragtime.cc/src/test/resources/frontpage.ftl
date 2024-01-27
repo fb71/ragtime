@@ -5,11 +5,11 @@
 
 <@page.layout title="Frontpage">
    <h2>Frontpage</h2>
-   
    <ul>
     <#list articles as article>
       <li>
-         [${article_index + 1}] <a href="article?id=${article.id}">${article.title}</a>
+         <#-- [${article_index + 1}] --> 
+         <a href="article?id=${article.id}">${article.title}</a>
       <br/>
       ${article.content}
       </li>

@@ -13,10 +13,13 @@
  */
 package ragtime.cc.website.template;
 
+import java.util.Iterator;
+
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
+import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Composite;
 import org.polymap.model2.Entity;
 import org.polymap.model2.Property;
@@ -24,9 +27,11 @@ import org.polymap.model2.Property;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.SimpleScalar;
+import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateModelIterator;
 import ragtime.cc.model.Format;
 import ragtime.cc.model.Format.FormatType;
 
@@ -53,6 +58,7 @@ public class CompositeTemplateModel
         this.composite = composite;
     }
 
+
     @Override
     public TemplateModel get( String key ) throws TemplateModelException {
         // "id"
@@ -62,7 +68,7 @@ public class CompositeTemplateModel
         var prop = composite.info().getProperty( key );
         // single
         if (prop.getMaxOccurs() == 1) {
-            Property<?> p = (Property<?>)prop.get( composite );
+            var p = (Property<?>)prop.get( composite );
             // String
             if (String.class.isAssignableFrom( prop.getType() )) {
                 var a = prop.getAnnotation( Format.class );
@@ -83,8 +89,33 @@ public class CompositeTemplateModel
                 return new CompositeTemplateModel( (Composite)p.get() );
             }
         }
+        // list
+        else {
+            var p = (CollectionProperty<?>)prop.get( composite );
+            // Composite
+            if (Composite.class.isAssignableFrom( prop.getType() )) {
+                return new TemplateCollectionModel() {
+                    @Override
+                    public TemplateModelIterator iterator() throws TemplateModelException {
+                        return new TemplateModelIterator() {
+                            Iterator it = p.iterator();
+                            @Override
+                            public TemplateModel next() throws TemplateModelException {
+                                return new CompositeTemplateModel( (Composite)it.next() );
+                            }
+                            @Override
+                            public boolean hasNext() throws TemplateModelException {
+                                return it.hasNext();
+                            }
+                        };
+                    }
+                };
+            }
+        }
         throw new RuntimeException( "Not yet: " + prop);
     }
+
+
 
     @Override
     public boolean isEmpty() throws TemplateModelException {

@@ -27,6 +27,8 @@ import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.model.Article;
+import ragtime.cc.website.model.TemplateConfigEntity;
+import ragtime.cc.website.model.WebsiteConfigEntity;
 
 /**
  *
@@ -61,7 +63,7 @@ public class Repositories {
         var dir = new File( "/tmp/ragtime.cc" );
         dir.mkdir();
         return EntityRepository.newConfiguration()
-                .entities.set( Arrays.asList( Article.info ) )
+                .entities.set( Arrays.asList( Article.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
                 .store.set( new No2Store( new File( dir, "main.db" ) ) )
                 .create()
                 .then( newRepo -> {
@@ -74,12 +76,32 @@ public class Repositories {
 
     protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
         var uow2 = repo.newUnitOfWork();
-        return uow2.query( Article.class ).executeCollect()
+        return uow2.query( Article.class )
+                .executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Erster Artikel" );
-                            proto.content.set( "Hier steht der Text..." );
+                            proto.content.set( "Hier steht der Text. Mit **Markdown**!" );
+                        });
+                        uow2.createEntity( TemplateConfigEntity.class, proto -> {
+                            proto.page.createValue( page -> {
+                                page.title.set( "Praxis für Psychotherapie" );
+                                page.title2.set( "Dipl.-Psych. Friederike Gienke" );
+                                page.footer.set( "&copy; Praxis für Psychotherapie" );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Home" );
+                                navItem.href.set( "frontpage" );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Kontakt" );
+                                navItem.href.set( "kontakt" );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Impressum" );
+                                navItem.href.set( "impressum" );
+                            });
                         });
                     }
                     LOG.debug( "Repo: Test Article created" );

@@ -13,8 +13,6 @@
  */
 package ragtime.cc.article;
 
-import static org.polymap.model2.query.Expressions.matches;
-
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
@@ -25,14 +23,14 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.modeladapter.LazyModelValues;
-import areca.ui.modeladapter.ModelValue;
-import areca.ui.modeladapter.Pojo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
+import areca.ui.viewer.model.LazyListModel;
+import areca.ui.viewer.model.Model;
+import areca.ui.viewer.model.Pojo;
 import ragtime.cc.model.Article;
 
 /**
@@ -61,26 +59,29 @@ public class ArticlesState {
      * Model: searchTxt
      */
     @State.Model
-    public ModelValue<String>   searchTxt = new Pojo<>( "" );
+    public Model<String>    searchTxt = new Pojo<>( "" );
 
     @State.Model
-    public ModelValue<Article>  selected = new Pojo<>();
+    public Model<Article>   selected = new Pojo<>();
 
     /**
      * Model: articles
      */
     @State.Model
-    public LazyModelValues<Article> articles = new QueriedModelValues<>() {
+    public LazyListModel<Article> articles = new QueriedModelValues<>() {
         {
-            fireIfChanged( searchTxt );
+            // re-fire events from searchTxt
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            // fire event on Entity change
+            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
         }
         @Override
         protected Query<Article> query() {
             var searchTxtMatch = Expressions.TRUE;
             if (searchTxt.get().length() > 0) {
                 searchTxtMatch = Expressions.or(
-                        matches( Article.TYPE.title, searchTxt.get() + "*" ),
-                        matches( Article.TYPE.content, searchTxt.get() + "*" ) );
+                        Expressions.matches( Article.TYPE.title, searchTxt.get() + "*" ),
+                        Expressions.matches( Article.TYPE.content, searchTxt.get() + "*" ) );
             }
             return uow.query( Article.class )
                     .where( searchTxtMatch )

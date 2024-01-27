@@ -16,29 +16,40 @@ package ragtime.cc.article;
 import org.polymap.model2.Entity;
 import org.polymap.model2.runtime.Lifecycle.State;
 
+import areca.common.base.Supplier.RSupplier;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.ui.modeladapter.ModelValue;
+import areca.ui.viewer.model.Model;
+import areca.ui.viewer.model.ModelBaseImpl;
 import ragtime.cc.model.EntityLifecycleEvent;
 
 /**
+ * A {@link ModelValue} that carries an {@link Entity}. It {@link #fireChangeEvent()}
+ * if the Entity was submitted/modified.
  *
  * @author Falko Bräutigam
  */
 public class EntityModelValue<V extends Entity>
-        extends ModelValue<V> {
+        extends ModelBaseImpl
+        implements Model<V> {
 
     private static final Log LOG = LogFactory.getLog( EntityModelValue.class );
 
     private V entity;
 
     public EntityModelValue() {
+    }
+
+    /**
+     * Causes this {@link Model} to {@link #fireChangeEvent()} if the {@link Entity} changed.
+     */
+    public EntityModelValue<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
         EventManager.instance()
                 .subscribe( ev -> fireChangeEvent() )
-                .performIf( EntityLifecycleEvent.class, ev ->
-                        ev.state == State.AFTER_SUBMIT && ev.belongsTo( entity ) )
-                .unsubscribeIf( () -> isDisposed() );
+                .performIf( EntityLifecycleEvent.class, ev -> ev.state == State.AFTER_SUBMIT && ev.belongsTo( entity ) )
+                .unsubscribeIf( unsubscribeIf );
+        return this;
     }
 
     @Override

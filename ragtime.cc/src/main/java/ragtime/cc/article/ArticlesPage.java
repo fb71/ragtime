@@ -17,6 +17,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.ScrollableComposite;
@@ -27,6 +28,7 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
+import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import ragtime.cc.model.Article;
 
@@ -47,6 +49,9 @@ public class ArticlesPage {
     @Page.Context
     protected ArticlesState     state;
 
+    @Page.Context
+    protected PageSite          site;
+
     private ScrollableComposite list;
 
 
@@ -55,6 +60,15 @@ public class ArticlesPage {
         ui.init( parent ).title.set( "Artikel" );
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
+
+        // actions
+        site.actions.add( new Action() {{
+            icon.set( "public" );
+            description.set( "Web-Seite ansehen" );
+            handler.set( ev -> {
+                //state.listArticles();
+            });
+        }});
 
         // search
         ui.body.add( new TextField() {{
@@ -72,7 +86,8 @@ public class ArticlesPage {
             add( new Text() {{
                content.set( "..." );
             }});
-            state.articles.onChange( ev -> refreshArticlesList() );
+            state.articles.subscribe( ev -> refreshArticlesList() )
+                    .unsubscribeIf( () -> site.isClosed() );
             refreshArticlesList();
         }});
         return ui;

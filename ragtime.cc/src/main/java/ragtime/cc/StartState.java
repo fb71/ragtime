@@ -23,6 +23,7 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.article.ArticlesState;
+import ragtime.cc.website.TemplateConfigState;
 
 /**
  * The start {@link State} of the application.
@@ -36,13 +37,16 @@ public class StartState {
 
     public static final ClassInfo<StartState> INFO = StartStateClassInfo.instance();
 
-    protected UnitOfWork    uow;
-
     @State.Context
     protected Pageflow      pageflow;
 
     @State.Context
     protected StateSite     site;
+
+    @State.Context
+    protected UICommon      uic;
+
+    protected UnitOfWork    uow;
 
 
     @State.Init
@@ -52,13 +56,22 @@ public class StartState {
 
         pageflow.create( new FrontPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
+                .putContext( uic, Page.Context.DEFAULT_SCOPE )
                 .open();
     }
 
 
     @State.Action
-    public void listArticles() {
+    public void openArticlesAction() {
         site.createState( new ArticlesState() )
+                .putContext( uow, State.Context.DEFAULT_SCOPE )
+                .activate();
+    }
+
+
+    @State.Action
+    public void openSettingsAction() {
+        site.createState( new TemplateConfigState() )
                 .putContext( uow, State.Context.DEFAULT_SCOPE )
                 .activate();
     }

@@ -53,6 +53,7 @@ import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
 import freemarker.template.Version;
 import ragtime.cc.Repositories;
+import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
  * Processes templates + data/model with FreeMarker and CommonMark to provide a
@@ -149,7 +150,7 @@ public class TemplateServlet
         var uow = Repositories.mainRepo().newUnitOfWork();
         var data = loadData( template, request.getParameterMap(), uow );
         data.put( "params", new HttpRequestParamsTemplateModel( request ) );
-        data.put( "config", templateConfig() );
+        data.put( "config", loadTemplateConfig( uow ) );
 
         try (var out = resp.getWriter()) {
             template.process( data, out );
@@ -158,6 +159,12 @@ public class TemplateServlet
     }
 
 
+    protected Object loadTemplateConfig( UnitOfWork uow ) {
+        var config = uow.query( TemplateConfigEntity.class ).executeCollect().waitForResult().get().get( 0 );
+        return new CompositeTemplateModel( config );
+    }
+
+    @Deprecated
     protected Object templateConfig() {
         return new HashMap<>() {{
             put( "nav_items", new ArrayList<>() {{

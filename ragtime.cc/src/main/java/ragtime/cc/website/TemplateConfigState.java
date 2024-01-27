@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.article;
+package ragtime.cc.website;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
@@ -25,18 +25,21 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
-import ragtime.cc.model.Article;
+import ragtime.cc.UICommon;
+import ragtime.cc.article.EntityModelValue;
+import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
+ * A UI {@link State} that handles editing of a {@link TemplateConfigEntity}.
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticleEditState {
+public class TemplateConfigState {
 
-    private static final Log LOG = LogFactory.getLog( ArticleEditState.class );
+    private static final Log LOG = LogFactory.getLog( TemplateConfigState.class );
 
-    public static final ClassInfo<ArticleEditState> INFO = ArticleEditStateClassInfo.instance();
+    public static final ClassInfo<TemplateConfigState> INFO = TemplateConfigStateClassInfo.instance();
 
     @State.Context
     protected StateSite     site;
@@ -44,25 +47,29 @@ public class ArticleEditState {
     @State.Context
     protected Pageflow      pageflow;
 
-    protected ArticlePage   page;
+    protected TemplateConfigPage page;
 
     @State.Context
     protected UnitOfWork    uow;
 
-    @State.Context
     @State.Model
-    public Model<Article>   article = new EntityModelValue<>();
+    public Model<TemplateConfigEntity> config = new EntityModelValue<>();
 
-    public boolean          edited;
-
-    public boolean          valid;
+    @State.Context
+    @Deprecated // XXX
+    protected UICommon      uic;
 
 
     @State.Init
     public void initAction() {
-        pageflow.create( page = new ArticlePage() )
-                .putContext( this, Page.Context.DEFAULT_SCOPE )
-                .open();
+        uow.query( TemplateConfigEntity.class ).executeCollect().onSuccess( rs -> {
+            config.set( rs.get( 0 ) );
+
+            pageflow.create( page = new TemplateConfigPage() )
+                    .putContext( this, Page.Context.DEFAULT_SCOPE )
+                    .putContext( uic, Page.Context.DEFAULT_SCOPE )
+                    .open();
+        });
     };
 
 
@@ -81,11 +88,11 @@ public class ArticleEditState {
     public StateAction<Void> submitAction = new StateAction<>() {
         @Override
         public boolean canRun() {
-            return edited && valid;
+            return true; //edited && valid;
         }
         @Override
         public void run( Void arg ) {
-            uow.submit().onSuccess( __ -> disposeAction() );
+            uow.submit(); //.onSuccess( __ -> disposeAction() );
         }
     };
 
