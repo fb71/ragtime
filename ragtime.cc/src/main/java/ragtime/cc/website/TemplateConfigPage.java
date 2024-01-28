@@ -18,16 +18,20 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.component2.Button;
+import areca.ui.component2.Events.EventType;
+import areca.ui.component2.Label;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
-import areca.ui.form.Form;
 import areca.ui.layout.FillLayout;
+import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.TextFieldViewer;
+import areca.ui.viewer.form.Form;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.PropertyModelValue;
 import ragtime.cc.website.model.TemplateConfigEntity;
@@ -68,14 +72,17 @@ public class TemplateConfigPage {
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
-            layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space ) );
+            layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space2 ) );
 
             TemplateConfigEntity config = state.config.get();
 
             form = new Form();
+            // PageConfig
             add( new UIComposite() {{
-                layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space + 10 ) );
+                layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space2 ) );
                 bordered.set( true );
+                cssClasses.add( "MessageCard" );
+                new Label( this ).content.set( "Seite" );
 
                 add( form.newField().label( "Titel" )
                         .viewer( new TextFieldViewer() )
@@ -85,8 +92,48 @@ public class TemplateConfigPage {
                         .viewer( new TextFieldViewer() )
                         .model( new PropertyModelValue<>( config.page.get().title2 ) )
                         .create() );
+                add( form.newField().label( "Fusszeile" )
+                        .viewer( new TextFieldViewer() )
+                        .model( new PropertyModelValue<>( config.page.get().footer ) )
+                        .create() );
             }});
+            // NavItems
+            add( new UIComposite() {{
+                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.margins ).spacing( uic.space2 ) );
+                bordered.set( true );
+                cssClasses.add( "MessageCard" );
+                new Label( this ).content.set( "Navigation" );
 
+                for (var navItem : config.navItems) {
+                    add( new UIComposite() {{
+                        var itemRow = this;
+                        layoutConstraints.set( RowConstraints.height( 35 ) );
+                        layout.set( RowLayout.filled().spacing( uic.space ) );
+
+                        add( form.newField().label( "Titel" )
+                                .viewer( new TextFieldViewer() )
+                                .model( new PropertyModelValue<>( navItem.title ) )
+                                .create() );
+                        add( form.newField().label( "Ziel" )
+                                .viewer( new TextFieldViewer() )
+                                .model( new PropertyModelValue<>( navItem.href ) )
+                                .create() );
+
+                        add( new Button() {{
+                            layoutConstraints.set( RowConstraints.width( 50 ) );
+                            bordered.set( false );
+                            icon.set( "delete" );
+                            tooltip.set( "Diesen Eintrag löschen" );
+                            events.on( EventType.SELECT, ev -> {
+                                //state.
+                                var itemRowParent = itemRow.parent();
+                                itemRow.dispose();
+                                itemRowParent.layout();
+                            });
+                        }});
+                    }});
+                }
+            }});
             form.load();
         }});
 

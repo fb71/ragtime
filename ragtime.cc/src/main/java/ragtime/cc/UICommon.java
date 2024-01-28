@@ -29,6 +29,9 @@ public class UICommon {
     /** Default space in the UI */
     public int space = 15;
 
+    /** Slightly bigger {@link #space} */
+    public int space2 = space + (space / 2);
+
     /** Default margins used in the UI */
     public Size margins = Size.of( space, space );
 
