@@ -37,7 +37,7 @@ public class Article
     @Queryable
     public Property<String> title;
 
-    @Format(Format.FormatType.MARKDOWN)
+    //@Format(Format.FormatType.MARKDOWN)
     public Property<String> content;
 
 }
