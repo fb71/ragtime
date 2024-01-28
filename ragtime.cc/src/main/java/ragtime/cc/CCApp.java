@@ -50,6 +50,7 @@ public class CCApp
         LogFactory.setClassLevel( CCApp.class, Level.INFO );
         LogFactory.setPackageLevel( No2Store.class, Level.DEBUG );
         LogFactory.setPackageLevel( State.class, Level.DEBUG );
+        //LogFactory.setClassLevel( UIEventCollector.class, Level.DEBUG );
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
     }
@@ -67,7 +68,7 @@ public class CCApp
         try {
             LOG.info( "createUI(): ..." );
             createUI( rootWindow -> {
-                rootWindow.layout.set( MaxWidthLayout.width( 400 ).fillHeight.set( true ) );
+                rootWindow.layout.set( MaxWidthLayout.width( 650 ).fillHeight.set( true ) );
                 var pageflowContainer = rootWindow.add( new UIComposite() {{
                     cssClasses.add( "MaxWidth" );
                 }});
