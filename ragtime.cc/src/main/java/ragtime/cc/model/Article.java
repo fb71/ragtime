@@ -19,7 +19,6 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import ragtime.cc.model.Format.FormatType;
 
 /**
  *
@@ -38,7 +37,7 @@ public class Article
     @Queryable
     public Property<String> title;
 
-    @Format(FormatType.MARKDOWN)
+    @Format(Format.FormatType.MARKDOWN)
     public Property<String> content;
 
 }
