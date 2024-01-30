@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -45,7 +44,7 @@ import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.rt.server.EventLoop;
-import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.core.DirectiveCallPlace;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -79,15 +78,14 @@ public class TemplateServlet
             Version v2_3_32 = new Version( 2, 3, 32 );
             cfg = new Configuration( v2_3_32 );
 
-            var templateHome = new File( "/home/falko/workspaces/workspace-android/ragtime/ragtime.cc/src/test/resources/" );
-            cfg.setTemplateLoader( new FileTemplateLoader( templateHome ) );
+            cfg.setTemplateLoader( new ClassTemplateLoader( Thread.currentThread().getContextClassLoader(), "templates" ) );
 
             cfg.setDefaultEncoding( "ISO-8859-1" );
             cfg.setLocale( Locale.GERMAN );
             cfg.setTemplateExceptionHandler( TemplateExceptionHandler.RETHROW_HANDLER );
             LOG.info( "initialized" );
         }
-        catch (IOException e) {
+        catch (Exception e) {
             throw new RuntimeException( e );
         }
     }
