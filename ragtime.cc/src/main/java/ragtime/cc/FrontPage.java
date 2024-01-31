@@ -22,6 +22,7 @@ import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.Link;
 import areca.ui.component2.Text;
 import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
@@ -60,6 +61,11 @@ public class FrontPage {
         ui.body.layout.set( RowLayout.verticals().fillWidth( true ).margins( Size.of( 10, 10 ) ).spacing( 10 ) );
         ui.body.add( new Text() {{
             content.set( "New plans, new horizons... :) " );
+        }});
+
+        ui.body.add( new Link() {{
+            content.set( "Website..." );
+            href.set( "template/frontpage" );
         }});
 
         ui.body.add( new TextField() {{
