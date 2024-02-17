@@ -77,6 +77,7 @@ public class TemplateConfigPage {
             TemplateConfigEntity config = state.config.get();
 
             form = new Form();
+
             // PageConfig
             add( new UIComposite() {{
                 layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space2 ) );

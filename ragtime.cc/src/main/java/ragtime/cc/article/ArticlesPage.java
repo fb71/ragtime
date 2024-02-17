@@ -120,9 +120,9 @@ public class ArticlesPage {
                 //format.set( Format.HTML );
                 content.set( article.title.get() );
             }});
-            add( new Text() {{
-                content.set( article.content.get() );
-            }});
+//            add( new Text() {{
+//                content.set( article.content.get() );
+//            }});
             events.on( EventType.SELECT, ev -> {
                 state.selected.set( article );
                 state.editArticleAction.run();
