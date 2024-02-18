@@ -11,7 +11,7 @@
          <#-- [${article_index + 1}] --> 
          <a href="article?id=${article.id}">${article.title}</a>
       <br/>
-      ${article.content}
+      <#-- ${article.content} -->
       </li>
     </#list>
   </ul>
