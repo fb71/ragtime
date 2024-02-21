@@ -3,8 +3,8 @@
 
 <@c.data name="articles" model="QueryTemplateModel" params="type=ragtime.cc.model.Article"/>
 
-<@page.layout title="Frontpage">
-   <h2>Frontpage</h2>
+<@page.layout title="Home">
+   <h2>Home</h2>
    <ul>
     <#list articles as article>
       <li>

@@ -72,7 +72,9 @@ public class ImageAnnotationsCloud
                     String.format( "<span style=color:#e7763f;\">%s</span>", l2 ) );
 
             if (l2.length() == 3) {
-                new Tag( this ).icons.add( "help" );
+                addDecorator( new Tag() {{
+                    icons.add( "help" );
+                }});
             }
         }
 

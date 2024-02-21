@@ -15,6 +15,10 @@ package ragtime.cc;
 
 import java.util.concurrent.Callable;
 
+import java.io.File;
+
+import javax.servlet.ServletContext;
+
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Platform;
@@ -29,6 +33,7 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
+import ragtime.cc.model.AccountEntity;
 
 /**
  *
@@ -43,8 +48,10 @@ public class CCApp
 
     private static boolean debug = true;
 
+    private static File workspaceDir;
 
-    public static void init() throws Exception {
+
+    public static void init( ServletContext ctx ) throws Exception {
         LOG.info( "Debug: %s", debug );
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( CCApp.class, Level.INFO );
@@ -53,12 +60,34 @@ public class CCApp
         //LogFactory.setClassLevel( UIEventCollector.class, Level.DEBUG );
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
+
+//        File tmp = (File)ctx.getAttribute( "javax.servlet.context.tempdir" );
+//        File dbBaseDir = new File( tmp, "../ragtime.cc " );
+        workspaceDir = new File( System.getProperty( "user.home" ), "servers/workspace-ragtime.cc" );
+        workspaceDir.mkdirs();
+        LOG.info( "Workspace: %s", workspaceDir.getAbsolutePath() );
+
+        Repositories.init();
     }
 
 
     public static void dispose() {
         LOG.warn( "DISPOSE " );
         Repositories.dispose();
+    }
+
+
+    /**
+     * The workspace directory of the given {@link AccountEntity#permid}.
+     *
+     * @param permid The permanent ID of the {@link AccountEntity}.
+     */
+    public static File workspaceDir( int permid ) {
+        return new File( workspaceDir, Integer.toString( permid ) );
+    }
+
+    public static File workspaceDir() {
+        return workspaceDir;
     }
 
     // instance *******************************************
@@ -75,11 +104,8 @@ public class CCApp
                 rootWindow.layout();
 
                 var pageflow = Pageflow.start( pageflowContainer );
-//                        .create( new FrontPage() )
-//                        .putContext( startState, Page.Context.DEFAULT_SCOPE )
-//                        .open();
 
-                State.start( new StartState() )
+                State.start( new LoginState() )
                         .putContext( pageflow, State.Context.DEFAULT_SCOPE )
                         .putContext( new UICommon(), State.Context.DEFAULT_SCOPE )
                         //.putContext( new CCAppStatePageMapping( pageflow ), State.Context.DEFAULT_SCOPE )
@@ -119,7 +145,9 @@ public class CCApp
                 LOG.info( "Operation cancelled." );
             }
             else if (debug) {
-                throw rootCauseForTeaVM( e );
+                LOG.warn( "defaultErrorHandler(): ", e );
+                e.printStackTrace( System.err );
+                //throw rootCauseForTeaVM( e );
             }
             else {
                 //Pageflow.current().open( new GeneralErrorPage( e ), null );

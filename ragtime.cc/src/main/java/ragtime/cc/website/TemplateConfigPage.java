@@ -80,10 +80,10 @@ public class TemplateConfigPage {
 
             // PageConfig
             add( new UIComposite() {{
-                layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space2 ) );
+                layout.set( RowLayout.filled().vertical().margins( uic.margins2 ).spacing( uic.space2 ) );
                 bordered.set( true );
                 cssClasses.add( "MessageCard" );
-                new Label( this ).content.set( "Seite" );
+                addDecorator( new Label().content.set( "Seite" ) );
 
                 add( form.newField().label( "Titel" )
                         .viewer( new TextFieldViewer() )
@@ -100,10 +100,10 @@ public class TemplateConfigPage {
             }});
             // NavItems
             add( new UIComposite() {{
-                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.margins ).spacing( uic.space2 ) );
+                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.margins2 ).spacing( uic.space2 ) );
                 bordered.set( true );
                 cssClasses.add( "MessageCard" );
-                new Label( this ).content.set( "Navigation" );
+                addDecorator( new Label().content.set( "Navigation / Menüs" ) ).get();
 
                 for (var navItem : config.navItems) {
                     add( new UIComposite() {{

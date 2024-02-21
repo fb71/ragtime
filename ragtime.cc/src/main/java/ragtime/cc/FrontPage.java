@@ -65,7 +65,7 @@ public class FrontPage {
 
         ui.body.add( new Link() {{
             content.set( "Website..." );
-            href.set( "template/frontpage" );
+            href.set( String.format( "website/%s/home", state.account.permid.get() ) );
         }});
 
         ui.body.add( new TextField() {{

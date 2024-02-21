@@ -35,4 +35,6 @@ public class UICommon {
     /** Default margins used in the UI */
     public Size margins = Size.of( space, space );
 
+    public Size margins2 = Size.of( space2, space2 );
+
 }

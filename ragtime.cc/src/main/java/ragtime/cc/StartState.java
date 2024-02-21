@@ -13,7 +13,6 @@
  */
 package ragtime.cc;
 
-import org.polymap.model2.runtime.UnitOfWork;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -23,6 +22,7 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.article.ArticlesState;
+import ragtime.cc.model.AccountEntity;
 import ragtime.cc.website.TemplateConfigState;
 
 /**
@@ -46,14 +46,12 @@ public class StartState {
     @State.Context
     protected UICommon      uic;
 
-    protected UnitOfWork    uow;
+    @State.Context( scope=Repositories.SCOPE_MAIN )
+    protected AccountEntity account;
 
 
     @State.Init
     public void init() {
-        var repo = Repositories.mainRepo();
-        uow = repo.newUnitOfWork(); // .setPriority( priority );
-
         pageflow.create( new FrontPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( uic, Page.Context.DEFAULT_SCOPE )
@@ -64,7 +62,6 @@ public class StartState {
     @State.Action
     public void openArticlesAction() {
         site.createState( new ArticlesState() )
-                .putContext( uow, State.Context.DEFAULT_SCOPE )
                 .activate();
     }
 
@@ -72,7 +69,6 @@ public class StartState {
     @State.Action
     public void openSettingsAction() {
         site.createState( new TemplateConfigState() )
-                .putContext( uow, State.Context.DEFAULT_SCOPE )
                 .activate();
     }
 

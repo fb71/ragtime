@@ -19,13 +19,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
 
+import org.apache.commons.io.IOUtils;
+
 import org.polymap.model2.runtime.EntityRepository;
+import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Promise;
+import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import areca.ui.statenaction.State;
+import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
 import ragtime.cc.website.model.TemplateConfigEntity;
 import ragtime.cc.website.model.WebsiteConfigEntity;
@@ -38,13 +44,21 @@ public class Repositories {
 
     private static final Log LOG = LogFactory.getLog( Repositories.class );
 
-    private static Map<String,EntityRepository> repos = new ConcurrentHashMap<>();
+    /** the {@link State.Context} scope of the main {@link EntityRepository} and {@link UnitOfWork}. */
+    public static final String SCOPE_MAIN = "main-repository";
+
+    private static RLazy<EntityRepository> mainRepo = new RLazy<>();
+
+    private static Map<Integer,EntityRepository> repos = new ConcurrentHashMap<>();
+
+
+    public static void init() {
+    }
 
 
     public static void dispose() {
-        for (var repo : repos.values()) {
-            repo.close();
-        }
+        mainRepo.ifInitialized( repo -> repo.close() );
+        repos.values().forEach( repo -> repo.close() );
         repos.clear();
     }
 
@@ -53,28 +67,72 @@ public class Repositories {
      * Gets the main {@link EntityRepository}
      */
     public static EntityRepository mainRepo() {
-        return repos.computeIfAbsent( "main", __ -> {
-            return initMainRepo();
+        return mainRepo.supply( () -> {
+            var dbfile = new File( CCApp.workspaceDir(), "main.db" );
+            dbfile.delete();
+
+            return EntityRepository.newConfiguration()
+                    .entities.set( Arrays.asList( AccountEntity.info ) )
+                    .store.set( new No2Store( dbfile ) )
+                    .create()
+                    .then( newRepo -> {
+                        LOG.debug( "Repo: created." );
+                        return populateMainRepo( newRepo ).map( __ -> newRepo );
+                    })
+                    .waitForResult().get();
         });
     }
 
 
-    protected static EntityRepository initMainRepo() {
-        var dir = new File( "/tmp/ragtime.cc" );
-        dir.mkdir();
-        return EntityRepository.newConfiguration()
-                .entities.set( Arrays.asList( Article.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
-                .store.set( new No2Store( new File( dir, "main.db" ) ) )
-                .create()
-                .then( newRepo -> {
-                    LOG.debug( "Repo: created." );
-                    return populateMainRepo( newRepo ).map( __ -> newRepo );
+    protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
+        var uow = repo.newUnitOfWork();
+        return uow.query( AccountEntity.class ).executeCollect()
+                .then( rs -> {
+                    if (rs.size() == 0) {
+                        // admin
+                        uow.createEntity( AccountEntity.class, proto -> {
+                            proto.isAdmin.set( true );
+                            proto.login.set( "admin" );
+                            proto.setPassword( "admin" );
+                            proto.permid.set( 0 );
+                            CCApp.workspaceDir( 0 ).mkdir();
+                        });
+                        // gienke
+                        uow.createEntity( AccountEntity.class, proto -> {
+                            proto.isAdmin.set( false );
+                            proto.login.set( "praxis@psychotherapie-gienke.de" );
+                            proto.permid.set( 1 );
+                            CCApp.workspaceDir( 1 ).mkdir();
+                        });
+                    }
+                    return uow.submit();
                 })
-                .waitForResult().get();
+                .onSuccess( submitted -> {
+                    LOG.debug( "Repo: submitted." );
+                });
     }
 
 
-    protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
+    public static EntityRepository repo( int permid ) {
+        File workspace = CCApp.workspaceDir( permid );
+        if (!workspace.exists()) {
+            throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
+        }
+        return repos.computeIfAbsent( permid, __ -> {
+            return EntityRepository.newConfiguration()
+                    .entities.set( Arrays.asList( Article.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
+                    .store.set( new No2Store( new File( workspace, "content.db" ) ) )
+                    .create()
+                    .then( newRepo -> {
+                        LOG.debug( "Repo: created." );
+                        return populateGienkeRepo( newRepo ).map( ___ -> newRepo );
+                    })
+                    .waitForResult().get(); // XXX
+        });
+    }
+
+
+    protected static Promise<Submitted> populateGienkeRepo( EntityRepository repo ) {
         var uow2 = repo.newUnitOfWork();
         return uow2.query( Article.class )
                 .executeCollect()
@@ -82,8 +140,11 @@ public class Repositories {
                     if (rs.size() == 0) {
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Erster Artikel" );
-                            proto.content.set( "Hier steht der Text. Mit **Markdown**!" );
+                            var welcome = IOUtils.toString( Thread.currentThread().getContextClassLoader().getResource( "welcome.md" ), "UTF-8" );
+                            proto.content.set( welcome );
+                            //proto.content.set( "Hier steht der Text. Mit **Markdown**!" );
                         });
+
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
                             proto.page.createValue( page -> {
                                 page.title.set( "Praxis für Psychotherapie" );
@@ -92,7 +153,7 @@ public class Repositories {
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Home" );
-                                navItem.href.set( "frontpage" );
+                                navItem.href.set( "home" );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Kontakt" );

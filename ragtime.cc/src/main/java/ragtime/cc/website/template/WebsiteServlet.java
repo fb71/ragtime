@@ -60,12 +60,12 @@ import ragtime.cc.website.model.TemplateConfigEntity;
  *
  * @author Falko Bräutigam
  */
-public class TemplateServlet
+public class WebsiteServlet
         extends HttpServlet {
 
-    private static final String SESSION_ATTRIBUTE = "ragtime.cc.website.session";
+    private static final String ATTR_SESSION = "ragtime.cc.website.session";
 
-    private static final Log LOG = LogFactory.getLog( TemplateServlet.class );
+    private static final Log LOG = LogFactory.getLog( WebsiteServlet.class );
 
     private static final Pattern        MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]+)\"/>");
 
@@ -101,13 +101,13 @@ public class TemplateServlet
     /**
      *
      */
-    protected Session checkInitSession( HttpSession httpSession ) {
-        var session = (Session)httpSession.getAttribute( SESSION_ATTRIBUTE );
+    protected Session session( HttpSession httpSession ) {
+        var session = (Session)httpSession.getAttribute( ATTR_SESSION );
         synchronized (httpSession) {
             if (session == null) {
                 LOG.info( "Session: START" );
                 session = new Session();
-                httpSession.setAttribute( SESSION_ATTRIBUTE, session );
+                httpSession.setAttribute( ATTR_SESSION, session );
 
                 ThreadBoundSessionScoper.instance().bind( session, __ -> {
                     Session.setInstance( new EventLoop() );
@@ -123,7 +123,7 @@ public class TemplateServlet
         try {
             var t = Timer.start();
             var httpSession = req.getSession( true );
-            var session = checkInitSession( httpSession );
+            var session = session( httpSession );
 
             ThreadBoundSessionScoper.instance().bind( session, __ -> {
                 process( req, resp );
@@ -141,11 +141,23 @@ public class TemplateServlet
 
 
     protected void process( HttpServletRequest request, HttpServletResponse resp ) throws Exception {
+        var uow = Repositories.mainRepo().newUnitOfWork();
+
+        // find permid in path
+        var parts = split( request.getPathInfo(), '/' );
+        if (parts.length == 2) {
+            var permid = Integer.parseInt( parts[0] );
+            uow = Repositories.repo( permid ).newUnitOfWork();
+        }
+        // find from domain name
+        else {
+            throw new RuntimeException( "Domain name mapping is not yet implemented." );
+        }
+
         var templateName = StringUtils.substringAfterLast( request.getPathInfo(), "/" );
         LOG.info( "Loading template: %s", templateName );
         var template = cfg.getTemplate( templateName + ".ftl" );
 
-        var uow = Repositories.mainRepo().newUnitOfWork();
         var data = loadData( template, request.getParameterMap(), uow );
         data.put( "params", new HttpRequestParamsTemplateModel( request ) );
         data.put( "config", loadTemplateConfig( uow ) );
