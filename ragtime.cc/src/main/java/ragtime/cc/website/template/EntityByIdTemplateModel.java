@@ -11,35 +11,29 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.model;
+package ragtime.cc.website.template;
 
-import org.polymap.model2.ManyAssociation;
-import org.polymap.model2.Property;
-import org.polymap.model2.Queryable;
+import org.polymap.model2.Entity;
+import org.polymap.model2.runtime.UnitOfWork;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.common.reflect.ClassInfo;
-import areca.common.reflect.RuntimeInfo;
 
 /**
+ * Provides an {@link Entity} by specified type and id.
  *
  * @author Falko Bräutigam
  */
-@RuntimeInfo
-public class Article
-        extends Common {
+public class EntityByIdTemplateModel
+        extends CompositeTemplateModel {
 
-    private static final Log LOG = LogFactory.getLog( Article.class );
+    private static final Log LOG = LogFactory.getLog( EntityByIdTemplateModel.class );
 
-    public static final ClassInfo<Article> info = ArticleClassInfo.instance();
 
-    public static Article TYPE;
+    public EntityByIdTemplateModel( ModelParams modelParams, UnitOfWork uow ) throws ClassNotFoundException {
+        @SuppressWarnings( "unchecked" )
+        var entityType = (Class<? extends Entity>)Class.forName( modelParams.get( "type" ) );
+        this.composite = uow.entity( entityType, modelParams.get( "id" ) ).waitForResult().get();
+    }
 
-    @Queryable
-    public Property<String>             title;
-
-    @Format( Format.FormatType.MARKDOWN )
-    public Property<String>             content;
-
-    public ManyAssociation<TagEntity>   tags;
 }

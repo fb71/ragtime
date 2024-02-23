@@ -11,7 +11,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc;
+package ragtime.cc.model;
+
+import static java.util.Arrays.asList;
+import static ragtime.cc.website.template.ArticleByTagTemplateModel.PARAM_TAG;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -31,8 +34,7 @@ import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.statenaction.State;
-import ragtime.cc.model.AccountEntity;
-import ragtime.cc.model.Article;
+import ragtime.cc.CCApp;
 import ragtime.cc.website.model.TemplateConfigEntity;
 import ragtime.cc.website.model.WebsiteConfigEntity;
 
@@ -118,10 +120,13 @@ public class Repositories {
         if (!workspace.exists()) {
             throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
         }
+        var dbfile = new File( workspace, "content.db" );
+        dbfile.delete();
+
         return repos.computeIfAbsent( permid, __ -> {
             return EntityRepository.newConfiguration()
-                    .entities.set( Arrays.asList( Article.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
-                    .store.set( new No2Store( new File( workspace, "content.db" ) ) )
+                    .entities.set( asList( Article.info, TagEntity.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
+                    .store.set( new No2Store( dbfile ) )
                     .create()
                     .then( newRepo -> {
                         LOG.debug( "Repo: created." );
@@ -138,13 +143,35 @@ public class Repositories {
                 .executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
-                        uow2.createEntity( Article.class, proto -> {
-                            proto.title.set( "Erster Artikel" );
-                            var welcome = IOUtils.toString( Thread.currentThread().getContextClassLoader().getResource( "welcome.md" ), "UTF-8" );
-                            proto.content.set( welcome );
-                            //proto.content.set( "Hier steht der Text. Mit **Markdown**!" );
+                        // Tags
+                        var homeTag = uow2.createEntity( TagEntity.class, proto -> {
+                            proto.category.set( TagEntity.WEBSITE_NAVI );
+                            proto.name.set( "Home" );
+                        });
+                        var kontaktTag = uow2.createEntity( TagEntity.class, proto -> {
+                            proto.category.set( TagEntity.WEBSITE_NAVI );
+                            proto.name.set( "Kontakt" );
                         });
 
+                        // Article
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Willkommen" );
+                            var welcome = IOUtils.toString( Thread.currentThread().getContextClassLoader().getResource( "welcome.md" ), "UTF-8" );
+                            proto.content.set( welcome );
+                            proto.tags.add( homeTag );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Kontakt" );
+                            proto.content.set( "Telefon: ..." );
+                            proto.tags.add( kontaktTag );
+                        });
+                        var impressum = uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Impressum" );
+                            proto.content.set( "## Impressum" );
+                            //proto.tags.add( kontaktTag );
+                        });
+
+                        // TemplateConfig
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
                             proto.page.createValue( page -> {
                                 page.title.set( "Praxis für Psychotherapie" );
@@ -157,11 +184,11 @@ public class Repositories {
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Kontakt" );
-                                navItem.href.set( "kontakt" );
+                                navItem.href.set( String.format( "frontpage?%s=Kontakt", PARAM_TAG ) );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );
-                                navItem.href.set( "impressum" );
+                                navItem.href.set( "article?id=" + impressum.id() );
                             });
                         });
                     }

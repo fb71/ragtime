@@ -13,9 +13,9 @@
  */
 package ragtime.cc.model;
 
-import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -26,20 +26,24 @@ import areca.common.reflect.RuntimeInfo;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class Article
+public class TagEntity
         extends Common {
 
-    private static final Log LOG = LogFactory.getLog( Article.class );
+    private static final Log LOG = LogFactory.getLog( TagEntity.class );
 
-    public static final ClassInfo<Article> info = ArticleClassInfo.instance();
+    public static final ClassInfo<TagEntity> info = TagEntityClassInfo.instance();
 
-    public static Article TYPE;
+    public static TagEntity TYPE;
+
+    /** Category: Website frontpage navigation/menu entries */
+    public static final String WEBSITE_NAVI = "Website:Navigation";
 
     @Queryable
-    public Property<String>             title;
+    public Property<String> name;
 
-    @Format( Format.FormatType.MARKDOWN )
-    public Property<String>             content;
+    @Queryable
+    public Property<String> category;
 
-    public ManyAssociation<TagEntity>   tags;
+    public Property<String> description;
+
 }

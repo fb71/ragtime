@@ -15,10 +15,6 @@ package ragtime.cc.website.template;
 
 import java.util.Iterator;
 
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
-
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Composite;
 import org.polymap.model2.Entity;
@@ -45,13 +41,13 @@ public class CompositeTemplateModel
 
     private static final Log LOG = LogFactory.getLog( CompositeTemplateModel.class );
 
-    protected static Parser         markdownParser = Parser.builder().build();
-
-    protected static HtmlRenderer   markdownRenderer = HtmlRenderer.builder().build();
-
-    // instance *******************************************
-
     protected Composite composite;
+
+    /**
+     * Just for subclass initialization.
+     */
+    protected CompositeTemplateModel() {
+    }
 
 
     public CompositeTemplateModel( Composite composite ) {
@@ -74,14 +70,9 @@ public class CompositeTemplateModel
                 var a = prop.getAnnotation( Format.class );
                 var format = a != null ? a.value() : FormatType.PLAIN;
                 switch (format) {
-                    case MARKDOWN: {
-                        Node document = markdownParser.parse( (String)p.get() );
-                        return new SimpleScalar( markdownRenderer.render( document ) );
-                    }
-                    case PLAIN:
-                        return new SimpleScalar( (String)p.get() );
-                    default:
-                        throw new RuntimeException( "Not yet: " + format );
+                    case MARKDOWN: return new SimpleScalar( Markdown.render( (String)p.get() ) );
+                    case PLAIN: return new SimpleScalar( (String)p.get() );
+                    default: throw new RuntimeException( "Not yet: " + format );
                 }
             }
             // Composite
@@ -114,7 +105,6 @@ public class CompositeTemplateModel
         }
         throw new RuntimeException( "Not yet: " + prop);
     }
-
 
 
     @Override

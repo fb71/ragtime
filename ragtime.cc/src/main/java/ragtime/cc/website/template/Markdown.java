@@ -11,35 +11,32 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.model;
+package ragtime.cc.website.template;
 
-import org.polymap.model2.ManyAssociation;
-import org.polymap.model2.Property;
-import org.polymap.model2.Queryable;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.common.reflect.ClassInfo;
-import areca.common.reflect.RuntimeInfo;
+import freemarker.template.TemplateModelException;
 
 /**
+ * Markdown parse and render functionality.
  *
  * @author Falko Bräutigam
  */
-@RuntimeInfo
-public class Article
-        extends Common {
+public class Markdown {
 
-    private static final Log LOG = LogFactory.getLog( Article.class );
+    private static final Log LOG = LogFactory.getLog( Markdown.class );
 
-    public static final ClassInfo<Article> info = ArticleClassInfo.instance();
+    public static Parser         parser = Parser.builder().build();
 
-    public static Article TYPE;
+    public static HtmlRenderer   renderer = HtmlRenderer.builder().build();
 
-    @Queryable
-    public Property<String>             title;
 
-    @Format( Format.FormatType.MARKDOWN )
-    public Property<String>             content;
-
-    public ManyAssociation<TagEntity>   tags;
+    public static String render( String markdown ) throws TemplateModelException {
+        Node document = parser.parse( markdown );
+        return renderer.render( document );
+    }
 }

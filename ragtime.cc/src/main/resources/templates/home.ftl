@@ -3,16 +3,8 @@
 
 <@c.data name="articles" model="QueryTemplateModel" params="type=ragtime.cc.model.Article"/>
 
-<@page.layout title="Home">
-   <h2>Home</h2>
-   <ul>
-    <#list articles as article>
-      <li>
-         <#-- [${article_index + 1}] --> 
-         <a href="article?id=${article.id}">${article.title}</a>
-      <br/>
-      <#-- ${article.content} -->
-      </li>
-    </#list>
-  </ul>
+<@c.data name="article" model="ArticleByTagTemplateModel" params="t=Home"/>
+
+<@page.layout title="${article.title}">
+   ${article.content}
 </@page.layout>

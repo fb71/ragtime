@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.polymap.model2.Entity;
 import org.polymap.model2.query.Query;
+import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -35,6 +36,13 @@ public class QueryTemplateModel
     private static final Log LOG = LogFactory.getLog( QueryTemplateModel.class );
 
     protected Query<?>      query;
+
+
+    public QueryTemplateModel( ModelParams modelParams, UnitOfWork uow ) throws ClassNotFoundException {
+        @SuppressWarnings( "unchecked" )
+        var entityType = (Class<? extends Entity>)Class.forName( modelParams.get( "type" ) );
+        this.query = uow.query( entityType );
+    }
 
 
     public QueryTemplateModel( Query<?> query ) {

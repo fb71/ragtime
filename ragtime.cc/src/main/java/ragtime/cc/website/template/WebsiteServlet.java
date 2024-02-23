@@ -14,14 +14,10 @@
 package ragtime.cc.website.template;
 
 import static org.apache.commons.lang3.StringUtils.split;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import java.io.IOException;
@@ -34,7 +30,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.polymap.model2.Entity;
 import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.Assert;
@@ -51,7 +46,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
 import freemarker.template.Version;
-import ragtime.cc.Repositories;
+import ragtime.cc.model.Repositories;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
@@ -67,7 +62,7 @@ public class WebsiteServlet
 
     private static final Log LOG = LogFactory.getLog( WebsiteServlet.class );
 
-    private static final Pattern        MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]+)\"/>");
+    private static final Pattern        MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
 
     private Configuration               cfg;
 
@@ -155,10 +150,10 @@ public class WebsiteServlet
         }
 
         var templateName = StringUtils.substringAfterLast( request.getPathInfo(), "/" );
-        LOG.info( "Loading template: %s", templateName );
+        LOG.info( "Loading template: %s(.ftl)", templateName );
         var template = cfg.getTemplate( templateName + ".ftl" );
 
-        var data = loadData( template, request.getParameterMap(), uow );
+        var data = loadData( template, request, uow );
         data.put( "params", new HttpRequestParamsTemplateModel( request ) );
         data.put( "config", loadTemplateConfig( uow ) );
 
@@ -195,44 +190,34 @@ public class WebsiteServlet
      * </pre>
      */
     @SuppressWarnings({"deprecation", "unchecked"})
-    protected HashMap<Object,Object> loadData( Template template, Map<String,String[]> httpParams, UnitOfWork uow ) throws Exception {
+    protected HashMap<Object,Object> loadData( Template template, HttpServletRequest request, UnitOfWork uow ) throws Exception {
         var result = new HashMap<>();
         for (var child : Collections.list( template.getRootTreeNode().children() )) {
-            LOG.debug( "child: [%s] %s", child.getClass().getSimpleName(), child );
+            // find macro calls
             if (child instanceof DirectiveCallPlace) {
                 var m = MACRO_CALL.matcher( child.toString() );
                 if (m.matches()) {
-                    var modelParams = new HashMap<String,String>();
-                    // HTTP params
-                    for (var entry : httpParams.entrySet()) {
-                        modelParams.put( entry.getKey(), entry.getValue()[0] );
-                    }
+                    var modelParams = new ModelParams();
+
+                    modelParams.addHttpParams( request );
+
                     // macro params
                     String name = m.group( 1 );
                     String modelName = m.group( 2 );
-                    String macroParams = m.group( 3 );
-                    LOG.info( "MACRO: name=%s model=%s params=%s", name, modelName, macroParams );
-                    for (String kv : split( macroParams, "," )) {
-                        modelParams.put( substringBefore( kv, "=" ), substringAfter( kv, "=" ) );
-                    }
-                    LOG.info( "MODEL: %s", modelParams );
+                    modelParams.addMacroParams( m.group( 3 ) );
+                    LOG.info( "MACRO: name=%s model=%s params=%s", name, modelName, modelParams );
 
-                    // CompositeTemplateModel
-                    if (modelName.equals( CompositeTemplateModel.class.getSimpleName() )) {
-                        Class<? extends Entity> entityType = (Class<? extends Entity>)Class.forName( modelParams.get( "type" ) );
-                        uow.entity( entityType, modelParams.get( "id" ) )
-                                .waitForResult( entity -> result.put( name, new CompositeTemplateModel( entity ) ) );
-
-//                        uow.query( entityType ).where( Expressions.id( modelParams.get( "id") ) )
-//                                .executeCollect()
-//                                .waitForResult( rs -> {
-//                                    result.put( name, new CompositeTemplateModel( rs.get( 0 ) ) );
-//                                });
+                    // Entity by id
+                    if (modelName.equals( EntityByIdTemplateModel.class.getSimpleName() )) {
+                        result.put( name, new EntityByIdTemplateModel( modelParams, uow ) );
                     }
-                    // QueryTemplateModel
+                    // Article by tag
+                    else if (modelName.equals( ArticleByTagTemplateModel.class.getSimpleName() )) {
+                        result.put( name, new ArticleByTagTemplateModel( modelParams, uow ) );
+                    }
+                    // Query
                     else if (modelName.equals( QueryTemplateModel.class.getSimpleName() )) {
-                        Class<? extends Entity> entityType = (Class<? extends Entity>)Class.forName( modelParams.get( "type" ) );
-                        result.put( name, new QueryTemplateModel( uow.query( entityType ) ) );
+                        result.put( name, new QueryTemplateModel( modelParams, uow ) );
                     }
                     else {
                         throw new RuntimeException( "more work! : " + modelName );
