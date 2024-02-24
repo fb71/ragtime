@@ -1,4 +1,3 @@
-\
 <img src="media/friederike_1.jpg" style="display:block; margin:auto;" alt="Bild von Friederike"></img>
 
 Dipl.-Psych. Friederike Gienke\

@@ -9,13 +9,13 @@
 <@page.layout title="${article.title}">
    
     <#assign style = "style=\"color:#695ea1\"">
-    <aside class="d-none d-md-block float-md-end border-start ms-5 ps-5" ${style}>
+    <aside class="d-none d-md-block float-md-end border-start py-5 ms-5 ps-5" ${style}>
         ${aside.content}
     </aside>
 
    ${article.content}
 
-    <div class="d-block d-md-none border-top mt-4" ${style}>
+    <div class="d-block d-md-none border-top pt-4 mt-4" ${style}>
         ${aside.content}
     </div>
    
