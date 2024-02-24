@@ -24,7 +24,7 @@
       <!-- Template Servlet -->
       <servlet>
         <servlet-name>TemplateServlet</servlet-name>
-        <servlet-class>ragtime.cc.website.template.WebsiteServlet</servlet-class>
+        <servlet-class>ragtime.cc.website.http.WebsiteServlet</servlet-class>
       </servlet>
 
       <servlet-mapping>

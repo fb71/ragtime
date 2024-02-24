@@ -13,32 +13,18 @@
  */
 package ragtime.cc.website.template;
 
-import static org.apache.commons.lang3.StringUtils.split;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
-import areca.common.Assert;
-import areca.common.Session;
-import areca.common.SessionScoper.ThreadBoundSessionScoper;
-import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.rt.server.EventLoop;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.core.DirectiveCallPlace;
 import freemarker.template.Configuration;
@@ -46,29 +32,26 @@ import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
 import freemarker.template.Version;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.website.http.ContentProvider;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
- * Processes templates + data/model with FreeMarker and CommonMark to provide a
- * website.
+ * Provides HTML content created from templates + data/model with FreeMarker and
+ * CommonMark.
  *
  * @author Falko Bräutigam
  */
-public class WebsiteServlet
-        extends HttpServlet {
+public class TemplateContentProvider
+        implements ContentProvider {
 
-    private static final String ATTR_SESSION = "ragtime.cc.website.session";
-
-    private static final Log LOG = LogFactory.getLog( WebsiteServlet.class );
+    private static final Log LOG = LogFactory.getLog( TemplateContentProvider.class );
 
     private static final Pattern        MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
 
-    private Configuration               cfg;
+    private static Configuration        cfg;
 
 
-    @Override
-    public void init() throws ServletException {
+    static {
         try {
             Version v2_3_32 = new Version( 2, 3, 32 );
             cfg = new Configuration( v2_3_32 );
@@ -86,97 +69,24 @@ public class WebsiteServlet
     }
 
 
-    @Override
-    public void destroy() {
-        LOG.warn( "DISPOSE " );
-        Repositories.dispose();
-    }
-
-
-    /**
-     *
-     */
-    protected Session session( HttpSession httpSession ) {
-        var session = (Session)httpSession.getAttribute( ATTR_SESSION );
-        synchronized (httpSession) {
-            if (session == null) {
-                LOG.info( "Session: START" );
-                session = new Session();
-                httpSession.setAttribute( ATTR_SESSION, session );
-
-                ThreadBoundSessionScoper.instance().bind( session, __ -> {
-                    Session.setInstance( new EventLoop() );
-                });
-            }
-        }
-        return Assert.notNull( session );
-    }
-
-
-    @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
-        try {
-            var t = Timer.start();
-            var httpSession = req.getSession( true );
-            var session = session( httpSession );
-
-            ThreadBoundSessionScoper.instance().bind( session, __ -> {
-                process( req, resp );
-            });
-            LOG.warn( "processed (%s)", t.elapsedHumanReadable() );
-        }
-        catch (Exception e) {
-            resp.setStatus( 500 );
-            try (var out = resp.getWriter()) {
-                out.write( "" + e );
-            }
-            e.printStackTrace();
-        }
-    }
-
-
-    protected void process( HttpServletRequest request, HttpServletResponse resp ) throws Exception {
-        var uow = Repositories.mainRepo().newUnitOfWork();
-
-        // find permid in path
-        var parts = split( request.getPathInfo(), '/' );
-        if (parts.length == 2) {
-            var permid = Integer.parseInt( parts[0] );
-            uow = Repositories.repo( permid ).newUnitOfWork();
-        }
-        // find from domain name
-        else {
-            throw new RuntimeException( "Domain name mapping is not yet implemented." );
-        }
-
-        var templateName = StringUtils.substringAfterLast( request.getPathInfo(), "/" );
+    public void process( Request request ) throws Exception {
+        var templateName = StringUtils.substringAfterLast( request.httpRequest().getPathInfo(), "/" );
         LOG.info( "Loading template: %s(.ftl)", templateName );
         var template = cfg.getTemplate( templateName + ".ftl" );
 
-        var data = loadData( template, request, uow );
-        data.put( "params", new HttpRequestParamsTemplateModel( request ) );
-        data.put( "config", loadTemplateConfig( uow ) );
+        var data = loadData( template, request.httpRequest(), request.uow() );
+        data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest() ) );
+        data.put( "config", loadTemplateConfig( request.uow() ) );
 
-        try (var out = resp.getWriter()) {
+        try (var out = request.httpResponse().getWriter()) {
             template.process( data, out );
         }
-        uow.close();
     }
 
 
     protected Object loadTemplateConfig( UnitOfWork uow ) {
         var config = uow.query( TemplateConfigEntity.class ).executeCollect().waitForResult().get().get( 0 );
         return new CompositeTemplateModel( config );
-    }
-
-    @Deprecated
-    protected Object templateConfig() {
-        return new HashMap<>() {{
-            put( "nav_items", new ArrayList<>() {{
-                add( new HashMap<>() {{ put( "title", "Home"); put( "href", "frontpage"); }});
-                add( new HashMap<>() {{ put( "title", "Impressum"); put( "href", "impressum"); }});
-            }});
-        }};
     }
 
 
@@ -205,7 +115,7 @@ public class WebsiteServlet
                     String name = m.group( 1 );
                     String modelName = m.group( 2 );
                     modelParams.addMacroParams( m.group( 3 ) );
-                    LOG.info( "MACRO: name=%s model=%s params=%s", name, modelName, modelParams );
+                    LOG.info( "Data macro: name=%s model=%s params=%s", name, modelName, modelParams );
 
                     // Entity by id
                     if (modelName.equals( EntityByIdTemplateModel.class.getSimpleName() )) {

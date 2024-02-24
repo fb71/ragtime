@@ -41,5 +41,6 @@ public class Article
     @Format( Format.FormatType.MARKDOWN )
     public Property<String>             content;
 
+    @Queryable
     public ManyAssociation<TagEntity>   tags;
 }

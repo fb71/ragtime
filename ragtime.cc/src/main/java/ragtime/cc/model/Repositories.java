@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 
@@ -116,28 +117,29 @@ public class Repositories {
 
 
     public static EntityRepository repo( int permid ) {
-        File workspace = CCApp.workspaceDir( permid );
-        if (!workspace.exists()) {
-            throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
-        }
-        var dbfile = new File( workspace, "content.db" );
-        dbfile.delete();
-
         return repos.computeIfAbsent( permid, __ -> {
+            File workspace = CCApp.workspaceDir( permid );
+            if (!workspace.exists()) {
+                throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
+            }
+            var dbfile = new File( workspace, "content.db" );
+            dbfile.delete();
+
             return EntityRepository.newConfiguration()
-                    .entities.set( asList( Article.info, TagEntity.info, WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
+                    .entities.set( asList( Article.info, MediaEntity.info, TagEntity.info,
+                            WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
                     .store.set( new No2Store( dbfile ) )
                     .create()
                     .then( newRepo -> {
                         LOG.debug( "Repo: created." );
-                        return populateGienkeRepo( newRepo ).map( ___ -> newRepo );
+                        return populateGienkeRepo( newRepo, permid ).map( ___ -> newRepo );
                     })
                     .waitForResult().get(); // XXX
         });
     }
 
 
-    protected static Promise<Submitted> populateGienkeRepo( EntityRepository repo ) {
+    protected static Promise<Submitted> populateGienkeRepo( EntityRepository repo, int permid ) {
         var uow2 = repo.newUnitOfWork();
         return uow2.query( Article.class )
                 .executeCollect()
@@ -162,13 +164,26 @@ public class Repositories {
                         });
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Kontakt" );
-                            proto.content.set( "Telefon: ..." );
+                            proto.content.set( "Bild:\n<img src=\"media/friederike_1.jpg\"/>" );
                             proto.tags.add( kontaktTag );
                         });
                         var impressum = uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Impressum" );
-                            proto.content.set( "## Impressum" );
+                            proto.content.set( "## Impressum\n![alt](media/friederike_1.jpg)" );
                             //proto.tags.add( kontaktTag );
+                        });
+
+                        // Media
+                        uow2.createEntity( MediaEntity.class, proto -> {
+                            proto.name.set( "friederike_1.jpg" );
+                            proto.mimetype.set( "image/jpeg" );
+                            proto.permid.set( permid );
+                            try (
+                                var in = new URL( "https://www.psychotherapie-gienke.de/wp-content/Bilder/gienke_01.jpg" ).openStream();
+                                var out = proto.write();
+                            ){
+                                IOUtils.copy( in, out );
+                            }
                         });
 
                         // TemplateConfig
