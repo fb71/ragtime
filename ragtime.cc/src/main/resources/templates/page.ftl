@@ -13,7 +13,7 @@
 
 <body>
     <#-- Page header with logo and tagline-->
-    <header class="py-3 bg-light border-bottom">
+    <header class="py-3 border-bottom" style="background-color:#f0eff6">
         <div class="container">
             <div class="text-center my-5">
                 <h1 class="fw-bolder">${config.page.title}</h1>
@@ -23,7 +23,7 @@
     </header>
     
     <#-- Responsive navbar-->
-    <nav class="navbar navbar-expand-lg border-bottom mb-4">
+    <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
             <a class="navbar-brand" href="#!"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>

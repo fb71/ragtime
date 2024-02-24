@@ -14,7 +14,7 @@
 package ragtime.cc.model;
 
 import static java.util.Arrays.asList;
-import static ragtime.cc.website.template.ArticleByTagTemplateModel.PARAM_TAG;
+import static ragtime.cc.website.template.ArticleTemplateModel.PARAM_TAG;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -38,6 +38,7 @@ import areca.ui.statenaction.State;
 import ragtime.cc.CCApp;
 import ragtime.cc.website.model.TemplateConfigEntity;
 import ragtime.cc.website.model.WebsiteConfigEntity;
+import ragtime.cc.website.template.ArticleTemplateModel;
 
 /**
  *
@@ -154,12 +155,16 @@ public class Repositories {
                             proto.category.set( TagEntity.WEBSITE_NAVI );
                             proto.name.set( "Kontakt" );
                         });
+                        var asideTag = uow2.createEntity( TagEntity.class, proto -> {
+                            proto.category.set( TagEntity.WEBSITE_NAVI );
+                            proto.name.set( "aside" );
+                        });
 
                         // Article
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Willkommen" );
-                            var welcome = IOUtils.toString( Thread.currentThread().getContextClassLoader().getResource( "welcome.md" ), "UTF-8" );
-                            proto.content.set( welcome );
+                            proto.content.set( IOUtils.toString( cl.getResource( "welcome.md" ), "UTF-8" ) );
                             proto.tags.add( homeTag );
                         });
                         uow2.createEntity( Article.class, proto -> {
@@ -171,6 +176,15 @@ public class Repositories {
                             proto.title.set( "Impressum" );
                             proto.content.set( "## Impressum\n![alt](media/friederike_1.jpg)" );
                             //proto.tags.add( kontaktTag );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Datenschutz" );
+                            proto.content.set( "## Datenschutz" );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Kasten mit Bild" );
+                            proto.content.set( IOUtils.toString( cl.getResource( "aside.md" ), "UTF-8" ) );
+                            proto.tags.add( asideTag );
                         });
 
                         // Media
@@ -194,12 +208,16 @@ public class Repositories {
                                 page.footer.set( "&copy; Praxis für Psychotherapie" );
                             });
                             proto.navItems.createElement( navItem -> {
-                                navItem.title.set( "Home" );
+                                navItem.title.set( "Willkommen" );
                                 navItem.href.set( "home" );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Kontakt" );
                                 navItem.href.set( String.format( "frontpage?%s=Kontakt", PARAM_TAG ) );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Datenschutz" );
+                                navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );

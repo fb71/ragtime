@@ -85,7 +85,7 @@ public class TemplateContentProvider
 
 
     protected Object loadTemplateConfig( UnitOfWork uow ) {
-        var config = uow.query( TemplateConfigEntity.class ).executeCollect().waitForResult().get().get( 0 );
+        var config = uow.query( TemplateConfigEntity.class ).singleResult().waitForResult().get();
         return new CompositeTemplateModel( config );
     }
 
@@ -122,8 +122,8 @@ public class TemplateContentProvider
                         result.put( name, new EntityByIdTemplateModel( modelParams, uow ) );
                     }
                     // Article by tag
-                    else if (modelName.equals( ArticleByTagTemplateModel.class.getSimpleName() )) {
-                        result.put( name, new ArticleByTagTemplateModel( modelParams, uow ) );
+                    else if (modelName.equals( ArticleTemplateModel.class.getSimpleName() )) {
+                        result.put( name, new ArticleTemplateModel( modelParams, uow ) );
                     }
                     // Query
                     else if (modelName.equals( QueryTemplateModel.class.getSimpleName() )) {

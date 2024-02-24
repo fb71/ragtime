@@ -19,37 +19,55 @@ import static org.polymap.model2.query.Expressions.eq;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
-import areca.common.Assert;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.TagEntity;
 
 /**
- * Provides an {@link Article} by specified name of a {@link TagEntity}.
+ * Provides an {@link Article} by specified {@link Article#title} or name of a
+ * {@link Article#tags}/{@link TagEntity}.
  *
  * @author Falko Bräutigam
  */
-public class ArticleByTagTemplateModel
+public class ArticleTemplateModel
         extends CompositeTemplateModel {
 
-    private static final Log LOG = LogFactory.getLog( ArticleByTagTemplateModel.class );
+    private static final Log LOG = LogFactory.getLog( ArticleTemplateModel.class );
 
     public static final String PARAM_TAG = "t";
+    public static final String PARAM_TITLE = "n";
 
-    public ArticleByTagTemplateModel( ModelParams modelParams, UnitOfWork uow ) {
+
+    public ArticleTemplateModel( ModelParams modelParams, UnitOfWork uow ) {
+        if (modelParams.containsKey( PARAM_TAG )) {
+            articleByTag( modelParams, uow );
+        }
+        else if (modelParams.containsKey( PARAM_TITLE )) {
+            articleByTitle( modelParams, uow );
+        }
+        else {
+            throw new RuntimeException( "Model param missing!");
+        }
+    }
+
+
+    protected void articleByTitle( ModelParams modelParams, UnitOfWork uow ) {
+        this.composite = uow.query( Article.class )
+                .where( eq( Article.TYPE.title, modelParams.get( PARAM_TITLE ) ) )
+                .singleResult()
+                .waitForResult().get();
+    }
+
+
+    protected void articleByTag( ModelParams modelParams, UnitOfWork uow ) {
         var tagQuery = and(
                 eq( TagEntity.TYPE.name, modelParams.get( PARAM_TAG ) ),
                 eq( TagEntity.TYPE.category, TagEntity.WEBSITE_NAVI ) );
 
-        var rs = uow.query( Article.class )
+        this.composite = uow.query( Article.class )
                 .where( anyOf( Article.TYPE.tags, tagQuery ) )
-                .executeCollect()
+                .singleResult()
                 .waitForResult().get();
-
-        Assert.isEqual( 1, rs.size(), "Wrong number of result: " + rs.size() );
-
-        this.composite = rs.get( 0 );
     }
-
 }

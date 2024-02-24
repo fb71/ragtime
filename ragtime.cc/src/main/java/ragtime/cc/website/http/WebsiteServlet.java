@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.Assert;
 import areca.common.Session;
 import areca.common.SessionScoper.ThreadBoundSessionScoper;
 import areca.common.Timer;
@@ -118,7 +119,12 @@ public class WebsiteServlet
         };
 
         //LOG.info( "Path: %s", Arrays.toString( parts ) );
-        if (parts.length >= 2 && parts[1].equals( "media" )) {
+
+        if (parts.length == 1) {
+            Assert.that( req.getPathInfo().endsWith( "/" ), "Home URL does not end with a '/'" );
+            resp.sendRedirect( "home" );
+        }
+        else if (parts.length >= 2 && parts[1].equals( "media" )) {
             new MediaContentProvider().process( request );
         }
         else {
