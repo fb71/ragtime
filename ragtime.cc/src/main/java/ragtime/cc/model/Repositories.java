@@ -14,8 +14,6 @@
 package ragtime.cc.model;
 
 import static java.util.Arrays.asList;
-import static ragtime.cc.website.template.ArticleTemplateModel.PARAM_TAG;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -164,26 +162,26 @@ public class Repositories {
                         ClassLoader cl = Thread.currentThread().getContextClassLoader();
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Willkommen" );
-                            proto.content.set( IOUtils.toString( cl.getResource( "welcome.md" ), "UTF-8" ) );
+                            proto.content.set( IOUtils.toString( cl.getResource( "gienke/welcome.md" ), "UTF-8" ) );
                             proto.tags.add( homeTag );
                         });
-                        uow2.createEntity( Article.class, proto -> {
-                            proto.title.set( "Kontakt" );
-                            proto.content.set( "Bild:\n<img src=\"media/friederike_1.jpg\"/>" );
-                            proto.tags.add( kontaktTag );
-                        });
+//                        uow2.createEntity( Article.class, proto -> {
+//                            proto.title.set( "Kontakt" );
+//                            proto.content.set( "Bild:\n<img src=\"media/friederike_1.jpg\"/>" );
+//                            proto.tags.add( kontaktTag );
+//                        });
                         var impressum = uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Impressum" );
-                            proto.content.set( "## Impressum\n![alt](media/friederike_1.jpg)" );
+                            proto.content.set( IOUtils.toString( cl.getResource( "gienke/impressum.md" ), "UTF-8" ) );
                             //proto.tags.add( kontaktTag );
                         });
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Datenschutz" );
-                            proto.content.set( "## Datenschutz" );
+                            proto.content.set( IOUtils.toString( cl.getResource( "gienke/datenschutz.md" ), "UTF-8" ) );
                         });
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Kasten mit Bild" );
-                            proto.content.set( IOUtils.toString( cl.getResource( "aside.md" ), "UTF-8" ) );
+                            proto.content.set( IOUtils.toString( cl.getResource( "gienke/aside.md" ), "UTF-8" ) );
                             proto.tags.add( asideTag );
                         });
 
@@ -211,10 +209,10 @@ public class Repositories {
                                 navItem.title.set( "Willkommen" );
                                 navItem.href.set( "home" );
                             });
-                            proto.navItems.createElement( navItem -> {
-                                navItem.title.set( "Kontakt" );
-                                navItem.href.set( String.format( "frontpage?%s=Kontakt", PARAM_TAG ) );
-                            });
+//                            proto.navItems.createElement( navItem -> {
+//                                navItem.title.set( "Kontakt" );
+//                                navItem.href.set( String.format( "frontpage?%s=Kontakt", PARAM_TAG ) );
+//                            });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Datenschutz" );
                                 navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );

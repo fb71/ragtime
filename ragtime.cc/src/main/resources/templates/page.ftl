@@ -9,6 +9,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <#--link href="../css/template-common.css" rel="stylesheet"-->
+    <style>
+        :root {
+            --bs-link-color: #7767c5;
+            --bs-link-color-rgb: 119, 103, 197;
+        }
+        .navbar-nav {
+            --bs-nav-link-color: 695ea1;
+        }            
+        .nav-link:hover {
+            --bs-nav-link-color: 695ea1;
+            text-decoration: underline;
+        }            
+    </style>    
 </head>
 
 <body>
