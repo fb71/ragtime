@@ -98,7 +98,7 @@ public class CCApp
         try {
             LOG.info( "createUI(): ..." );
             createUI( rootWindow -> {
-                rootWindow.layout.set( MaxWidthLayout.width( 650 ).fillHeight.set( true ) );
+                rootWindow.layout.set( MaxWidthLayout.width( 750 ).fillHeight.set( true ) );
                 var pageflowContainer = rootWindow.add( new UIComposite() {{
                     cssClasses.add( "MaxWidth" );
                 }});

@@ -74,7 +74,7 @@ public class Repositories {
             dbfile.delete();
 
             return EntityRepository.newConfiguration()
-                    .entities.set( Arrays.asList( AccountEntity.info ) )
+                    .entities.set( Arrays.asList( AccountEntity.info, ModelVersionEntity.info ) )
                     .store.set( new No2Store( dbfile ) )
                     .create()
                     .then( newRepo -> {
@@ -91,6 +91,10 @@ public class Repositories {
         return uow.query( AccountEntity.class ).executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
+                        // model version
+                        uow.createEntity( ModelVersionEntity.class, proto -> {
+                            proto.version.set( ModelVersionEntity.VERSION_MAIN );
+                        });
                         // admin
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
@@ -126,7 +130,8 @@ public class Repositories {
 
             return EntityRepository.newConfiguration()
                     .entities.set( asList( Article.info, MediaEntity.info, TagEntity.info,
-                            WebsiteConfigEntity.info, TemplateConfigEntity.info ) )
+                            WebsiteConfigEntity.info, TemplateConfigEntity.info,
+                            ModelVersionEntity.info ) )
                     .store.set( new No2Store( dbfile ) )
                     .create()
                     .then( newRepo -> {
@@ -144,6 +149,10 @@ public class Repositories {
                 .executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
+                        // model version
+                        uow2.createEntity( ModelVersionEntity.class, proto -> {
+                            proto.version.set( ModelVersionEntity.VERSION_CONTENT );
+                        });
                         // Tags
                         var homeTag = uow2.createEntity( TagEntity.class, proto -> {
                             proto.category.set( TagEntity.WEBSITE_NAVI );

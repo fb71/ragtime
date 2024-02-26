@@ -85,7 +85,7 @@ public class ArticleEditState {
         }
         @Override
         public void run( Void arg ) {
-            uow.submit().onSuccess( __ -> disposeAction() );
+            uow.submit(); //.onSuccess( __ -> disposeAction() );
         }
     };
 
