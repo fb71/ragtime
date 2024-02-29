@@ -57,7 +57,7 @@ public class ArticlesPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Artikel" );
+        ui.init( parent ).title.set( "Inhalt/Texte" );
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
 
@@ -67,6 +67,14 @@ public class ArticlesPage {
             description.set( "Web-Seite ansehen" );
             handler.set( ev -> {
                 //state.listArticles();
+            });
+        }});
+        // action: settings
+        site.actions.add( new Action() {{
+            icon.set( "settings" );
+            description.set( "Einstellungen" );
+            handler.set( ev -> {
+                state.openSettingsAction();
             });
         }});
 

@@ -32,6 +32,7 @@ import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
 import ragtime.cc.model.Article;
+import ragtime.cc.website.TemplateConfigState;
 
 /**
  *
@@ -103,6 +104,11 @@ public class ArticlesState {
         pageflow.close( page );
         site.dispose();
     };
+
+    @State.Action
+    public void openSettingsAction() {
+        site.createState( new TemplateConfigState() ).activate();
+    }
 
 
     @State.Action

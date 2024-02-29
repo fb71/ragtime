@@ -31,6 +31,7 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.article.ArticlesState;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Repositories;
 
@@ -97,7 +98,7 @@ public class LoginState {
 
                     var contentRepo = Repositories.repo( account.permid.get() );
                     var contentUow = contentRepo.newUnitOfWork();
-                    site.createState( new StartState() )
+                    site.createState( new ArticlesState() )
                             .putContext( account, Repositories.SCOPE_MAIN )
                             .putContext( repo, Repositories.SCOPE_MAIN )
                             .putContext( uow, Repositories.SCOPE_MAIN )
