@@ -32,10 +32,10 @@
         <url-pattern>/eventloop/*</url-pattern>
       </servlet-mapping>      
 
-      <servlet-mapping>
+      <!--servlet-mapping>
         <servlet-name>ArecaUIServer</servlet-name>
-        <url-pattern>app/eventloop/*</url-pattern>
-      </servlet-mapping>      
+        <url-pattern>/app/eventloop/*</url-pattern>
+      </servlet-mapping-->      
 
       <!-- Website/Template Servlet -->
       <servlet>
@@ -48,17 +48,7 @@
         <url-pattern>/website/*</url-pattern>
       </servlet-mapping>      
 
-      <!-- ResourceServlet -->
-      <!--servlet>
-        <servlet-name>Resources</servlet-name>
-        <servlet-class>areca.rt.server.servlet.ResourceServlet</servlet-class>
-      </servlet>
-
-      <servlet-mapping>
-         <servlet-name>Resources</servlet-name>
-        <url-pattern>/res/*</url-pattern>
-      </servlet-mapping-->      
-
+    <!-- -->
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
