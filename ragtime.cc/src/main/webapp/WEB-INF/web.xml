@@ -5,6 +5,17 @@
       metadata-complete="true"
       version="3.1">
       
+      <!-- TeaVM app/resources -->
+      <servlet>
+        <servlet-name>TeaAppResourcesServlet</servlet-name>
+        <servlet-class>areca.rt.teavm.TeaAppResourcesServlet</servlet-class>
+      </servlet>
+
+      <servlet-mapping>
+        <servlet-name>TeaAppResourcesServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+      </servlet-mapping>      
+
       <!-- UI server -->
       <servlet>
         <servlet-name>ArecaUIServer</servlet-name>
@@ -17,23 +28,28 @@
       </servlet>
 
       <servlet-mapping>
-         <servlet-name>ArecaUIServer</servlet-name>
-        <url-pattern>/ui/*</url-pattern>
+        <servlet-name>ArecaUIServer</servlet-name>
+        <url-pattern>/eventloop/*</url-pattern>
       </servlet-mapping>      
 
-      <!-- Template Servlet -->
+      <servlet-mapping>
+        <servlet-name>ArecaUIServer</servlet-name>
+        <url-pattern>app/eventloop/*</url-pattern>
+      </servlet-mapping>      
+
+      <!-- Website/Template Servlet -->
       <servlet>
-        <servlet-name>TemplateServlet</servlet-name>
+        <servlet-name>WebsiteServlet</servlet-name>
         <servlet-class>ragtime.cc.website.http.WebsiteServlet</servlet-class>
       </servlet>
 
       <servlet-mapping>
-         <servlet-name>TemplateServlet</servlet-name>
+         <servlet-name>WebsiteServlet</servlet-name>
         <url-pattern>/website/*</url-pattern>
       </servlet-mapping>      
 
       <!-- ResourceServlet -->
-      <servlet>
+      <!--servlet>
         <servlet-name>Resources</servlet-name>
         <servlet-class>areca.rt.server.servlet.ResourceServlet</servlet-class>
       </servlet>
@@ -41,7 +57,7 @@
       <servlet-mapping>
          <servlet-name>Resources</servlet-name>
         <url-pattern>/res/*</url-pattern>
-      </servlet-mapping>      
+      </servlet-mapping-->      
 
     <session-config>
         <session-timeout>30</session-timeout>

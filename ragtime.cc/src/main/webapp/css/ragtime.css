@@ -1,7 +1,10 @@
 .RootWindow {
     background-color: #2e2e2e;
 }
-
+.btn:hover {
+    margin-top: -1px;
+}
+/*
 .MessageCard {
     //color: darken($font_color, 5%);
     //background-color: darken($bg1_color, 3%);
@@ -15,6 +18,7 @@
     background-color: $light_bg_color;
     padding: 5px;
 }
+*/
 .NeedsBtnBad {
     border: 1px solid #d34242;
 }

@@ -29,6 +29,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
 import areca.rt.server.ServerApp;
+import areca.rt.server.servlet.ArecaUIServer;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
@@ -52,6 +53,9 @@ public class CCApp
     private static File workspaceDir;
 
 
+    /**
+     * Called by the {@link ArecaUIServer} once, when the servlet is loaded.
+     */
     public static void init( ServletContext ctx ) throws Exception {
         LOG.info( "Debug: %s", debug );
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
@@ -62,8 +66,6 @@ public class CCApp
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
 
-//        File tmp = (File)ctx.getAttribute( "javax.servlet.context.tempdir" );
-//        File dbBaseDir = new File( tmp, "../ragtime.cc " );
         workspaceDir = new File( System.getProperty( "user.home" ), "servers/workspace-ragtime.cc" );
         workspaceDir.mkdirs();
         LOG.info( "Workspace: %s", workspaceDir.getAbsolutePath() );
@@ -97,6 +99,7 @@ public class CCApp
     public void createUI() {
         try {
             LOG.info( "createUI(): ..." );
+
             createUI( rootWindow -> {
                 rootWindow.layout.set( MaxWidthLayout.width( 750 ).fillHeight.set( true ) );
                 var pageflowContainer = rootWindow.add( new UIComposite() {{
