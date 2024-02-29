@@ -136,23 +136,6 @@
                     <configuration>
                         <lifecycleMappingMetadata>
                             <pluginExecutions>                                
-                                <!-- SASS -->
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>nl.geodienstencentrum.maven</groupId>
-                                        <artifactId>sass-maven-plugin</artifactId>
-                                        <versionRange>[0,)</versionRange>
-                                        <goals>
-                                            <goal>update-stylesheets</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore>true</ignore>
-                                        <execute>
-                                            <runOnIncremental>true</runOnIncremental>
-                                        </execute>
-                                    </action>
-                                </pluginExecution>
                                 <!-- jar -->
                                 <pluginExecution>
                                     <pluginExecutionFilter>
