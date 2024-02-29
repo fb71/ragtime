@@ -95,11 +95,11 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
-                    <webResources>
+                    <!--webResources>
                         <resource>
                             <directory>${project.build.directory}/generated</directory>
                         </resource>
-                    </webResources>
+                    </webResources-->
                 </configuration>
             </plugin>
 
@@ -115,8 +115,7 @@
                     <webApp>
                         <contextPath>/ragtime.cc</contextPath>
                         <resourceBases>
-                            ${project.basedir}/src/main/webapp,
-                            ${project.build.directory}/generated
+                            ${project.basedir}/src/main/webapp
                         </resourceBases>
                     </webApp>
                 </configuration>
