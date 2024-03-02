@@ -13,6 +13,9 @@
  */
 package ragtime.cc.article;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -24,7 +27,6 @@ import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
-import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
@@ -45,11 +47,16 @@ public class ArticlesPage {
 
     public static final ClassInfo<ArticlesPage> INFO = ArticlesPageClassInfo.instance();
 
+    protected static final DateFormat df = SimpleDateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM );
+
     @Page.Part
     protected PageContainer     ui;
 
     @Page.Context
     protected ArticlesState     state;
+
+//    @Page.Context
+//    protected UICommon          uic;
 
     @Page.Context
     protected PageSite          site;
@@ -78,28 +85,29 @@ public class ArticlesPage {
             });
         }});
 
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
+        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 
         // website link
         ui.body.add( new Link() {{
-            layoutConstraints.set( RowConstraints.height( 35 ) );
-            content.set( "Website..." );
+            layoutConstraints.set( RowConstraints.height( 25 ) );
+            content.set( "Web-Seite ansehen..." );
+            tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
             href.set( String.format( "website/%s/home", state.account.permid.get() ) );
         }});
 
-        // search
-        ui.body.add( new TextField() {{
-            layoutConstraints.set( RowConstraints.height( 35 ) );
-            content.set( state.searchTxt.get() );
-            events.on( EventType.TEXT, ev -> {
-                state.searchTxt.set( content.get() );
-            });
-        }});
+//        // search
+//        ui.body.add( new TextField() {{
+//            layoutConstraints.set( RowConstraints.height( 35 ) );
+//            content.set( state.searchTxt.get() );
+//            events.on( EventType.TEXT, ev -> {
+//                state.searchTxt.set( content.get() );
+//            });
+//        }});
 
         // list
         ui.body.add( new ScrollableComposite() {{
             list = this;
-            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 5 ) );
+            layout.set( RowLayout.filled().vertical().spacing( 10 ) );
             add( new Text() {{
                content.set( "..." );
             }});
@@ -130,15 +138,18 @@ public class ArticlesPage {
     protected class ArticleListItem extends Button {
 
         public ArticleListItem( Article article ) {
-            //cssClasses.add( "Button" );
             layoutConstraints.set( RowConstraints.height( 50 ) );
-            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
+            layout.set( RowLayout.filled().vertical().margins( 10, 10 ).spacing( 8 ) );
+            bordered.set( false );
             add( new Text() {{
                 //format.set( Format.HTML );
                 content.set( article.title.get() );
             }});
             add( new Text() {{
-                content.set( "..." );
+                content.set( "Geändert: " + df.format( article.modified.get() ) );
+                styles.add( CssStyle.of( "font-size", "10px") );
+                styles.add( CssStyle.of( "color", "#707070") );
+                enabled.set( false );
             }});
             events.on( EventType.SELECT, ev -> {
                 state.selected.set( article );
