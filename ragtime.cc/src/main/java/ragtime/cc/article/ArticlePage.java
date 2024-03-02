@@ -70,7 +70,7 @@ public class ArticlePage {
             submitBtn.enabled.set( enabled );
         });
 
-        ui.body.layout.set( uic.verticalL() );
+        ui.body.layout.set( uic.verticalL().fillHeight( true ) );
 
         ui.body.add( form.newField().label( "Titel" )
                 .model( new PropertyModel<>( state.article.$().title ) )
@@ -82,7 +82,7 @@ public class ArticlePage {
                 .model( new PropertyModel<>( state.article.$().content ) )
                 .viewer( new TextFieldViewer().configure( (TextField t) -> t.multiline.set( true ) ) )
                 .create()
-                .layoutConstraints.set( RowConstraints.height( 300 ) ) );
+                .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
 
 //        ui.body.add( new Text() {{
 //            content.set( "Angelegt: " + state.article.$().created.get() );
@@ -96,23 +96,6 @@ public class ArticlePage {
 //        }});
 
         form.load();
-
-//        ui.body.add( new ScrollableComposite() {{
-//            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
-//
-//            add( new TextField() {{
-//                multiline.set( true );
-//                content.set( state.article.$().content.get() );
-//                events.on( EventType.TEXT, ev -> {
-//                    LOG.info( "TEXT: %s", content.get() );
-//                    state.article.$().content.set( content.get() );
-//
-//                    state.edited = true;
-//                    state.valid = true;
-//                    updateEnabled();
-//                });
-//            }});
-//        }});
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
@@ -129,12 +112,6 @@ public class ArticlePage {
         }});
         return ui;
     }
-
-
-//    protected void updateEnabled() {
-//        LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
-//        submitBtn.icon.set( form.isChanged() && form.isValid() ? "done" : "cancel" );
-//    }
 
 
     @Page.Close
