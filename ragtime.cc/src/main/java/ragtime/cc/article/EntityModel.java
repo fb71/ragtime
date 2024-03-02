@@ -30,21 +30,21 @@ import ragtime.cc.model.EntityLifecycleEvent;
  *
  * @author Falko Bräutigam
  */
-public class EntityModelValue<V extends Entity>
+public class EntityModel<V extends Entity>
         extends ModelBaseImpl
         implements Model<V> {
 
-    private static final Log LOG = LogFactory.getLog( EntityModelValue.class );
+    private static final Log LOG = LogFactory.getLog( EntityModel.class );
 
     private V entity;
 
-    public EntityModelValue() {
+    public EntityModel() {
     }
 
     /**
      * Causes this {@link Model} to {@link #fireChangeEvent()} if the {@link Entity} changed.
      */
-    public EntityModelValue<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
+    public EntityModel<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
         EventManager.instance()
                 .subscribe( ev -> fireChangeEvent() )
                 .performIf( EntityLifecycleEvent.class, ev -> ev.state == State.AFTER_SUBMIT && ev.belongsTo( entity ) )

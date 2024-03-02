@@ -15,6 +15,7 @@ package ragtime.cc.article;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.statenaction.State;
 import ragtime.cc.model.Article;
@@ -29,8 +30,16 @@ public class ArticleCreateState
 
     private static final Log LOG = LogFactory.getLog( ArticleCreateState.class );
 
+    public static final ClassInfo<ArticleCreateState> INFO = ArticleCreateStateClassInfo.instance();
+
     @State.Init
-    public void init() {
-        article.set( uow.createEntity( Article.class ) );
-    }
+    @Override
+    public void initAction() {
+        article.set( uow.createEntity( Article.class, proto -> {
+            proto.title.set( "Neuer Text" );
+            proto.content.set( "..." );
+        }));
+        super.initAction();
+    };
+
 }

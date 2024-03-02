@@ -25,7 +25,7 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
-import ragtime.cc.article.EntityModelValue;
+import ragtime.cc.article.EntityModel;
 import ragtime.cc.website.model.WebsiteConfigEntity;
 
 /**
@@ -52,7 +52,7 @@ public class WebsiteConfigState {
 
     @State.Context
     @State.Model
-    public Model<WebsiteConfigEntity> config = new EntityModelValue<>();
+    public Model<WebsiteConfigEntity> config = new EntityModel<>();
 
     public boolean          edited;
 

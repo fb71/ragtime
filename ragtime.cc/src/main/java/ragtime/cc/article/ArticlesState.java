@@ -31,7 +31,9 @@ import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
+import ragtime.cc.model.Repositories;
 import ragtime.cc.website.TemplateConfigState;
 
 /**
@@ -53,6 +55,9 @@ public class ArticlesState {
 
     @State.Context
     protected UnitOfWork    uow;
+
+    @State.Context( scope=Repositories.SCOPE_MAIN )
+    protected AccountEntity account;
 
     protected ArticlesPage  page;
 
@@ -86,7 +91,7 @@ public class ArticlesState {
             }
             return uow.query( Article.class )
                     .where( searchTxtMatch )
-                    .orderBy( Article.TYPE.modified, Order.DESC );
+                    .orderBy( Article.TYPE.title, Order.ASC );
         }
     };
 

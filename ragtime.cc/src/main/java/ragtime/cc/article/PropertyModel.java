@@ -24,15 +24,15 @@ import areca.ui.viewer.model.ModelBaseImpl;
  *
  * @author Falko Bräutigam
  */
-public class PropertyModelValue<V>
+public class PropertyModel<V>
         extends ModelBaseImpl
         implements Model<V> {
 
-    private static final Log LOG = LogFactory.getLog( PropertyModelValue.class );
+    private static final Log LOG = LogFactory.getLog( PropertyModel.class );
 
     private Property<V> prop;
 
-    public PropertyModelValue( Property<V> prop ) {
+    public PropertyModel( Property<V> prop ) {
         this.prop = prop;
     }
 

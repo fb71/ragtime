@@ -33,7 +33,7 @@ import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.UICommon;
-import ragtime.cc.article.PropertyModelValue;
+import ragtime.cc.article.PropertyModel;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
@@ -72,7 +72,7 @@ public class TemplateConfigPage {
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
-            layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.space2 ) );
+            layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
 
             TemplateConfigEntity config = state.config.get();
 
@@ -80,27 +80,27 @@ public class TemplateConfigPage {
 
             // PageConfig
             add( new UIComposite() {{
-                layout.set( RowLayout.filled().vertical().margins( uic.margins2 ).spacing( uic.space2 ) );
+                layout.set( RowLayout.filled().vertical().margins( uic.marginsL ).spacing( uic.spaceL ) );
                 bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Seite" ) );
 
                 add( form.newField().label( "Titel" )
                         .viewer( new TextFieldViewer() )
-                        .model( new PropertyModelValue<>( config.page.get().title ) )
+                        .model( new PropertyModel<>( config.page.get().title ) )
                         .create() );
                 add( form.newField().label( "Titel 2" )
                         .viewer( new TextFieldViewer() )
-                        .model( new PropertyModelValue<>( config.page.get().title2 ) )
+                        .model( new PropertyModel<>( config.page.get().title2 ) )
                         .create() );
                 add( form.newField().label( "Fusszeile" )
                         .viewer( new TextFieldViewer() )
-                        .model( new PropertyModelValue<>( config.page.get().footer ) )
+                        .model( new PropertyModel<>( config.page.get().footer ) )
                         .create() );
             }});
             // NavItems
             add( new UIComposite() {{
-                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.margins2 ).spacing( uic.space2 ) );
+                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.marginsL ).spacing( uic.spaceL ) );
                 bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Navigation / Menüs" ) ).get();
@@ -113,11 +113,11 @@ public class TemplateConfigPage {
 
                         add( form.newField().label( "Titel" )
                                 .viewer( new TextFieldViewer() )
-                                .model( new PropertyModelValue<>( navItem.title ) )
+                                .model( new PropertyModel<>( navItem.title ) )
                                 .create() );
                         add( form.newField().label( "Ziel" )
                                 .viewer( new TextFieldViewer() )
-                                .model( new PropertyModelValue<>( navItem.href ) )
+                                .model( new PropertyModel<>( navItem.href ) )
                                 .create() );
 
                         add( new Button() {{

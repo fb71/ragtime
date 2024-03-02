@@ -16,6 +16,7 @@ package ragtime.cc;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.Size;
+import areca.ui.layout.RowLayout;
 
 /**
  * Common UI settings and functions depending on the current window size.
@@ -30,11 +31,20 @@ public class UICommon {
     public int space = 15;
 
     /** Slightly bigger {@link #space} */
-    public int space2 = space + (space / 2);
+    public int spaceL = space + (space / 2);
 
     /** Default margins used in the UI */
     public Size margins = Size.of( space, space );
 
-    public Size margins2 = Size.of( space2, space2 );
+    public Size marginsL = Size.of( spaceL, spaceL );
 
+    /** */
+    public RowLayout vertical() {
+        return RowLayout.filled().vertical().margins( margins ).spacing( space );
+    }
+
+    /** */
+    public RowLayout verticalL() {
+        return RowLayout.filled().vertical().margins( marginsL ).spacing( spaceL );
+    }
 }

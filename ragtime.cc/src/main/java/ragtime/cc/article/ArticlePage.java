@@ -18,17 +18,17 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
-import areca.ui.Size;
-import areca.ui.component2.Events.EventType;
-import areca.ui.component2.ScrollableComposite;
+import areca.ui.component2.Button;
 import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
-import areca.ui.layout.FillLayout;
-import areca.ui.layout.RowLayout;
+import areca.ui.layout.RowConstraints;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.TextFieldViewer;
+import areca.ui.viewer.form.Form;
+import ragtime.cc.UICommon;
 
 /**
  *
@@ -45,6 +45,9 @@ public class ArticlePage {
     protected PageContainer     ui;
 
     @Page.Context
+    protected UICommon          uic;
+
+    @Page.Context
     protected PageSite          site;
 
     @Page.Context
@@ -52,45 +55,86 @@ public class ArticlePage {
 
     protected Action            submitBtn;
 
+    private Form                form;
+
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
         ui.init( parent ).title.set( state.article.$().title.get() );
 
-        // header
+        form = new Form();
+        form.subscribe( ev -> {
+            LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
+            boolean enabled = form.isChanged() && form.isValid();
+            submitBtn.icon.set( enabled ? "done" : "" );
+            submitBtn.enabled.set( enabled );
+        });
+
+        ui.body.layout.set( uic.verticalL() );
+
+        ui.body.add( form.newField().label( "Titel" )
+                .model( new PropertyModel<>( state.article.$().title ) )
+                .viewer( new TextFieldViewer() )
+                .create()
+                .layoutConstraints.set( RowConstraints.height( 35 ) ) );
+
+        ui.body.add( form.newField()
+                .model( new PropertyModel<>( state.article.$().content ) )
+                .viewer( new TextFieldViewer().configure( (TextField t) -> t.multiline.set( true ) ) )
+                .create()
+                .layoutConstraints.set( RowConstraints.height( 300 ) ) );
+
+//        ui.body.add( new Text() {{
+//            content.set( "Angelegt: " + state.article.$().created.get() );
+//            layoutConstraints.set( RowConstraints.height( 15 ) );
+//        }});
+//
+//        ui.body.add( new Text() {{
+//            content.set( "Geändert: " + state.article.$().created.get() );
+//            enabled.set( false );
+//            layoutConstraints.set( RowConstraints.height( 15 ) );
+//        }});
+
+        form.load();
+
+//        ui.body.add( new ScrollableComposite() {{
+//            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
+//
+//            add( new TextField() {{
+//                multiline.set( true );
+//                content.set( state.article.$().content.get() );
+//                events.on( EventType.TEXT, ev -> {
+//                    LOG.info( "TEXT: %s", content.get() );
+//                    state.article.$().content.set( content.get() );
+//
+//                    state.edited = true;
+//                    state.valid = true;
+//                    updateEnabled();
+//                });
+//            }});
+//        }});
+
+        // action: submit
         site.actions.add( submitBtn = new Action() {{
             //icon.set( "done" );
             description.set( "Speichern" );
+            type.set( Button.Type.PRIMARY );
+            enabled.set( false );
             handler.set( ev -> {
-                state.submitAction.run();
-            });
-        }});
-
-        ui.body.layout.set( FillLayout.defaults() );
-        ui.body.add( new ScrollableComposite() {{
-            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
-
-            add( new TextField() {{
-                multiline.set( true );
-                content.set( state.article.$().content.get() );
-                events.on( EventType.TEXT, ev -> {
-                    LOG.info( "TEXT: %s", content.get() );
-                    state.article.$().content.set( content.get() );
-
-                    state.edited = true;
-                    state.valid = true;
-                    updateEnabled();
+                form.submit();
+                state.submitAction().onSuccess( __ -> {
+                    submitBtn.enabled.set( false );
                 });
-            }});
+            });
         }});
         return ui;
     }
 
 
-    protected void updateEnabled() {
-        LOG.info( "updateEnabled(): %s", state.submitAction.canRun() );
-        submitBtn.icon.set( state.submitAction.canRun() ? "done" : "cancel" );
-    }
+//    protected void updateEnabled() {
+//        LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
+//        submitBtn.icon.set( form.isChanged() && form.isValid() ? "done" : "cancel" );
+//    }
 
 
     @Page.Close

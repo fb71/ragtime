@@ -14,7 +14,9 @@
 package ragtime.cc.article;
 
 import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -22,9 +24,9 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
+import ragtime.cc.UICommon;
 import ragtime.cc.model.Article;
 
 /**
@@ -44,24 +46,29 @@ public class ArticleEditState {
     @State.Context
     protected Pageflow      pageflow;
 
+    @State.Context
+    @Deprecated
+    protected UICommon      uic;
+
     protected ArticlePage   page;
 
     @State.Context
     protected UnitOfWork    uow;
 
-    @State.Context
+    @State.Context(required = false)
     @State.Model
-    public Model<Article>   article = new EntityModelValue<>();
+    public Model<Article>   article = new EntityModel<>();
 
-    public boolean          edited;
-
-    public boolean          valid;
+//    public boolean          edited;
+//
+//    public boolean          valid;
 
 
     @State.Init
     public void initAction() {
         pageflow.create( page = new ArticlePage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
+                .putContext( uic, Page.Context.DEFAULT_SCOPE )
                 .open();
     };
 
@@ -78,15 +85,20 @@ public class ArticleEditState {
 
 
     @State.Action
-    public StateAction<Void> submitAction = new StateAction<>() {
-        @Override
-        public boolean canRun() {
-            return edited && valid;
-        }
-        @Override
-        public void run( Void arg ) {
-            uow.submit(); //.onSuccess( __ -> disposeAction() );
-        }
-    };
+    public Promise<Submitted> submitAction() {
+        return uow.submit(); //.onSuccess( __ -> disposeAction() );
+    }
+
+//    @State.Action
+//    public StateAction<Void> submitAction = new StateAction<>() {
+//        @Override
+//        public boolean canRun() {
+//            return edited && valid;
+//        }
+//        @Override
+//        public void run( Void arg ) {
+//            uow.submit(); //.onSuccess( __ -> disposeAction() );
+//        }
+//    };
 
 }

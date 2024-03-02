@@ -16,6 +16,8 @@ package ragtime.cc.model;
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+import org.polymap.model2.store.no2.Fulltext;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -38,6 +40,8 @@ public class Article
     @Queryable
     public Property<String>             title;
 
+    @Queryable
+    @Fulltext
     @Format( Format.FormatType.MARKDOWN )
     public Property<String>             content;
 

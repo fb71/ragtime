@@ -19,7 +19,9 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
+import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.TextField;
@@ -59,14 +61,12 @@ public class ArticlesPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Inhalt/Texte" );
 
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
-
         // actions
         site.actions.add( new Action() {{
-            icon.set( "public" );
-            description.set( "Web-Seite ansehen" );
+            icon.set( "add" );
+            description.set( "Neuen Artikel/Text anlegen" );
             handler.set( ev -> {
-                //state.listArticles();
+                state.createArticleAction();
             });
         }});
         // action: settings
@@ -76,6 +76,15 @@ public class ArticlesPage {
             handler.set( ev -> {
                 state.openSettingsAction();
             });
+        }});
+
+        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 10 ) );
+
+        // website link
+        ui.body.add( new Link() {{
+            layoutConstraints.set( RowConstraints.height( 35 ) );
+            content.set( "Website..." );
+            href.set( String.format( "website/%s/home", state.account.permid.get() ) );
         }});
 
         // search
@@ -118,19 +127,19 @@ public class ArticlesPage {
     /**
      *
      */
-    protected class ArticleListItem extends UIComposite {
+    protected class ArticleListItem extends Button {
 
         public ArticleListItem( Article article ) {
-            cssClasses.add( "Button" );
+            //cssClasses.add( "Button" );
             layoutConstraints.set( RowConstraints.height( 50 ) );
-            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 5 ) ) );
+            layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ) );
             add( new Text() {{
                 //format.set( Format.HTML );
                 content.set( article.title.get() );
             }});
-//            add( new Text() {{
-//                content.set( article.content.get() );
-//            }});
+            add( new Text() {{
+                content.set( "..." );
+            }});
             events.on( EventType.SELECT, ev -> {
                 state.selected.set( article );
                 state.editArticleAction.run();

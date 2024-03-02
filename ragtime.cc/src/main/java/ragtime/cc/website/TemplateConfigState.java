@@ -26,7 +26,7 @@ import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import ragtime.cc.UICommon;
-import ragtime.cc.article.EntityModelValue;
+import ragtime.cc.article.EntityModel;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
@@ -53,7 +53,7 @@ public class TemplateConfigState {
     protected UnitOfWork    uow;
 
     @State.Model
-    public Model<TemplateConfigEntity> config = new EntityModelValue<>();
+    public Model<TemplateConfigEntity> config = new EntityModel<>();
 
     @State.Context
     @Deprecated // XXX
