@@ -55,6 +55,12 @@ public class AccountEntity
 
     public Property<Date>       lastLogin;
 
+    @Queryable
+    public Property<String>     rememberMe;
+
+    @Queryable
+    public Property<String>     rememberMeSalt;
+
     public AccountEntity setPassword( String pwd ) {
         var encrypted = PasswordEncryption.encrypt( pwd );
         pwdHash.set( encrypted.hash );

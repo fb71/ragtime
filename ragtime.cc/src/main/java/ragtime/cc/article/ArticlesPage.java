@@ -38,6 +38,7 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import ragtime.cc.LoginState;
 import ragtime.cc.model.Article;
 
 /**
@@ -86,6 +87,19 @@ public class ArticlesPage {
             description.set( "Einstellungen" );
             handler.set( ev -> {
                 state.openSettingsAction();
+            });
+        }});
+        // action: logout
+        site.actions.add( new Action() {{
+            icon.set( "logout" );
+            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
+            handler.set( ev -> {
+                LoginState.logout( state.account ).onSuccess( __ -> {
+                    ui.body.components.disposeAll();
+                    ui.body.add( new Text() {{
+                        content.set( "Logout complete. Reload browser!" );
+                    }});
+                });
             });
         }});
 

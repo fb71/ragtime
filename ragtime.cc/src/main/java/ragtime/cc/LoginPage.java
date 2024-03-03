@@ -63,18 +63,21 @@ public class LoginPage {
             var form = new Form();
             add( form.newField().label( "Login" )
                     .model( state.login )
-                    .viewer( new TextFieldViewer() )
+                    .viewer( new TextFieldViewer() ) //.configure( (TextField f) -> f.type.set( TextField.Type.USERNAME ) ) )
                     .create());
 
             add( form.newField().label( "Password" )
                     .model( state.pwd )
-                    .viewer( new TextFieldViewer() )
+                    .viewer( new TextFieldViewer() ) // .configure( (TextField f) -> f.type.set( TextField.Type.PASSWORD ) ) )
                     .create());
             form.load();
 
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 40 ) );
+                //type.set( Button.Type.SUBMIT );
                 label.set( "Login" );
+                enabled.set( false );
+                form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
                 events.on( EventType.SELECT, ev -> {
                     form.submit();
                     state.loginAction().onError( e -> {

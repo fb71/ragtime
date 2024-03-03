@@ -100,8 +100,8 @@ public class PasswordEncryption
     }
 
     public static class Encrypted {
-        String hash;
-        String salt;
+        public String hash;
+        public String salt;
 
         protected Encrypted( String hash, String salt ) {
             this.hash = hash;
