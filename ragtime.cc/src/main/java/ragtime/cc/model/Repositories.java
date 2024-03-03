@@ -53,7 +53,7 @@ public class Repositories {
 
     private static Map<Integer,EntityRepository> repos = new ConcurrentHashMap<>();
 
-    private static final boolean CLEAN_ON_STARTUP = true;
+    private static final boolean CLEAN_ON_STARTUP = false;
 
 
     public static void init() {

@@ -18,7 +18,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import java.io.BufferedWriter;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.runtime.UnitOfWork;
@@ -78,7 +81,7 @@ public class TemplateContentProvider
         data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest() ) );
         data.put( "config", loadTemplateConfig( request.uow() ) );
 
-        try (var out = request.httpResponse().getWriter()) {
+        try (var out = new BufferedWriter( request.httpResponse().getWriter() )) {
             template.process( data, out );
         }
     }

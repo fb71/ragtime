@@ -26,7 +26,7 @@
 
 <body>
     <#-- Page header with logo and tagline-->
-    <header class="py-3 border-bottom" style="background-color:#f0eff6">
+    <header class="py-3 border-bottom" style="background-color:${config.colors.headerBackground}; color:${config.colors.headerForeground}">
         <div class="container">
             <div class="text-center my-5">
                 <h1 class="fw-bolder">${config.page.title}</h1>
