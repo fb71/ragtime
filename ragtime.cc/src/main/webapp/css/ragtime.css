@@ -4,6 +4,11 @@
 .btn:hover {
     margin-top: -1px;
 }
+.MessageCard {
+    background-color: #252525;
+    border-top: 1px solid #444444;
+    border-radius: 6px;
+}
 /*
 .MessageCard {
     //color: darken($font_color, 5%);

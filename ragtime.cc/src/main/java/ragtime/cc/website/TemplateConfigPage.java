@@ -30,6 +30,7 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.UICommon;
@@ -68,7 +69,7 @@ public class TemplateConfigPage {
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
-        ui.init( parent ).title.set( "Web-Seite" );
+        ui.init( parent ).title.set( "Einstellungen" );
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
@@ -80,8 +81,9 @@ public class TemplateConfigPage {
 
             // PageConfig
             add( new UIComposite() {{
-                layout.set( RowLayout.filled().vertical().margins( uic.marginsL ).spacing( uic.spaceL ) );
-                bordered.set( true );
+                layoutConstraints.set( RowConstraints.height( 200 ) );
+                layout.set( uic.verticalL() );
+                //bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Seite" ) );
 
@@ -98,10 +100,48 @@ public class TemplateConfigPage {
                         .model( new PropertyModel<>( config.page.get().footer ) )
                         .create() );
             }});
+
+            // Colors
+            add( new UIComposite() {{
+                layoutConstraints.set( RowConstraints.height( 310 ) );
+                layout.set( uic.verticalL().spacing( uic.space ) );
+                //bordered.set( true );
+                cssClasses.add( "MessageCard" );
+                addDecorator( new Label().content.set( "Farben" ) );
+
+                add( form.newField().label( "Hintergrund" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().pageBackground ) )
+                        .create() );
+                add( form.newField().label( "Text" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().pageForeground ) )
+                        .create() );
+
+                add( form.newField().label( "Kopf: Hintergrund" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().headerBackground ) )
+                        .create() );
+                add( form.newField().label( "Kopf: Text" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().headerForeground ) )
+                        .create() );
+
+                add( form.newField().label( "Akzent" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().accent ) )
+                        .create() );
+                add( form.newField().label( "Link" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( config.colors.get().link ) )
+                        .create() );
+            }});
+
             // NavItems
             add( new UIComposite() {{
-                layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.marginsL ).spacing( uic.spaceL ) );
-                bordered.set( true );
+                layoutConstraints.set( RowConstraints.height( 200 ) );
+                layout.set( uic.verticalL() );
+                //bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Navigation / Menüs" ) ).get();
 
@@ -140,27 +180,32 @@ public class TemplateConfigPage {
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
-            //icon.set( "done" );
             description.set( "Speichern" );
+            type.set( Button.Type.PRIMARY );
+            enabled.set( false );
             handler.set( ev -> {
                 form.submit();
-                state.submitAction.run();
+                state.submitAction().onSuccess( __ -> {
+                    enabled.set( false );
+                });
             });
-            form.subscribe( l -> {
-                icon.set( form.isChanged() && form.isValid() && state.submitAction.canRun() ? "done" : "cancel" );
-            });
-        }});
-        // action: revert
-        site.actions.add( revertBtn = new Action() {{
-            //icon.set( "undo" );
-            description.set( "Zurücksetzen" );
-            handler.set( ev -> {
-                form.revert();
-            });
-            form.subscribe( l -> {
-                icon.set( form.isChanged() ? "undo" : "" );
+            form.subscribe( ev -> {
+                var _enabled = form.isChanged() && form.isValid();
+                enabled.set( _enabled );
+                icon.set( _enabled ? "done" : "" );
             });
         }});
+//        // action: revert
+//        site.actions.add( revertBtn = new Action() {{
+//            //icon.set( "undo" );
+//            description.set( "Zurücksetzen" );
+//            handler.set( ev -> {
+//                form.revert();
+//            });
+//            form.subscribe( l -> {
+//                icon.set( form.isChanged() ? "undo" : "" );
+//            });
+//        }});
 
         return ui;
     }

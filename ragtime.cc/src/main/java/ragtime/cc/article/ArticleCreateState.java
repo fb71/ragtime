@@ -30,6 +30,7 @@ public class ArticleCreateState
 
     private static final Log LOG = LogFactory.getLog( ArticleCreateState.class );
 
+    @SuppressWarnings( "hiding" )
     public static final ClassInfo<ArticleCreateState> INFO = ArticleCreateStateClassInfo.instance();
 
     @State.Init

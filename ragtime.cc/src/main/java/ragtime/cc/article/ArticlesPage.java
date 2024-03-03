@@ -13,6 +13,10 @@
  */
 package ragtime.cc.article;
 
+import static java.text.DateFormat.MEDIUM;
+
+import java.util.Locale;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -47,7 +51,7 @@ public class ArticlesPage {
 
     public static final ClassInfo<ArticlesPage> INFO = ArticlesPageClassInfo.instance();
 
-    protected static final DateFormat df = SimpleDateFormat.getDateTimeInstance( DateFormat.MEDIUM, DateFormat.MEDIUM );
+    protected static final DateFormat df = SimpleDateFormat.getDateTimeInstance( MEDIUM, MEDIUM, Locale.GERMAN );
 
     @Page.Part
     protected PageContainer     ui;

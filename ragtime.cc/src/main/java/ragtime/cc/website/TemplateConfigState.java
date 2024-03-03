@@ -14,7 +14,9 @@
 package ragtime.cc.website;
 
 import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -22,7 +24,6 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateAction;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import ragtime.cc.UICommon;
@@ -62,8 +63,8 @@ public class TemplateConfigState {
 
     @State.Init
     public void initAction() {
-        uow.query( TemplateConfigEntity.class ).executeCollect().onSuccess( rs -> {
-            config.set( rs.get( 0 ) );
+        uow.query( TemplateConfigEntity.class ).singleResult().onSuccess( c -> {
+            config.set( c );
 
             pageflow.create( page = new TemplateConfigPage() )
                     .putContext( this, Page.Context.DEFAULT_SCOPE )
@@ -85,15 +86,8 @@ public class TemplateConfigState {
 
 
     @State.Action
-    public StateAction<Void> submitAction = new StateAction<>() {
-        @Override
-        public boolean canRun() {
-            return true; //edited && valid;
-        }
-        @Override
-        public void run( Void arg ) {
-            uow.submit(); //.onSuccess( __ -> disposeAction() );
-        }
+    public Promise<Submitted> submitAction() {
+        return uow.submit(); //.onSuccess( __ -> disposeAction() );
     };
 
 }

@@ -13,34 +13,29 @@
  */
 package ragtime.cc.website.model;
 
-import org.polymap.model2.CollectionProperty;
-import org.polymap.model2.Entity;
+import org.polymap.model2.Composite;
 import org.polymap.model2.Property;
 
-import areca.common.log.LogFactory;
-import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 
-/**
- * The configuration of the main/common (?) template.
- *
- * @author Falko Bräutigam
- */
 @RuntimeInfo
-public class TemplateConfigEntity
-        extends Entity {
+public class Colors
+        extends Composite {
 
-    private static final Log LOG = LogFactory.getLog( TemplateConfigEntity.class );
+    public static final ClassInfo<Colors> info = ColorsClassInfo.instance();
 
-    public static final ClassInfo<TemplateConfigEntity> info = TemplateConfigEntityClassInfo.instance();
+    public static Colors    TYPE;
 
-    public static TemplateConfigEntity  TYPE;
+    public Property<String>     pageBackground;
 
-    public Property<PageConfig>         page;
+    public Property<String>     pageForeground;
 
-    public CollectionProperty<NavItem>  navItems;
+    public Property<String>     headerBackground;
 
-    public Property<Colors>             colors;
+    public Property<String>     headerForeground;
 
+    public Property<String>     accent;
+
+    public Property<String>     link;
 }

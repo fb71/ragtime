@@ -53,6 +53,8 @@ public class Repositories {
 
     private static Map<Integer,EntityRepository> repos = new ConcurrentHashMap<>();
 
+    private static final boolean CLEAN_ON_STARTUP = true;
+
 
     public static void init() {
     }
@@ -71,7 +73,9 @@ public class Repositories {
     public static EntityRepository mainRepo() {
         return mainRepo.supply( () -> {
             var dbfile = new File( CCApp.workspaceDir(), "main.db" );
-            dbfile.delete();
+            if (CLEAN_ON_STARTUP) {
+                dbfile.delete();
+            }
 
             return EntityRepository.newConfiguration()
                     .entities.set( Arrays.asList( AccountEntity.info, ModelVersionEntity.info ) )
@@ -126,7 +130,9 @@ public class Repositories {
                 throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
             }
             var dbfile = new File( workspace, "content.db" );
-            dbfile.delete();
+            if (CLEAN_ON_STARTUP) {
+                dbfile.delete();
+            }
 
             return EntityRepository.newConfiguration()
                     .entities.set( asList( Article.info, MediaEntity.info, TagEntity.info,
@@ -158,7 +164,7 @@ public class Repositories {
                             proto.category.set( TagEntity.WEBSITE_NAVI );
                             proto.name.set( "Home" );
                         });
-                        var kontaktTag = uow2.createEntity( TagEntity.class, proto -> {
+                        uow2.createEntity( TagEntity.class, proto -> {
                             proto.category.set( TagEntity.WEBSITE_NAVI );
                             proto.name.set( "Kontakt" );
                         });
@@ -229,6 +235,14 @@ public class Repositories {
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );
                                 navItem.href.set( "article?id=" + impressum.id() );
+                            });
+                            proto.colors.createValue( colors -> {
+                                colors.pageBackground.set( "#f0f0f0" );
+                                colors.pageForeground.set( "#212529" );
+                                colors.headerBackground.set( "#f0eff6" );
+                                colors.headerForeground.set( "#212529" );
+                                colors.accent.set( "#695ea1" );
+                                colors.link.set( "#7767c5" );
                             });
                         });
                     }
