@@ -236,14 +236,14 @@ public class Repositories {
                                 navItem.title.set( "Impressum" );
                                 navItem.href.set( "article?id=" + impressum.id() );
                             });
-                            proto.colors.createValue( colors -> {
-                                colors.pageBackground.set( "#f0f0f0" );
-                                colors.pageForeground.set( "#212529" );
-                                colors.headerBackground.set( "#f0eff6" );
-                                colors.headerForeground.set( "#212529" );
-                                colors.accent.set( "#695ea1" );
-                                colors.link.set( "#7767c5" );
-                            });
+//                            proto.colors.createValue( colors -> {
+//                                colors.pageBackground.set( "#f0f0f0" );
+//                                colors.pageForeground.set( "#212529" );
+//                                colors.headerBackground.set( "#f0eff6" );
+//                                colors.headerForeground.set( "#212529" );
+//                                colors.accent.set( "#695ea1" );
+//                                colors.link.set( "#7767c5" );
+//                            });
                         });
                     }
                     LOG.debug( "Repo: Test Article created" );

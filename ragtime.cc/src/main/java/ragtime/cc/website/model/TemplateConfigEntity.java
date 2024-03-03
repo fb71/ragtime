@@ -14,16 +14,19 @@
 package ragtime.cc.website.model;
 
 import org.polymap.model2.CollectionProperty;
+import org.polymap.model2.Concerns;
 import org.polymap.model2.Entity;
+import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.model.DefaultsCompositeConcern;
 
 /**
- * The configuration of the main/common (?) template.
+ * The configuration of the main/common(?) template.
  *
  * @author Falko Bräutigam
  */
@@ -41,6 +44,8 @@ public class TemplateConfigEntity
 
     public CollectionProperty<NavItem>  navItems;
 
+    @Nullable
+    @Concerns( DefaultsCompositeConcern.class )
     public Property<Colors>             colors;
 
 }

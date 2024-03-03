@@ -14,6 +14,7 @@
 package ragtime.cc.website.model;
 
 import org.polymap.model2.Composite;
+import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Property;
 
 import areca.common.reflect.ClassInfo;
@@ -27,15 +28,21 @@ public class Colors
 
     public static Colors    TYPE;
 
+    @DefaultValue( "#f0f0f0" )
     public Property<String>     pageBackground;
 
+    @DefaultValue( "#212529" )
     public Property<String>     pageForeground;
 
+    @DefaultValue( "#f0eff6" )
     public Property<String>     headerBackground;
 
+    @DefaultValue( "#212529" )
     public Property<String>     headerForeground;
 
+    @DefaultValue( "#695ea1" )
     public Property<String>     accent;
 
+    @DefaultValue( "#7767c5" )
     public Property<String>     link;
 }
