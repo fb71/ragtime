@@ -13,6 +13,8 @@
  */
 package ragtime.cc.model;
 
+import java.util.Date;
+
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
@@ -50,6 +52,8 @@ public class AccountEntity
     protected Property<String>  pwdSalt;
 
     public Property<Boolean>    isAdmin;
+
+    public Property<Date>       lastLogin;
 
     public AccountEntity setPassword( String pwd ) {
         var encrypted = PasswordEncryption.encrypt( pwd );

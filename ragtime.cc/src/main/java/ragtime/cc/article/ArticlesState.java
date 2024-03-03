@@ -74,7 +74,7 @@ public class ArticlesState {
      * Model: articles
      */
     @State.Model
-    public LazyListModel<Article> articles = new QueriedModelValues<>() {
+    public LazyListModel<Article> articles = new EntityListModel<>( Article.class ) {
         {
             // re-fire events from searchTxt
             searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );

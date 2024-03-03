@@ -124,7 +124,7 @@ public class ArticlesPage {
 
 
     protected void refreshArticlesList() {
-        list.components.disposeAll();
+        list.components.disposeAll();  // XXX race cond.
         state.articles.load( 0, 100 ).onSuccess( opt -> {
             opt.ifPresent( article -> {
                 list.add( new ArticleListItem( article ) );

@@ -13,6 +13,8 @@
  */
 package ragtime.cc;
 
+import java.util.Date;
+
 import javax.security.auth.login.LoginException;
 
 import org.polymap.model2.query.Expressions;
@@ -95,6 +97,8 @@ public class LoginState {
                     if (!account.checkPassword( pwd.$() )) {
                         throw new LoginException( "Wrong pwd for login: " + login.get() );
                     }
+                    account.lastLogin.set( new Date() );
+                    uow.submit();
 
                     var contentRepo = Repositories.repo( account.permid.get() );
                     var contentUow = contentRepo.newUnitOfWork();

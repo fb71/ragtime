@@ -32,42 +32,47 @@ import ragtime.cc.model.EntityLifecycleEvent;
  *
  * @author Falko Bräutigam
  */
-public class QueriedModelValues<V extends Entity>
+public class EntityListModel<V extends Entity>
         extends ModelBaseImpl
         implements LazyListModel<V> {
 
-    private static final Log LOG = LogFactory.getLog( QueriedModelValues.class );
+    private static final Log LOG = LogFactory.getLog( EntityListModel.class );
 
-    protected RSupplier<Query<V>>  supplier;
+    protected RSupplier<Query<V>>   query;
+
+    protected Class<V>              resultType;
 
     /**
      * Override {@link #query()}!
      */
-    public QueriedModelValues() {
+    public EntityListModel( Class<V> resultType ) {
+        this.resultType = resultType;
     }
 
 
-    public QueriedModelValues( RSupplier<Query<V>> supplier ) {
-        this.supplier = Assert.notNull( supplier );
-    }
-
-
-    /**
-     * Causes this to {@link #fireChangeEvent()} if {@link Entity}s changed.
-     */
-    public QueriedModelValues<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
-        EventManager.instance()
-                .subscribe( ev -> fireChangeEvent() )
-                // XXX check type on every entity
-                .performIf( EntityLifecycleEvent.class, ev -> ev.state == State.AFTER_SUBMIT )
-                .unsubscribeIf( unsubscribeIf );
-        return this;
+    public EntityListModel( Class<V> resultType, RSupplier<Query<V>> query ) {
+        this( resultType );
+        this.query = Assert.notNull( query );
     }
 
 
     protected Query<V> query() {
-        return Assert.notNull( supplier, "Override #query() or provide a Supplier in the ctor!" ).supply();
+        return Assert.notNull( query, "Override #query() or provide a Supplier in the ctor!" ).supply();
     }
+
+
+    /**
+     * Causes this model to {@link #fireChangeEvent()} if {@link Entity}s changed.
+     */
+    public EntityListModel<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
+        EventManager.instance()
+                .subscribe( ev -> fireChangeEvent() )
+                .performIf( EntityLifecycleEvent.class, ev ->
+                        ev.state == State.AFTER_SUBMIT && resultType.isInstance( ev.getSource() ) )
+                .unsubscribeIf( unsubscribeIf );
+        return this;
+    }
+
 
     @Override
     public Promise<Integer> count() {

@@ -47,7 +47,8 @@ public class EntityModel<V extends Entity>
     public EntityModel<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
         EventManager.instance()
                 .subscribe( ev -> fireChangeEvent() )
-                .performIf( EntityLifecycleEvent.class, ev -> ev.state == State.AFTER_SUBMIT && ev.belongsTo( entity ) )
+                .performIf( EntityLifecycleEvent.class, ev ->
+                        ev.state == State.AFTER_SUBMIT && ev.belongsTo( entity ) )
                 .unsubscribeIf( unsubscribeIf );
         return this;
     }
