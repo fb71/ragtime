@@ -77,10 +77,10 @@ public class LoginState {
     protected UnitOfWork    uow;
 
     @State.Model
-    public Model<String>    login = new Pojo<>( "admin" );
+    public Model<String>    login = new Pojo<>( "" );
 
     @State.Model
-    public Model<String>    pwd = new Pojo<>( "admin" );
+    public Model<String>    pwd = new Pojo<>( "" );
 
 
     @State.Init
