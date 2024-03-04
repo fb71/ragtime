@@ -13,8 +13,6 @@
  */
 package ragtime.cc.website.http;
 
-import static org.apache.commons.lang3.StringUtils.substringAfterLast;
-
 import org.apache.commons.io.IOUtils;
 import org.polymap.model2.query.Expressions;
 
@@ -34,15 +32,15 @@ public class MediaContentProvider
 
     @Override
     public void process( Request request ) throws Exception {
-        var name = substringAfterLast( request.httpRequest().getPathInfo(), "/" );
-        request.uow().query( MediaEntity.class )
+        var name = String.join(  "/", request.path );
+        request.uow.query( MediaEntity.class )
                 .where( Expressions.eq( MediaEntity.TYPE.name, name ) )
                 .singleResult()
                 .waitForResult( media -> {
-                    request.httpResponse().setContentType( media.mimetype.get() );
+                    request.httpResponse.setContentType( media.mimetype.get() );
                     try (
                         var in = media.read();
-                        var out = request.httpResponse().getOutputStream();
+                        var out = request.httpResponse.getOutputStream();
                     ) {
                         IOUtils.copy( in, out );
                     }

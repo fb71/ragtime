@@ -29,14 +29,17 @@ public interface ContentProvider {
 
     public void process( Request request ) throws Exception;
 
-    public interface Request {
+    public static class Request {
 
-        public HttpServletRequest httpRequest();
+        public HttpServletRequest httpRequest;
 
-        public HttpServletResponse httpResponse();
+        public HttpServletResponse httpResponse;
 
-        public UnitOfWork uow();
+        public UnitOfWork uow;
 
-        public File workspce();
+        public File workspace;
+
+        /** The parts of the URI path specific for this provider. */
+        public String[] path;
     }
 }

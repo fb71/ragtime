@@ -18,11 +18,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import java.io.BufferedWriter;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
@@ -72,16 +70,35 @@ public class TemplateContentProvider
     }
 
 
+    @Override
     public void process( Request request ) throws Exception {
-        var templateName = StringUtils.substringAfterLast( request.httpRequest().getPathInfo(), "/" );
+        var templateName = String.join( "/", request.path );
+
+        // stream resource (*.css, *.woff, ...)
+        if (templateName.endsWith( ".map" )) {
+            request.httpResponse.setStatus( 404 );
+            return;
+        }
+        var res = getClass().getClassLoader().getResource( "templates/" + templateName );
+        if (res != null) {
+            try (
+                var in = res.openStream();
+                var out = request.httpResponse.getOutputStream();
+            ) {
+                IOUtils.copy( in, out );
+            }
+            return;
+        }
+
+        // load template
         LOG.info( "Loading template: %s(.ftl)", templateName );
         var template = cfg.getTemplate( templateName + ".ftl" );
 
-        var data = loadData( template, request.httpRequest(), request.uow() );
-        data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest() ) );
-        data.put( "config", loadTemplateConfig( request.uow() ) );
+        var data = loadData( template, request.httpRequest, request.uow );
+        data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
+        data.put( "config", loadTemplateConfig( request.uow ) );
 
-        try (var out = new BufferedWriter( request.httpResponse().getWriter() )) {
+        try (var out = IOUtils.buffer( request.httpResponse.getWriter() )) {
             template.process( data, out );
         }
     }

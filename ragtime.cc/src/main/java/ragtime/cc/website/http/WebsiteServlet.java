@@ -15,7 +15,6 @@ package ragtime.cc.website.http;
 
 import static org.apache.commons.lang3.StringUtils.split;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.polymap.model2.runtime.UnitOfWork;
+import org.apache.commons.lang3.ArrayUtils;
 
 import areca.common.Assert;
 import areca.common.Session;
@@ -98,25 +97,12 @@ public class WebsiteServlet
         var parts = split( req.getPathInfo(), '/' );
         var permid = Integer.parseInt( parts[0] );
 
-        UnitOfWork uow = Repositories.repo( permid ).newUnitOfWork();
-        var request = new ContentProvider.Request() {
-            @Override
-            public HttpServletRequest httpRequest() {
-                return req;
-            }
-            @Override
-            public HttpServletResponse httpResponse() {
-                return resp;
-            }
-            @Override
-            public UnitOfWork uow() {
-                return uow;
-            }
-            @Override
-            public File workspce() {
-                return CCApp.workspaceDir( permid );
-            }
-        };
+        var request = new ContentProvider.Request() {{
+            this.httpRequest = req;
+            this.httpResponse = resp;
+            this.workspace = CCApp.workspaceDir( permid );
+        }};
+        request.uow = Repositories.repo( permid ).newUnitOfWork();
 
         //LOG.info( "Path: %s", Arrays.toString( parts ) );
 
@@ -125,12 +111,14 @@ public class WebsiteServlet
             resp.sendRedirect( "home" );
         }
         else if (parts.length >= 2 && parts[1].equals( "media" )) {
+            request.path = ArrayUtils.removeAll( parts, 0 , 1);
             new MediaContentProvider().process( request );
         }
         else {
+            request.path = ArrayUtils.remove( parts, 0 );
             new TemplateContentProvider().process( request );
         }
-        uow.close();
+        request.uow.close();
     }
 
 }
