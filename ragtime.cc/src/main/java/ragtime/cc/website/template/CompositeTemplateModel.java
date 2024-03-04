@@ -15,6 +15,8 @@ package ragtime.cc.website.template;
 
 import java.util.Iterator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Composite;
 import org.polymap.model2.Entity;
@@ -22,6 +24,7 @@ import org.polymap.model2.Property;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import areca.ui.Color;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModel;
@@ -56,7 +59,11 @@ public class CompositeTemplateModel
 
 
     @Override
-    public TemplateModel get( String key ) throws TemplateModelException {
+    public TemplateModel get( String _key ) throws TemplateModelException {
+        var key = StringUtils.substringBefore( _key, "@" );
+        var convert = StringUtils.substringAfter( _key, "@" );
+        //LOG.debug( "%s -> %s@%s", _key, key, convert );
+
         // "id"
         if (key.equals( "id" )) {
             return new SimpleScalar( ((Entity)composite).id().toString() );
@@ -71,7 +78,7 @@ public class CompositeTemplateModel
                 var format = a != null ? a.value() : FormatType.PLAIN;
                 switch (format) {
                     case MARKDOWN: return new SimpleScalar( Markdown.render( (String)p.get() ) );
-                    case PLAIN: return new SimpleScalar( (String)p.get() );
+                    case PLAIN: return new SimpleScalar( convert( p.get(), convert ) );
                     default: throw new RuntimeException( "Not yet: " + format );
                 }
             }
@@ -104,6 +111,19 @@ public class CompositeTemplateModel
             }
         }
         throw new RuntimeException( "Not yet: " + prop);
+    }
+
+    /**
+     * First simple attempt to support type and other conversions.
+     */
+    protected String convert( Object value, String convert ) {
+        if (convert.equalsIgnoreCase( "rgb" )) {
+            var c = Color.ofHex( (String)value );
+            return String.format( "%s,%s,%s", c.r, c.g, c.b );
+        }
+        else {
+            return (String)value;
+        }
     }
 
 

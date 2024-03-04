@@ -15,7 +15,7 @@
 
 <body>
     <#-- Page header with logo and tagline-->
-    <header class="py-3 border-bottom" style="background-color:${config.colors.headerBackground}; color:${config.colors.headerForeground}">
+    <header class="py-3 border-bottom">
         <div class="container">
             <div class="text-center my-5">
                 <h1 class="fw-bolder">${config.page.title}</h1>
@@ -28,7 +28,9 @@
     <nav class="navbar navbar-expand-lg mb-4">
         <div class="container">
             <a class="navbar-brand" href="#!"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <#list config.navItems as item>
