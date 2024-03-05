@@ -103,14 +103,23 @@ public class Repositories {
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
                             proto.login.set( "admin" );
+                            proto.email.set( "falko@fb71.org" );
                             proto.setPassword( "admin" );
                             proto.permid.set( 0 );
                             CCApp.workspaceDir( 0 ).mkdir();
+                        });
+                        // falko
+                        uow.createEntity( AccountEntity.class, proto -> {
+                            proto.login.set( "falko@polymap.de" );
+                            proto.email.set( "falko@polymap.de" );
+                            proto.permid.set( 2 );
+                            CCApp.workspaceDir( 2 ).mkdir();
                         });
                         // gienke
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( false );
                             proto.login.set( "praxis@psychotherapie-gienke.de" );
+                            proto.email.set( "praxis@psychotherapie-gienke.de" );
                             proto.permid.set( 1 );
                             CCApp.workspaceDir( 1 ).mkdir();
                         });

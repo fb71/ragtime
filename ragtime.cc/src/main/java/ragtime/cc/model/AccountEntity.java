@@ -15,6 +15,7 @@ package ragtime.cc.model;
 
 import java.util.Date;
 
+import org.polymap.model2.Defaults;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
@@ -47,10 +48,14 @@ public class AccountEntity
     @Queryable
     public Property<String>     login;
 
+    @Queryable
+    public Property<String>     email;
+
     protected Property<String>  pwdHash;
 
     protected Property<String>  pwdSalt;
 
+    @Defaults
     public Property<Boolean>    isAdmin;
 
     public Property<Date>       lastLogin;

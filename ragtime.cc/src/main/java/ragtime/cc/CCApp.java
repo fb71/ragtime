@@ -19,6 +19,8 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Platform;
@@ -48,7 +50,9 @@ public class CCApp
 
     private static final int DB_VERSION = 7;
 
-    private static boolean debug = true;
+    public static boolean debug = true;
+
+    public static CCAppConfig config;
 
     private static File workspaceDir;
 
@@ -66,8 +70,11 @@ public class CCApp
 
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
 
-        workspaceDir = new File( System.getProperty( "user.home" ), "servers/workspace-ragtime.cc" );
-        workspaceDir.mkdirs();
+        config = CCAppConfig.instance;
+
+        workspaceDir = config.workspaceBase.startsWith( "/" )
+                ? new File( config.workspaceBase )
+                : new File( SystemUtils.getUserHome(), config.workspaceBase );
         LOG.info( "Workspace: %s", workspaceDir.getAbsolutePath() );
 
         Repositories.init();

@@ -20,6 +20,9 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.Link;
+import areca.ui.component2.Text;
+import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
@@ -51,6 +54,9 @@ public class LoginPage {
     @Page.Context
     protected LoginState        state;
 
+    protected Text              responseTxt;
+
+    protected TextField         loginField;
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
@@ -61,17 +67,40 @@ public class LoginPage {
             layout.set( RowLayout.verticals().fillWidth( true ).margins( Size.of( 0, 50 ) ).spacing( 30 ) );
 
             var form = new Form();
-            add( form.newField().label( "Login" )
+            add( form.newField().label( "EMail" )
                     .model( state.login )
-                    .viewer( new TextFieldViewer() ) //.configure( (TextField f) -> f.type.set( TextField.Type.USERNAME ) ) )
-                    .create());
+                    .viewer( new TextFieldViewer().configure( (TextField f) -> {
+                        //f.type.set( TextField.Type.USERNAME );
+                        loginField = f;
+                    }))
+                    .create() );
 
-            add( form.newField().label( "Password" )
+            add( form.newField().label( "Passwort" )
                     .model( state.pwd )
                     .viewer( new TextFieldViewer() ) // .configure( (TextField f) -> f.type.set( TextField.Type.PASSWORD ) ) )
-                    .create());
+                    .create() );
             form.load();
 
+            //
+            add( new Link() {{
+                layoutConstraints.set( RowConstraints.height( 20 ) );
+                content.set( "Passwort vergessen... " );
+                styles.add( CssStyle.of( "text-align", "right" ) );
+                tooltip.set( "Sendet ein neues Passwort\nan die oben eingetragene Adresse" );
+                events.on( EventType.SELECT, ev -> {
+                    var email = loginField.content.$();
+                    state.sendNewPasswordAction( email )
+                            .onSuccess( __ -> {
+                                responseTxt.content.set( "EMail wurde versendet an:<br/><b>" + email + "</b>" );
+                            })
+                            .onError( e -> {
+                                responseTxt.content.set( "<b>EMail konnte nicht versandt werden!</b><br/>" + e.getMessage() );
+                                e.printStackTrace();
+                            });
+                });
+            }});
+
+            //
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 40 ) );
                 //type.set( Button.Type.SUBMIT );
@@ -82,8 +111,13 @@ public class LoginPage {
                     form.submit();
                     state.loginAction().onError( e -> {
                         LOG.info( "Login failed: %s", e.getMessage() );
+                        responseTxt.content.set( "Falsche EMail oder Passwort" );
                     });
                 });
+            }});
+            //
+            responseTxt = add( new Text() {{
+                format.set( Format.HTML );
             }});
         }});
         return ui;
