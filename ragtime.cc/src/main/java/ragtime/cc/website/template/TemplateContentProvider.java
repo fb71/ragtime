@@ -74,18 +74,20 @@ public class TemplateContentProvider
     public void process( Request request ) throws Exception {
         var templateName = String.join( "/", request.path );
 
-        // stream resource (*.css, *.woff, ...)
+        //
         if (templateName.endsWith( ".map" )) {
             request.httpResponse.setStatus( 404 );
             return;
         }
+        // stream resource (*.css, *.woff, ...)
         var res = getClass().getClassLoader().getResource( "templates/" + templateName );
         if (res != null) {
+            request.httpResponse.setBufferSize( 32*1024 );
             try (
                 var in = res.openStream();
                 var out = request.httpResponse.getOutputStream();
             ) {
-                IOUtils.copy( in, out );
+                IOUtils.copy( in, out, 32*1024 );
             }
             return;
         }
@@ -98,7 +100,8 @@ public class TemplateContentProvider
         data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
         data.put( "config", loadTemplateConfig( request.uow ) );
 
-        try (var out = IOUtils.buffer( request.httpResponse.getWriter() )) {
+        request.httpResponse.setBufferSize( 16*1024 );
+        try (var out = request.httpResponse.getWriter()) {
             template.process( data, out );
         }
     }

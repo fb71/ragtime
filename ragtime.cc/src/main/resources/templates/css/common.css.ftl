@@ -28,7 +28,7 @@
 }
 header {
     background-color: ${config.colors.headerBackground};
-    color:${config.colors.headerForeground};
+    color: ${config.colors.headerForeground};
 }
 .navbar-nav {
     --bs-nav-link-color: ${config.colors.link};

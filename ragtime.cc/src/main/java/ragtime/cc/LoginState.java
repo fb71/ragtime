@@ -13,6 +13,7 @@
  */
 package ragtime.cc;
 
+import static java.util.Objects.requireNonNullElse;
 import static org.polymap.model2.query.Expressions.eq;
 import java.util.Date;
 import java.util.Properties;
@@ -155,7 +156,7 @@ public class LoginState {
         var r = ArecaUIServer.currentRequest.get();
         //Sequence.of( r.request.getCookies() ).forEach( c -> LOG.info( "Cookie: %s", c.getName() ) );
 
-        return Sequence.of( r.request.getCookies() )
+        return Sequence.of( requireNonNullElse( r.request.getCookies(), new Cookie[0] ) )
                 .first( c -> c.getName().equals( COOKIE_NAME ) )
                 .map( presented -> {
                     var parts = StringUtils.split( presented.getValue(), COOKIE_DELIM );
@@ -177,6 +178,7 @@ public class LoginState {
                 })
                 .orNull();
     }
+
 
     protected void storeNewCookie( AccountEntity account ) {
         var value = RandomStringUtils.random( 24, true, true );
