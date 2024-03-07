@@ -31,6 +31,7 @@ import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.AccountsState;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.Repositories;
@@ -116,6 +117,10 @@ public class ArticlesState {
     }
 
 
+    public void openAccountsAction() {
+        site.createState( new AccountsState() ).activate();
+    }
+
     @State.Action
     public void createArticleAction() {
         site.createState( new ArticleCreateState() ).activate();
@@ -137,5 +142,6 @@ public class ArticlesState {
                     .activate();
         }
     };
+
 
 }

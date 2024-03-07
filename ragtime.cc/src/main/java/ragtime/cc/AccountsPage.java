@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.article;
+package ragtime.cc;
 
 import static java.text.DateFormat.MEDIUM;
 
@@ -28,7 +28,6 @@ import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
-import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
@@ -38,19 +37,18 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import ragtime.cc.LoginState;
-import ragtime.cc.model.Article;
+import ragtime.cc.model.AccountEntity;
 
 /**
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticlesPage {
+public class AccountsPage {
 
-    private static final Log LOG = LogFactory.getLog( ArticlesPage.class );
+    private static final Log LOG = LogFactory.getLog( AccountsPage.class );
 
-    public static final ClassInfo<ArticlesPage> INFO = ArticlesPageClassInfo.instance();
+    public static final ClassInfo<AccountsPage> INFO = AccountsPageClassInfo.instance();
 
     protected static final DateFormat df = SimpleDateFormat.getDateTimeInstance( MEDIUM, MEDIUM, Locale.GERMAN );
 
@@ -58,7 +56,7 @@ public class ArticlesPage {
     protected PageContainer     ui;
 
     @Page.Context
-    protected ArticlesState     state;
+    protected AccountsState     state;
 
 //    @Page.Context
 //    protected UICommon          uic;
@@ -73,58 +71,14 @@ public class ArticlesPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Inhalt/Texte" );
 
-        // action: new
+        // actions
         site.actions.add( new Action() {{
             icon.set( "add" );
-            description.set( "Neuen Artikel/Text anlegen" );
-            handler.set( ev -> state.createArticleAction() );
+            description.set( "Neuen Account anlegen" );
+            //handler.set( ev -> state.createAccountAction() );
         }});
-        // action: settings
-        site.actions.add( new Action() {{
-            icon.set( "settings" );
-            description.set( "Einstellungen" );
-            handler.set( ev -> state.openSettingsAction() );
-        }});
-        // action: logout
-        site.actions.add( new Action() {{
-            icon.set( "logout" );
-            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
-            handler.set( ev -> {
-                LoginState.logout( state.account ).onSuccess( __ -> {
-                    ui.body.components.disposeAll();
-                    ui.body.add( new Text() {{
-                        content.set( "Logout complete. Reload browser!" );
-                    }});
-                });
-            });
-        }});
-        if (state.account.isAdmin.get()) {
-            // action: settings
-            site.actions.add( new Action() {{
-                icon.set( "face4" );
-                description.set( "Accounts" );
-                handler.set( ev -> state.openAccountsAction() );
-            }});
-        }
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
-
-        // website link
-        ui.body.add( new Link() {{
-            layoutConstraints.set( RowConstraints.height( 25 ) );
-            content.set( "Web-Seite ansehen..." );
-            tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
-            href.set( String.format( "website/%s/home", state.account.permid.get() ) );
-        }});
-
-//        // search
-//        ui.body.add( new TextField() {{
-//            layoutConstraints.set( RowConstraints.height( 35 ) );
-//            content.set( state.searchTxt.get() );
-//            events.on( EventType.TEXT, ev -> {
-//                state.searchTxt.set( content.get() );
-//            });
-//        }});
 
         // list
         ui.body.add( new ScrollableComposite() {{
@@ -133,7 +87,7 @@ public class ArticlesPage {
             add( new Text() {{
                content.set( "..." );
             }});
-            state.articles.subscribe( ev -> refreshArticlesList() )
+            state.accounts.subscribe( ev -> refreshArticlesList() )
                     .unsubscribeIf( () -> site.isClosed() );
             refreshArticlesList();
         }});
@@ -143,9 +97,9 @@ public class ArticlesPage {
 
     protected void refreshArticlesList() {
         list.components.disposeAll();  // XXX race cond.
-        state.articles.load( 0, 100 ).onSuccess( opt -> {
+        state.accounts.load( 0, 100 ).onSuccess( opt -> {
             opt.ifPresent( article -> {
-                list.add( new ArticleListItem( article ) );
+                list.add( new AccountListItem( article ) );
             } );
             opt.ifAbsent( __ -> {
                 list.layout();
@@ -157,25 +111,26 @@ public class ArticlesPage {
     /**
      *
      */
-    protected class ArticleListItem extends Button {
+    protected class AccountListItem extends Button {
 
-        public ArticleListItem( Article article ) {
+        public AccountListItem( AccountEntity account ) {
             layoutConstraints.set( RowConstraints.height( 50 ) );
             layout.set( RowLayout.filled().vertical().margins( 10, 10 ).spacing( 8 ) );
             bordered.set( false );
             add( new Text() {{
                 //format.set( Format.HTML );
-                content.set( article.title.get() );
+                content.set( account.email.get() +
+                        (account.isAdmin.get() ? " (" + account.login.get() + ")" : "") );
             }});
             add( new Text() {{
-                content.set( "Geändert: " + df.format( article.modified.get() ) );
+                content.set( "Login: " + df.format( account.lastLogin.get() ) );
                 styles.add( CssStyle.of( "font-size", "10px") );
                 styles.add( CssStyle.of( "color", "#707070") );
                 enabled.set( false );
             }});
             events.on( EventType.SELECT, ev -> {
-                state.selected.set( article );
-                state.editArticleAction.run();
+                state.selected.set( account );
+                state.becomeAccountAction( account );
             });
         }
 

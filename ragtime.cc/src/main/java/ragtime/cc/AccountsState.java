@@ -1,0 +1,146 @@
+/*
+ * Copyright (C) 2024, the @authors. All rights reserved.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3.0 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ */
+package ragtime.cc;
+
+import static org.polymap.model2.query.Expressions.matches;
+import static org.polymap.model2.query.Expressions.or;
+
+import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query;
+import org.polymap.model2.query.Query.Order;
+import org.polymap.model2.runtime.UnitOfWork;
+
+import areca.common.log.LogFactory;
+import areca.common.log.LogFactory.Log;
+import areca.common.reflect.ClassInfo;
+import areca.common.reflect.RuntimeInfo;
+import areca.ui.pageflow.Page;
+import areca.ui.pageflow.Pageflow;
+import areca.ui.statenaction.State;
+import areca.ui.statenaction.StateSite;
+import areca.ui.viewer.model.LazyListModel;
+import areca.ui.viewer.model.Model;
+import areca.ui.viewer.model.Pojo;
+import ragtime.cc.article.ArticlesState;
+import ragtime.cc.article.EntityListModel;
+import ragtime.cc.model.AccountEntity;
+import ragtime.cc.model.Repositories;
+
+/**
+ *
+ * @author Falko Bräutigam
+ */
+@RuntimeInfo
+public class AccountsState {
+
+    private static final Log LOG = LogFactory.getLog( AccountsState.class );
+
+    public static final ClassInfo<AccountsState> INFO = AccountsStateClassInfo.instance();
+
+    @State.Context
+    protected StateSite     site;
+
+    @State.Context
+    protected Pageflow      pageflow;
+
+    @State.Context(scope = Repositories.SCOPE_MAIN)
+    protected UnitOfWork    uow;
+
+    protected AccountsPage  page;
+
+    /**
+     * Model: searchTxt
+     */
+    @State.Model
+    public Model<String>    searchTxt = new Pojo<>( "" );
+
+    @State.Model
+    public Model<AccountEntity> selected = new Pojo<>();
+
+    /**
+     * Model: articles
+     */
+    @State.Model
+    public LazyListModel<AccountEntity> accounts = new EntityListModel<>( AccountEntity.class ) {
+        {
+            // re-fire events from searchTxt
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            // fire event on Entity change
+            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+        }
+        @Override
+        protected Query<AccountEntity> query() {
+            var searchTxtMatch = Expressions.TRUE;
+            if (searchTxt.get().length() > 0) {
+                searchTxtMatch = or(
+                        matches( AccountEntity.TYPE.login, searchTxt.get() + "*" ),
+                        matches( AccountEntity.TYPE.email, searchTxt.get() + "*" ) );
+            }
+            return uow.query( AccountEntity.class )
+                    .where( searchTxtMatch )
+                    .orderBy( AccountEntity.TYPE.lastLogin, Order.DESC );
+        }
+    };
+
+
+    @State.Init
+    public void initAction() {
+        pageflow.create( page = new AccountsPage() )
+                .putContext( AccountsState.this, Page.Context.DEFAULT_SCOPE )
+                .open();
+    };
+
+
+    @State.Dispose
+    public void disposeAction() {
+        pageflow.close( page );
+        site.dispose();
+    };
+
+
+    @State.Action
+    public void becomeAccountAction( AccountEntity account ) {
+        var contentRepo = Repositories.repo( account.permid.get() );
+        var contentUow = contentRepo.newUnitOfWork();
+        site.createState( new ArticlesState() )
+                .putContext( account, Repositories.SCOPE_MAIN )
+                .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
+                .putContext( contentUow, State.Context.DEFAULT_SCOPE )
+                .activate();
+    }
+
+
+//    @State.Action
+//    public void createAccountAction() {
+//        site.createState( new AccountCreateState() ).activate();
+//    }
+//
+//
+//    @State.Action
+//    public StateAction<Void> editArticleAction = new StateAction<>() {
+//        @Override
+//        public boolean canRun() {
+//            return selected.$() != null;
+//        }
+//        @Override
+//        public void run( Void arg ) {
+//            Assert.that( canRun(), "StateAction: !canRun() " );
+//            site.createState( new ArticleEditState() )
+//                    .putContext( Assert.notNull( selected.$() ), State.Context.DEFAULT_SCOPE )
+//                    .onChange( ev -> LOG.info( "STATE CHANGE: %s", ev ) )
+//                    .activate();
+//        }
+//    };
+
+}

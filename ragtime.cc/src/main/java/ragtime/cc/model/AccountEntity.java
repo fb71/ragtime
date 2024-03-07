@@ -58,6 +58,8 @@ public class AccountEntity
     @Defaults
     public Property<Boolean>    isAdmin;
 
+    @Queryable
+    @Defaults
     public Property<Date>       lastLogin;
 
     @Queryable
