@@ -8,14 +8,14 @@
 
 <@page.layout title="${article.title}">
    
-    <aside class="d-none d-md-block float-md-end border-start py-5 ms-5 ps-5 pe-3" style="color:${config.colors.accent}">
+    <aside class="d-none d-md-block float-md-end border-start py-5 ms-5 ps-5 pe-3">
         ${aside.content}
     </aside>
 
    ${article.content}
-
-    <div class="d-block d-md-none border-top pt-4 mt-4" style="color:${config.colors.accent}">
-        ${aside.content}
-    </div>
    
+   <div class="d-block d-md-none border-top pt-4 mt-4" style="color:var(--common-accent-color)">
+        ${aside.content}
+   </div>
+
 </@page.layout>

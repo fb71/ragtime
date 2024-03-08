@@ -8,8 +8,10 @@
     <meta charset="iso-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
-    <#-- link href="css/roboto.css" rel="stylesheet"/-->
+    <#-- Styles specific to the common template -->
     <link href="css/common.css" rel="stylesheet"/>
+    <#-- Styles from TemplateConfigEntity -->
+    <link href="config.css" rel="stylesheet"/>
     <script src="bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
 </head>
 

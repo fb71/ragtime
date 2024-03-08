@@ -13,6 +13,8 @@
  */
 package ragtime.cc.website;
 
+import areca.common.Platform;
+import areca.common.Scheduler.Priority;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -35,7 +37,6 @@ import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.PropertyModel;
-import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
  *
@@ -75,7 +76,7 @@ public class TemplateConfigPage {
         ui.body.add( new ScrollableComposite() {{
             layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
 
-            TemplateConfigEntity config = state.config.get();
+            var config = state.config.get();
 
             form = new Form();
 
@@ -175,7 +176,7 @@ public class TemplateConfigPage {
                     }});
                 }
             }});
-            form.load();
+            Platform.scheduler.schedule( Priority.BACKGROUND, () -> form.load() );
         }});
 
         // action: submit
@@ -206,6 +207,14 @@ public class TemplateConfigPage {
 //                icon.set( form.isChanged() ? "undo" : "" );
 //            });
 //        }});
+        // action: CSS
+        site.actions.add( new Action() {{
+            icon.set( "code" );
+            description.set( "CSS bearbeiten" );
+            handler.set( ev -> {
+                site.createPage( new EditCssPage() ).open();
+            });
+        }});
 
         return ui;
     }

@@ -15,6 +15,7 @@ package ragtime.cc.website.model;
 
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Concerns;
+import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Entity;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
@@ -24,6 +25,7 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import ragtime.cc.model.DefaultsCompositeConcern;
+import ragtime.cc.website.template.TemplateContentProvider;
 
 /**
  * The configuration of the main/common(?) template.
@@ -48,4 +50,17 @@ public class TemplateConfigEntity
     @Concerns( DefaultsCompositeConcern.class )
     public Property<Colors>             colors;
 
+    /**
+     * Project specific CSS.
+     * Loaded as config.css from page.ftl via {@link TemplateContentProvider}
+     */
+    @DefaultValue( ":root {\n  /*--bs-body-bg: white;*/\n}" )
+    public Property<String>             css;
+
+    /**
+     * Project specific JS.
+     * Loaded as config.css from page.ftl via {@link TemplateContentProvider}
+     */
+    @DefaultValue( "" )
+    public Property<String>             js;
 }

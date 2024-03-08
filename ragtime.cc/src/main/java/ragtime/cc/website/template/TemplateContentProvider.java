@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import java.io.StringReader;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -47,9 +49,11 @@ public class TemplateContentProvider
 
     private static final Log LOG = LogFactory.getLog( TemplateContentProvider.class );
 
-    private static final Pattern        MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
+    public static final int         BUFFER_SIZE = 32 * 1024;
 
-    private static Configuration        cfg;
+    private static final Pattern    MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
+
+    private static Configuration    cfg;
 
 
     static {
@@ -73,8 +77,9 @@ public class TemplateContentProvider
     @Override
     public void process( Request request ) throws Exception {
         var templateName = String.join( "/", request.path );
+        request.httpResponse.setBufferSize( BUFFER_SIZE );
 
-        //
+        // skip *(.css).map
         if (templateName.endsWith( ".map" )) {
             request.httpResponse.setStatus( 404 );
             return;
@@ -82,12 +87,20 @@ public class TemplateContentProvider
         // stream resource (*.css, *.woff, ...)
         var res = getClass().getClassLoader().getResource( "templates/" + templateName );
         if (res != null) {
-            request.httpResponse.setBufferSize( 32*1024 );
             try (
                 var in = res.openStream();
                 var out = request.httpResponse.getOutputStream();
             ) {
-                IOUtils.copy( in, out, 32*1024 );
+                IOUtils.copy( in, out, BUFFER_SIZE );
+            }
+            return;
+        }
+
+        // config.css
+        var config = request.uow.query( TemplateConfigEntity.class ).singleResult().waitForResult().get();
+        if (templateName.equals( "config.css" )) {
+            try (var out = request.httpResponse.getWriter()) {
+                IOUtils.copy( new StringReader( config.css.get() ), out );
             }
             return;
         }
@@ -98,18 +111,11 @@ public class TemplateContentProvider
 
         var data = loadData( template, request.httpRequest, request.uow );
         data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
-        data.put( "config", loadTemplateConfig( request.uow ) );
+        data.put( "config", new CompositeTemplateModel( config ) );
 
-        request.httpResponse.setBufferSize( 16*1024 );
         try (var out = request.httpResponse.getWriter()) {
             template.process( data, out );
         }
-    }
-
-
-    protected Object loadTemplateConfig( UnitOfWork uow ) {
-        var config = uow.query( TemplateConfigEntity.class ).singleResult().waitForResult().get();
-        return new CompositeTemplateModel( config );
     }
 
 
