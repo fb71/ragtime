@@ -14,6 +14,9 @@
 package ragtime.cc.model;
 
 import static java.util.Arrays.asList;
+import static ragtime.cc.model.ModelVersionEntity.SCHEMA_VERSION_CONTENT;
+import static ragtime.cc.model.ModelVersionEntity.SCHEMA_VERSION_MAIN;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,11 +52,11 @@ public class Repositories {
     /** the {@link State.Context} scope of the main {@link EntityRepository} and {@link UnitOfWork}. */
     public static final String SCOPE_MAIN = "main-repository";
 
+    private static final boolean CLEAN_ON_STARTUP = false;
+
     private static RLazy<EntityRepository> mainRepo = new RLazy<>();
 
     private static Map<Integer,EntityRepository> repos = new ConcurrentHashMap<>();
-
-    private static final boolean CLEAN_ON_STARTUP = false;
 
 
     public static void init() {
@@ -76,7 +79,6 @@ public class Repositories {
             if (CLEAN_ON_STARTUP) {
                 dbfile.delete();
             }
-
             return EntityRepository.newConfiguration()
                     .entities.set( Arrays.asList( AccountEntity.info, ModelVersionEntity.info ) )
                     .store.set( new No2Store( dbfile ) )
@@ -91,14 +93,12 @@ public class Repositories {
 
 
     protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
-        var uow = repo.newUnitOfWork();
+        var uow = repo.newUnitOfWork();  // must not be closed as we are giving back promise
         return uow.query( AccountEntity.class ).executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
                         // model version
-                        uow.createEntity( ModelVersionEntity.class, proto -> {
-                            proto.version.set( ModelVersionEntity.VERSION_MAIN );
-                        });
+                        uow.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_MAIN ) );
                         // admin
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
@@ -108,27 +108,26 @@ public class Repositories {
                             proto.permid.set( 0 );
                             CCApp.workspaceDir( 0 ).mkdir();
                         });
-                        // falko
-                        uow.createEntity( AccountEntity.class, proto -> {
-                            proto.login.set( "falko@polymap.de" );
-                            proto.email.set( "falko@polymap.de" );
-                            proto.permid.set( 2 );
-                            CCApp.workspaceDir( 2 ).mkdir();
-                        });
                         // gienke
-                        uow.createEntity( AccountEntity.class, proto -> {
-                            proto.isAdmin.set( false );
-                            proto.login.set( "praxis@psychotherapie-gienke.de" );
-                            proto.email.set( "praxis@psychotherapie-gienke.de" );
-                            proto.permid.set( 1 );
-                            CCApp.workspaceDir( 1 ).mkdir();
-                        });
+                        uow.createEntity( AccountEntity.class, AccountEntity.defaults( "praxis@psychotherapie-gienke.de" ) );
                     }
                     return uow.submit();
                 })
                 .onSuccess( submitted -> {
                     LOG.debug( "Repo: submitted." );
                 });
+    }
+
+
+    public static int nextPermid( UnitOfWork uow ) {
+        return uow.query( ModelVersionEntity.class ).singleResult()
+                .map( mv -> {
+                    mv.nextPermid.set( mv.nextPermid.get() + 1 );
+                    LOG.info( "Next permid: %s", mv.nextPermid.get() );
+                    return mv;
+                })
+                .waitForResult().get()
+                .nextPermid.get();
     }
 
 
@@ -142,7 +141,6 @@ public class Repositories {
             if (CLEAN_ON_STARTUP) {
                 dbfile.delete();
             }
-
             return EntityRepository.newConfiguration()
                     .entities.set( asList( Article.info, MediaEntity.info, TagEntity.info,
                             WebsiteConfigEntity.info, TemplateConfigEntity.info,
@@ -151,10 +149,76 @@ public class Repositories {
                     .create()
                     .then( newRepo -> {
                         LOG.debug( "Repo: created." );
-                        return populateGienkeRepo( newRepo, permid ).map( ___ -> newRepo );
+                        return populateContentRepo( newRepo, permid ).map( ___ -> newRepo );
                     })
                     .waitForResult().get(); // XXX
         });
+    }
+
+
+    protected static Promise<Submitted> populateContentRepo( EntityRepository repo, int permid ) {
+        var uow2 = repo.newUnitOfWork();
+        return uow2.query( Article.class )
+                .executeCollect()
+                .then( rs -> {
+                    if (rs.size() == 0) {
+                        // model version
+                        uow2.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_CONTENT ) );
+                        // Tags
+                        var homeTag = uow2.createEntity( TagEntity.class, proto -> {
+                            proto.category.set( TagEntity.WEBSITE_NAVI );
+                            proto.name.set( "Home" );
+                        });
+                        var asideTag = uow2.createEntity( TagEntity.class, proto -> {
+                            proto.category.set( TagEntity.WEBSITE_NAVI );
+                            proto.name.set( "aside" );
+                        });
+                        // Article
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Willkommen" );
+                            proto.content.set( "## Willkommen\n\n..." );
+                            proto.tags.add( homeTag );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Impressum" );
+                            proto.content.set( "## Impressum\n\n..." );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Datenschutz" );
+                            proto.content.set( "## Datenschutz\n\n..." );
+                        });
+                        uow2.createEntity( Article.class, proto -> {
+                            proto.title.set( "Kasten mit Bild" );
+                            proto.content.set( "Kontakt..." );
+                            proto.tags.add( asideTag );
+                        });
+                        // TemplateConfig
+                        uow2.createEntity( TemplateConfigEntity.class, proto -> {
+                            proto.page.createValue( page -> {
+                                page.title.set( "Titel" );
+                                page.title2.set( "Untertitel" );
+                                page.footer.set( "&copy; ..." );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Willkommen" );
+                                navItem.href.set( "home" );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Datenschutz" );
+                                navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
+                            });
+                            proto.navItems.createElement( navItem -> {
+                                navItem.title.set( "Impressum" );
+                                navItem.href.set( String.format( "frontpage?%s=Impressum", ArticleTemplateModel.PARAM_TITLE ) );
+                            });
+                        });
+                    }
+                    LOG.debug( "Repo: content created" );
+                    return uow2.submit();
+                })
+                .onSuccess( submitted -> {
+                    LOG.debug( "Repo: submitted." );
+                });
     }
 
 
@@ -165,9 +229,7 @@ public class Repositories {
                 .then( rs -> {
                     if (rs.size() == 0) {
                         // model version
-                        uow2.createEntity( ModelVersionEntity.class, proto -> {
-                            proto.version.set( ModelVersionEntity.VERSION_CONTENT );
-                        });
+                        uow2.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_CONTENT ) );
                         // Tags
                         var homeTag = uow2.createEntity( TagEntity.class, proto -> {
                             proto.category.set( TagEntity.WEBSITE_NAVI );
@@ -233,10 +295,6 @@ public class Repositories {
                                 navItem.title.set( "Willkommen" );
                                 navItem.href.set( "home" );
                             });
-//                            proto.navItems.createElement( navItem -> {
-//                                navItem.title.set( "Kontakt" );
-//                                navItem.href.set( String.format( "frontpage?%s=Kontakt", PARAM_TAG ) );
-//                            });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Datenschutz" );
                                 navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
@@ -245,14 +303,6 @@ public class Repositories {
                                 navItem.title.set( "Impressum" );
                                 navItem.href.set( "article?id=" + impressum.id() );
                             });
-//                            proto.colors.createValue( colors -> {
-//                                colors.pageBackground.set( "#f0f0f0" );
-//                                colors.pageForeground.set( "#212529" );
-//                                colors.headerBackground.set( "#f0eff6" );
-//                                colors.headerForeground.set( "#212529" );
-//                                colors.accent.set( "#695ea1" );
-//                                colors.link.set( "#7767c5" );
-//                            });
                         });
                     }
                     LOG.debug( "Repo: Test Article created" );

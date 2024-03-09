@@ -13,7 +13,13 @@
  */
 package ragtime.cc.model;
 
+import java.util.Date;
+
+import org.polymap.model2.DefaultValue;
+import org.polymap.model2.Defaults;
 import org.polymap.model2.Property;
+
+import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -33,11 +39,26 @@ public class ModelVersionEntity
     public static final ClassInfo<ModelVersionEntity> info = ModelVersionEntityClassInfo.instance();
 
     /** The current version of the main model */
-    public static final Integer VERSION_MAIN = 1;
+    public static final Integer SCHEMA_VERSION_MAIN = 0;
 
     /** The current version of the content model */
-    public static final Integer VERSION_CONTENT = 1;
+    public static final Integer SCHEMA_VERSION_CONTENT = 0;
 
-    public Property<Integer> version;
+    public static RConsumer<ModelVersionEntity> defaults( Integer schemaVersion ) {
+        return proto -> {
+            proto.schemaVersion.set( schemaVersion );
+        };
+    }
+
+    // instance *******************************************
+
+    @Defaults
+    public Property<Integer> schemaVersion;
+
+    @Defaults
+    public Property<Date> lastCommit;
+
+    @DefaultValue(value = "10")
+    public Property<Integer> nextPermid;
 
 }

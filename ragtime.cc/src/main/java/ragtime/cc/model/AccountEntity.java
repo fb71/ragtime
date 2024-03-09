@@ -16,13 +16,17 @@ package ragtime.cc.model;
 import java.util.Date;
 
 import org.polymap.model2.Defaults;
+import org.polymap.model2.Immutable;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+
+import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.CCApp;
 
 /**
  *
@@ -38,7 +42,21 @@ public class AccountEntity
 
     public static AccountEntity TYPE;
 
+    public static RConsumer<AccountEntity> defaults( String email ) {
+        return proto -> {
+            proto.login.set( email );
+            proto.email.set( email );
+
+            var permid = Repositories.nextPermid( proto.context.getUnitOfWork() );
+            proto.permid.set( permid );
+            CCApp.workspaceDir( permid ).mkdir();
+        };
+    }
+
+    // instance *******************************************
+
     @Queryable
+    @Immutable
     public Property<Integer>    permid;
 
     @Queryable

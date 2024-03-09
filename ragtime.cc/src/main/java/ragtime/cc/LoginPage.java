@@ -13,6 +13,7 @@
  */
 package ragtime.cc;
 
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -81,7 +82,7 @@ public class LoginPage {
                     .create() );
             form.load();
 
-            //
+            // Passwort vergessen
             add( new Link() {{
                 layoutConstraints.set( RowConstraints.height( 20 ) );
                 content.set( "Passwort vergessen... " );
@@ -89,21 +90,24 @@ public class LoginPage {
                 tooltip.set( "Sendet ein neues Passwort\nan die oben eingetragene Adresse" );
                 events.on( EventType.SELECT, ev -> {
                     var email = loginField.content.$();
-                    state.sendNewPasswordAction( email )
+                    responseTxt.content.set( "EMail wird versendet..." );
+                    Platform.schedule( 500, () -> {
+                        state.sendNewPasswordAction( email )
                             .onSuccess( __ -> {
                                 responseTxt.content.set( "EMail wurde versendet an:<br/><b>" + email + "</b>" );
                             })
                             .onError( e -> {
-                                responseTxt.content.set( "<b>EMail konnte nicht versandt werden!</b><br/>" + e.getMessage() );
+                                responseTxt.content.set( "<b>EMail konnte nicht versandt werden.</b><br/>" + e.getMessage() );
                                 e.printStackTrace();
                             });
+                    });
                 });
             }});
 
-            //
+            // Login
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 40 ) );
-                //type.set( Button.Type.SUBMIT );
+                type.set( Button.Type.SUBMIT );
                 label.set( "Login" );
                 enabled.set( false );
                 form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
@@ -111,7 +115,31 @@ public class LoginPage {
                     form.submit();
                     state.loginAction().onError( e -> {
                         LOG.info( "Login failed: %s", e.getMessage() );
-                        responseTxt.content.set( "Falsche EMail oder Passwort" );
+                        responseTxt.content.set( "EMail oder Passwort sind nicht korrekt" );
+                    });
+                });
+            }});
+
+            // Register
+            add( new Button() {{
+                layoutConstraints.set( RowConstraints.height( 40 ) );
+                //type.set( Button.Type.SUBMIT );
+                label.set( "Registrieren" );
+                tooltip.set( "Registriert einen neuen Nutzer\nmit der oben eingetragenen EMail-Adresse.\nDas Passwort wird an diese Adresse verschickt." );
+                enabled.set( false );
+                form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
+                events.on( EventType.SELECT, ev -> {
+                    responseTxt.content.set( "Neuer Nutzer wird erstellt..." );
+                    Platform.schedule( 500, () -> {
+                        var email = loginField.content.$();
+                        state.registerAction( email )
+                                .onSuccess( __ -> {
+                                    responseTxt.content.set( "EMail wurde versendet an:<br/><b>" + email + "</b>" );
+                                })
+                                .onError( e -> {
+                                    responseTxt.content.set( "<b>Nutzer konnte nicht angelegt werden.</b><br/>" + e.getMessage() );
+                                    e.printStackTrace();
+                                });
                     });
                 });
             }});

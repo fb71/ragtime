@@ -87,7 +87,7 @@ public class EditCssPage {
         // action: submit
         site.actions.add( submitBtn = new Action() {{
             description.set( "Speichern" );
-            type.set( Button.Type.PRIMARY );
+            type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
                 form.submit();

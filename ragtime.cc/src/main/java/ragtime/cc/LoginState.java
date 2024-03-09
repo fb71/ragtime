@@ -16,7 +16,6 @@ package ragtime.cc;
 import static java.util.Objects.requireNonNullElse;
 import static org.polymap.model2.query.Expressions.eq;
 import java.util.Date;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
@@ -45,12 +44,6 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
-import jakarta.mail.Authenticator;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import ragtime.cc.article.ArticlesState;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.PasswordEncryption;
@@ -211,7 +204,7 @@ public class LoginState {
                 .where( /*XXX or( eq( AccountEntity.TYPE.login, login ),*/ eq( AccountEntity.TYPE.email, login ) )
                 .executeCollect()
                 .then( rs -> {
-                    rs.forEach( a -> LOG.info( "Account: %s: %s - %s", a.id(), a.login.get(), a.email.get() ) );
+                    //rs.forEach( a -> LOG.info( "Account: %s: %s - %s", a.id(), a.login.get(), a.email.get() ) );
                     Assert.that( rs.size() <= 1, "Login not unique: " + login );
                     if (rs.isEmpty()) {
                         throw new LoginException( "No such login: '" + login + "'" );
@@ -220,33 +213,26 @@ public class LoginState {
                     return uow.submit().map( __ -> rs.get( 0 ) );
                 })
                 .map( account -> {
-                    Properties props = new Properties();
-                    props.put( "mail.smtp.ssl.enable", "true" );
-                    props.put( "mail.smtp.ssl.checkserveridentity", "false" );
-                    props.put( "mail.smtp.host", CCApp.config.smtpHost );
-                    props.put( "mail.smtp.port", CCApp.config.smtpPort );
-                    props.put( "mail.smtp.auth", "true" );
-
-                    var auth = new Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication( CCApp.config.smtpUser, CCApp.config.smtpPassword );
-                        }
-                    };
-
-                    var session = Session.getInstance( props, auth );
-
-                    var msg = new MimeMessage( session );
-                    msg.setSubject( "Neues Passwort" );
-                    msg.setFrom( "falko@fb71.org" );
-                    msg.setRecipients( MimeMessage.RecipientType.TO, InternetAddress.parse( account.email.get() ) );
-                    msg.setText( "Ihr neues Passwort für *fb71.org* lautet: " + newPwd +
+                    Email.send( account.email.get(), "Neues Passwort",
+                            "Ihr neues Passwort für *fb71.org* lautet: " + newPwd +
                             "\n\nWenn Sie kein neues Passwort angefordert haben, dann" +
                             "\nantworten Sie bitte auf diese EMail mit einem kurzen Hinweis." +
-                            "\nVielen Dank!", "UTF-8" );
-                    Transport.send( msg );
-
+                            "\nVielen Dank!" );
                     return account;
                 });
     }
 
+
+    public Promise<AccountEntity> registerAction( String email ) {
+        return uow.query( AccountEntity.class )
+                .where( /*XXX or( eq( AccountEntity.TYPE.login, login ),*/ eq( AccountEntity.TYPE.email, email ) )
+                .executeCollect()
+                .then( rs -> {
+                    if (!rs.isEmpty()) {
+                        throw new LoginException( "EMail existiert bereits: '" + email + "'" );
+                    }
+                    uow.createEntity( AccountEntity.class, AccountEntity.defaults( email ) );
+                    return sendNewPasswordAction( email );
+                });
+    }
 }

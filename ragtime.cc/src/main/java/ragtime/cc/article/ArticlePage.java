@@ -18,7 +18,6 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
-import areca.ui.component2.Button;
 import areca.ui.component2.TextField;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
@@ -101,7 +100,7 @@ public class ArticlePage {
         site.actions.add( submitBtn = new Action() {{
             //icon.set( "done" );
             description.set( "Speichern" );
-            type.set( Button.Type.PRIMARY );
+            //type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
                 form.submit();
