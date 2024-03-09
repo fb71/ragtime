@@ -53,7 +53,7 @@
     </div>
 
     <#-- Footer-->
-    <footer class="CFooter py-2 bg-light">
+    <footer class="CFooter py-2">
         <div class="container">
             <p class="m-0 text-center small">
             ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a href="http://publico.de">Wizard & Crew</a>

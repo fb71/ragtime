@@ -29,7 +29,6 @@
     --common-link-color-rgb: ${config.colors.link@rgb};
     --common-accent-color: ${config.colors.accent};
     --common-accent-color-rgb: ${config.colors.accent@rgb};
-            
     --common-header-bg: ${config.colors.headerBackground};
     --common-header-color: ${config.colors.headerForeground};
     
@@ -41,13 +40,21 @@
     --bs-link-color: ${config.colors.link};
     --bs-link-color-rgb: ${config.colors.link@rgb};
 }
-header {
+
+.CHeader {
     background-color: var(--common-header-bg);
     color: var(--common-header-color);
 }
+
+.CFooter {
+    background-color: var(--common-header-bg);
+    color: var(--common-header-color);
+}
+
 aside {
     color: var(--common-accent-color);
 }
+
 .navbar-nav {
     --bs-nav-link-color: var(--bs-link-color);
 }            
