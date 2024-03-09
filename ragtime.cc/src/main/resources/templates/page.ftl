@@ -1,7 +1,7 @@
 <#--
   The main page layout. 
 -->
-<#macro layout title>
+<#macro layout title pageclass>
 <html>
 <head>
     <title>${title} - ${config.page.title}</title>
@@ -15,9 +15,9 @@
     <script src="bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
 </head>
 
-<body>
+<body class="${pageclass}">
     <#-- Page header with logo and tagline-->
-    <header class="py-3 border-bottom">
+    <header class="CHeader py-3 border-bottom">
         <div class="container">
             <div class="text-center my-5">
                 <h1 class="fw-bolder">${config.page.title}</h1>
@@ -27,7 +27,7 @@
     </header>
     
     <#-- Responsive navbar-->
-    <nav class="navbar navbar-expand-lg mb-4">
+    <nav class="CNavbar navbar navbar-expand-lg mb-4">
         <div class="container">
             <a class="navbar-brand" href="#!"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,12 +48,12 @@
         </div>
     </nav>
     
-    <div class="container">
+    <div class="CContent container">
     <#nested>
     </div>
 
     <#-- Footer-->
-    <footer class="py-2 bg-light">
+    <footer class="CFooter py-2 bg-light">
         <div class="container">
             <p class="m-0 text-center small">
             ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a href="http://publico.de">Wizard & Crew</a>
