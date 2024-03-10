@@ -53,7 +53,7 @@ public class WebsiteServlet
         try {
             resp.setStatus( 500 );
             try (var out = resp.getWriter()) {
-                out.write( "Error: " + e );
+                out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden." );
             }
             e.printStackTrace( System.err );
         }
@@ -84,7 +84,7 @@ public class WebsiteServlet
             });
 
             session.dispose();
-            LOG.warn( "OK: %s - %s", req.getPathInfo(), t.elapsedHumanReadable() );
+            LOG.warn( "%s: %s - %s", resp.getStatus(), req.getPathInfo(), t.elapsedHumanReadable() );
         }
         catch (Exception e) {
             error( e, resp );
@@ -101,19 +101,27 @@ public class WebsiteServlet
             this.httpRequest = req;
             this.httpResponse = resp;
             this.workspace = CCApp.workspaceDir( permid );
+            this.path = parts;
         }};
         request.uow = Repositories.repo( permid ).newUnitOfWork();
 
         //LOG.info( "Path: %s", Arrays.toString( parts ) );
 
+        // redirect: home
         if (parts.length == 1) {
             Assert.that( req.getPathInfo().endsWith( "/" ), "Home URL does not end with a '/'" );
             resp.sendRedirect( "home" );
         }
+        // sitemap / robots.txt
+//        else if (SitemapContentProvider.canProcess( request )) {
+//            new SitemapContentProvider().process( request );
+//        }
+        // media
         else if (parts.length >= 2 && parts[1].equals( "media" )) {
             request.path = ArrayUtils.removeAll( parts, 0 , 1);
             new MediaContentProvider().process( request );
         }
+        // template
         else {
             request.path = ArrayUtils.remove( parts, 0 );
             new TemplateContentProvider().process( request );
