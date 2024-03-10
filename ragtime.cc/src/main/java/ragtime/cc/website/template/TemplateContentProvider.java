@@ -34,6 +34,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
+import freemarker.template.TemplateNotFoundException;
 import freemarker.template.Version;
 import ragtime.cc.website.http.ContentProvider;
 import ragtime.cc.website.model.TemplateConfigEntity;
@@ -105,16 +106,24 @@ public class TemplateContentProvider
             return;
         }
 
-        // load template
-        LOG.info( "Loading template: %s(.ftl)", templateName );
-        var template = cfg.getTemplate( templateName + ".ftl" );
+        try {
+            // load template
+            LOG.info( "Loading template: %s(.ftl)", templateName );
+            var template = cfg.getTemplate( templateName + ".ftl" );
 
-        var data = loadData( template, request.httpRequest, request.uow );
-        data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
-        data.put( "config", new CompositeTemplateModel( config ) );
+            var data = loadData( template, request.httpRequest, request.uow );
+            data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
+            data.put( "config", new CompositeTemplateModel( config ) );
 
-        try (var out = request.httpResponse.getWriter()) {
-            template.process( data, out );
+            try (var out = request.httpResponse.getWriter()) {
+                template.process( data, out );
+            }
+        }
+        catch (TemplateNotFoundException e) {
+            request.httpResponse.setStatus( 404 );
+            try (var out = request.httpResponse.getWriter()) {
+                out.write( "Unter dieser Adresse gibt es nichts." );
+            }
         }
     }
 
