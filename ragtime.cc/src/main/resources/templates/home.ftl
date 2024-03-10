@@ -8,13 +8,13 @@
 
 <@page.layout title="${article.title}" pageclass="CHome">
    
-    <aside class="CStart d-none d-md-block float-md-end border-start py-5 ms-5 ps-5 pe-3">
+    <aside class="CAside CStart d-none d-md-block float-md-end border-start py-5 ms-5 ps-5 pe-3">
         ${aside.content}
     </aside>
 
    ${article.content}
    
-   <div class="CEnd d-block d-md-none border-top pt-4 mt-4" style="color:var(--common-accent-color)">
+   <div class="CAside CEnd d-block d-md-none border-top pt-4 mt-4" style="color:var(--common-accent-color)">
         ${aside.content}
    </div>
 
