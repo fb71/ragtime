@@ -35,7 +35,8 @@ import areca.ui.viewer.model.Pojo;
 import ragtime.cc.article.ArticlesState;
 import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.model.ContentRepo;
+import ragtime.cc.model.MainRepo;
 
 /**
  *
@@ -54,7 +55,7 @@ public class AccountsState {
     @State.Context
     protected Pageflow      pageflow;
 
-    @State.Context(scope = Repositories.SCOPE_MAIN)
+    @State.Context(scope = MainRepo.SCOPE)
     protected UnitOfWork    uow;
 
     protected AccountsPage  page;
@@ -111,10 +112,10 @@ public class AccountsState {
 
     @State.Action
     public void becomeAccountAction( AccountEntity account ) {
-        var contentRepo = Repositories.repo( account.permid.get() );
+        var contentRepo = ContentRepo.waitFor( account );
         var contentUow = contentRepo.newUnitOfWork();
         site.createState( new ArticlesState() )
-                .putContext( account, Repositories.SCOPE_MAIN )
+                .putContext( account, MainRepo.SCOPE )
                 .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )
                 .activate();

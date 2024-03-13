@@ -32,9 +32,10 @@ import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
 import ragtime.cc.AccountsState;
+import ragtime.cc.media.MediasState;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.model.MainRepo;
 import ragtime.cc.website.TemplateConfigState;
 
 /**
@@ -57,7 +58,7 @@ public class ArticlesState {
     @State.Context
     protected UnitOfWork    uow;
 
-    @State.Context( scope=Repositories.SCOPE_MAIN )
+    @State.Context( scope=MainRepo.SCOPE )
     protected AccountEntity account;
 
     protected ArticlesPage  page;
@@ -116,9 +117,12 @@ public class ArticlesState {
         site.createState( new TemplateConfigState() ).activate();
     }
 
-
     public void openAccountsAction() {
         site.createState( new AccountsState() ).activate();
+    }
+
+    public void openMediasAction() {
+        site.createState( new MediasState() ).activate();
     }
 
     @State.Action

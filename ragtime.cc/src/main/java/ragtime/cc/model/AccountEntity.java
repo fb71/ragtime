@@ -26,7 +26,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import ragtime.cc.CCApp;
+import ragtime.cc.Workspace;
 
 /**
  *
@@ -47,9 +47,9 @@ public class AccountEntity
             proto.login.set( email );
             proto.email.set( email );
 
-            var permid = Repositories.nextPermid( proto.context.getUnitOfWork() );
+            var permid = MainRepo.nextPermid( proto.context.getUnitOfWork() );
             proto.permid.set( permid );
-            CCApp.workspaceDir( permid ).mkdir();
+            Workspace.create( proto );
         };
     }
 

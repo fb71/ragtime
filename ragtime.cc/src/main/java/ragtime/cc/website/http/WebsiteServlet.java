@@ -31,8 +31,7 @@ import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.rt.server.EventLoop;
-import ragtime.cc.CCApp;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.model.ContentRepo;
 import ragtime.cc.website.template.TemplateContentProvider;
 
 /**
@@ -100,10 +99,9 @@ public class WebsiteServlet
         var request = new ContentProvider.Request() {{
             this.httpRequest = req;
             this.httpResponse = resp;
-            this.workspace = CCApp.workspaceDir( permid );
             this.path = parts;
         }};
-        request.uow = Repositories.repo( permid ).newUnitOfWork();
+        request.uow = ContentRepo.waitFor( permid ).newUnitOfWork();
 
         //LOG.info( "Path: %s", Arrays.toString( parts ) );
 

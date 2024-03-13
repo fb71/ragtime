@@ -24,11 +24,13 @@ import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 
+import areca.common.base.Consumer.RConsumer;
+import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import ragtime.cc.CCApp;
+import ragtime.cc.Workspace;
 
 /**
  *
@@ -42,19 +44,29 @@ public class MediaEntity
 
     public static final ClassInfo<MediaEntity> info = MediaEntityClassInfo.instance();
 
-    public static final String DIR_MEDIA = "media";
+    public static final String DIR = "media";
 
     public static MediaEntity TYPE;
+
+    public RConsumer<MediaEntity> defaults() {
+        return proto -> {
+            var account = proto.context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get();
+            proto.permid.set( account.permid.get() );
+        };
+    }
 
     @Queryable
     public Property<String>             name;
 
     public Property<String>             mimetype;
 
-    public Property<Integer>            permid; // XXX
-
     @Queryable
     public ManyAssociation<TagEntity>   tags;
+
+    public Property<Integer>            permid;
+
+    protected RLazy<Integer>            cpermid = new RLazy<>( () ->
+            context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get().permid.get() );
 
 
     /**
@@ -82,8 +94,9 @@ public class MediaEntity
     }
 
     protected File f() {
-        var workspace = CCApp.workspaceDir( permid.get() );
-        var media = new File( workspace, DIR_MEDIA );
+        //var workspace = Workspace.of( permid.get() );
+        var workspace = Workspace.of( cpermid.get() );
+        var media = new File( workspace, DIR );
         media.mkdirs();
         return new File( media, name.get() );
     }

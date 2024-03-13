@@ -46,8 +46,9 @@ import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
 import ragtime.cc.article.ArticlesState;
 import ragtime.cc.model.AccountEntity;
+import ragtime.cc.model.ContentRepo;
+import ragtime.cc.model.MainRepo;
 import ragtime.cc.model.PasswordEncryption;
-import ragtime.cc.model.Repositories;
 
 /**
  * The start {@link State} of the application.
@@ -87,7 +88,7 @@ public class LoginState {
 
     @State.Init
     public void init() {
-        repo = Repositories.mainRepo();
+        repo = MainRepo.waitFor();
         uow = repo.newUnitOfWork(); // .setPriority( priority );
 
         Platform.async( () -> {
@@ -133,12 +134,12 @@ public class LoginState {
 
 
     protected void advanceState( AccountEntity account ) {
-        var contentRepo = Repositories.repo( account.permid.get() );
+        var contentRepo = ContentRepo.waitFor( account );
         var contentUow = contentRepo.newUnitOfWork();
         site.createState( new ArticlesState() )
-                .putContext( account, Repositories.SCOPE_MAIN )
-                .putContext( repo, Repositories.SCOPE_MAIN )
-                .putContext( uow, Repositories.SCOPE_MAIN )
+                .putContext( account, MainRepo.SCOPE )
+                .putContext( repo, MainRepo.SCOPE )
+                .putContext( uow, MainRepo.SCOPE )
                 .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )
                 .activate();

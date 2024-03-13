@@ -106,6 +106,12 @@ public class ArticlesPage {
                 handler.set( ev -> state.openAccountsAction() );
             }});
         }
+        // action: medias
+        site.actions.add( new Action() {{
+            icon.set( "image" );
+            description.set( "Medien" );
+            handler.set( ev -> state.openMediasAction() );
+        }});
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 

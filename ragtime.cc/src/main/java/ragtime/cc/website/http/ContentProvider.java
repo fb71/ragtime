@@ -13,8 +13,6 @@
  */
 package ragtime.cc.website.http;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,8 +34,6 @@ public interface ContentProvider {
         public HttpServletResponse httpResponse;
 
         public UnitOfWork uow;
-
-        public File workspace;
 
         /** The parts of the URI path specific for this provider. */
         public String[] path;

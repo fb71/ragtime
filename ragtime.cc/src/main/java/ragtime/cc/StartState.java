@@ -17,13 +17,12 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.article.ArticlesState;
 import ragtime.cc.model.AccountEntity;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.model.MainRepo;
 import ragtime.cc.website.TemplateConfigState;
 
 /**
@@ -47,16 +46,16 @@ public class StartState {
     @State.Context
     protected UICommon      uic;
 
-    @State.Context( scope=Repositories.SCOPE_MAIN )
+    @State.Context( scope=MainRepo.SCOPE )
     protected AccountEntity account;
 
 
     @State.Init
     public void init() {
-        pageflow.create( new FrontPage() )
-                .putContext( this, Page.Context.DEFAULT_SCOPE )
-                .putContext( uic, Page.Context.DEFAULT_SCOPE )
-                .open();
+//        pageflow.create( new FrontPage() )
+//                .putContext( this, Page.Context.DEFAULT_SCOPE )
+//                .putContext( uic, Page.Context.DEFAULT_SCOPE )
+//                .open();
     }
 
 

@@ -13,9 +13,7 @@
  */
 package ragtime.cc.model;
 
-import static java.util.Arrays.asList;
 import static ragtime.cc.model.ModelVersionEntity.SCHEMA_VERSION_CONTENT;
-import static ragtime.cc.model.ModelVersionEntity.SCHEMA_VERSION_MAIN;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,16 +25,14 @@ import java.net.URL;
 import org.apache.commons.io.IOUtils;
 
 import org.polymap.model2.runtime.EntityRepository;
-import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Promise;
-import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.ui.statenaction.State;
-import ragtime.cc.CCApp;
+import ragtime.cc.Workspace;
+import ragtime.cc.website.http.WebsiteServlet;
 import ragtime.cc.website.model.TemplateConfigEntity;
 import ragtime.cc.website.model.WebsiteConfigEntity;
 import ragtime.cc.website.template.ArticleTemplateModel;
@@ -45,118 +41,90 @@ import ragtime.cc.website.template.ArticleTemplateModel;
  *
  * @author Falko Bräutigam
  */
-public class Repositories {
+public class ContentRepo {
 
-    private static final Log LOG = LogFactory.getLog( Repositories.class );
-
-    /** the {@link State.Context} scope of the main {@link EntityRepository} and {@link UnitOfWork}. */
-    public static final String SCOPE_MAIN = "main-repository";
+    private static final Log LOG = LogFactory.getLog( ContentRepo.class );
 
     private static final boolean CLEAN_ON_STARTUP = false;
 
-    private static RLazy<EntityRepository> mainRepo = new RLazy<>();
-
-    private static Map<Integer,EntityRepository> repos = new ConcurrentHashMap<>();
-
-
-    public static void init() {
-    }
+    private static Map<Integer,Promise<EntityRepository>> repos = new ConcurrentHashMap<>();
 
 
     public static void dispose() {
-        mainRepo.ifInitialized( repo -> repo.close() );
-        repos.values().forEach( repo -> repo.close() );
+        repos.values().forEach( promise -> promise.onSuccess( repo -> repo.close() ) );
         repos.clear();
     }
 
 
-    /**
-     * Gets the main {@link EntityRepository}
-     */
-    public static EntityRepository mainRepo() {
-        return mainRepo.supply( () -> {
-            var dbfile = new File( CCApp.workspaceDir(), "main.db" );
-            if (CLEAN_ON_STARTUP) {
-                dbfile.delete();
-            }
-            return EntityRepository.newConfiguration()
-                    .entities.set( Arrays.asList( AccountEntity.info, ModelVersionEntity.info ) )
-                    .store.set( new No2Store( dbfile ) )
-                    .create()
-                    .then( newRepo -> {
-                        LOG.debug( "Repo: created." );
-                        return populateMainRepo( newRepo ).map( __ -> newRepo );
-                    })
-                    .waitForResult().get();
+    public static EntityRepository waitFor( AccountEntity account ) {
+        return instanceOf( account ).waitForResult().get();
+
+    }
+
+
+    public static Promise<EntityRepository> instanceOf( AccountEntity account ) {
+        var permid = account.permid.get();
+        return repos.computeIfAbsent( permid, __ -> {
+            return create( account.permid.get() ).then( newRepo -> {
+                // XXX fix old repos
+                return checkAccount( newRepo, account ).map( ___ -> newRepo );
+            });
         });
     }
 
 
-    protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
-        var uow = repo.newUnitOfWork();  // must not be closed as we are giving back promise
-        return uow.query( AccountEntity.class ).executeCollect()
-                .then( rs -> {
-                    if (rs.size() == 0) {
-                        // model version
-                        uow.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_MAIN ) );
-                        // admin
-                        uow.createEntity( AccountEntity.class, proto -> {
-                            proto.isAdmin.set( true );
-                            proto.login.set( "admin" );
-                            proto.email.set( "falko@fb71.org" );
-                            proto.setPassword( "admin" );
-                            proto.permid.set( 0 );
-                            CCApp.workspaceDir( 0 ).mkdir();
-                        });
-                        // gienke
-                        uow.createEntity( AccountEntity.class, AccountEntity.defaults( "praxis@psychotherapie-gienke.de" ) );
-                    }
-                    return uow.submit();
-                })
-                .onSuccess( submitted -> {
-                    LOG.debug( "Repo: submitted." );
+    /**
+     * Called from {@link WebsiteServlet} without {@link AccountEntity}.
+     */
+    public static EntityRepository waitFor( int permid ) {
+        return repos.computeIfAbsent( permid, __ -> {
+            return create( permid );
+        }).waitForResult().get();
+    }
+
+
+    protected static Promise<EntityRepository> create( int permid ) {
+        File workspace = Workspace.of( permid );
+        if (!workspace.exists()) {
+            throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
+        }
+        var dbfile = new File( workspace, "content.db" );
+        if (CLEAN_ON_STARTUP) {
+            dbfile.delete();
+        }
+        return EntityRepository.newConfiguration()
+                .entities.set( Arrays.asList(
+                        AccountEntity.info,
+                        Article.info, MediaEntity.info, TagEntity.info,
+                        WebsiteConfigEntity.info, TemplateConfigEntity.info,
+                        ModelVersionEntity.info ) )
+                .store.set( new No2Store( dbfile ) )
+                .create()
+                .then( newRepo -> {
+                    LOG.debug( "Repo: initialized" );
+                    return populateContentRepo( newRepo ).map( ___ -> newRepo );
                 });
     }
 
 
-    public static int nextPermid( UnitOfWork uow ) {
-        return uow.query( ModelVersionEntity.class ).singleResult()
-                .map( mv -> {
-                    mv.nextPermid.set( mv.nextPermid.get() + 1 );
-                    LOG.info( "Next permid: %s", mv.nextPermid.get() );
-                    return mv;
-                })
-                .waitForResult().get()
-                .nextPermid.get();
+    protected static Promise<Submitted> checkAccount( EntityRepository repo, AccountEntity account ) {
+        var uow2 = repo.newUnitOfWork();
+        return uow2.query( AccountEntity.class )
+                .executeCollect()
+                .then( rs -> {
+                    if (rs.size() == 0) {
+                        uow2.createEntity( AccountEntity.class, proto -> {
+                            proto.permid.set( account.permid.get() );
+                            proto.email.set( account.email.get() );
+                            proto.login.set( account.login.get() );
+                        });
+                    }
+                    return uow2.submit();
+                });
     }
 
 
-    public static EntityRepository repo( int permid ) {
-        return repos.computeIfAbsent( permid, __ -> {
-            File workspace = CCApp.workspaceDir( permid );
-            if (!workspace.exists()) {
-                throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
-            }
-            var dbfile = new File( workspace, "content.db" );
-            if (CLEAN_ON_STARTUP) {
-                dbfile.delete();
-            }
-            return EntityRepository.newConfiguration()
-                    .entities.set( asList( Article.info, MediaEntity.info, TagEntity.info,
-                            WebsiteConfigEntity.info, TemplateConfigEntity.info,
-                            ModelVersionEntity.info ) )
-                    .store.set( new No2Store( dbfile ) )
-                    .create()
-                    .then( newRepo -> {
-                        LOG.debug( "Repo: created." );
-                        return populateContentRepo( newRepo, permid ).map( ___ -> newRepo );
-                    })
-                    .waitForResult().get(); // XXX
-        });
-    }
-
-
-    protected static Promise<Submitted> populateContentRepo( EntityRepository repo, int permid ) {
+    protected static Promise<Submitted> populateContentRepo( EntityRepository repo ) {
         var uow2 = repo.newUnitOfWork();
         return uow2.query( Article.class )
                 .executeCollect()
@@ -222,6 +190,9 @@ public class Repositories {
     }
 
 
+    /**
+     * @deprecated
+     */
     protected static Promise<Submitted> populateGienkeRepo( EntityRepository repo, int permid ) {
         var uow2 = repo.newUnitOfWork();
         return uow2.query( Article.class )

@@ -15,11 +15,7 @@ package ragtime.cc;
 
 import java.util.concurrent.Callable;
 
-import java.io.File;
-
 import javax.servlet.ServletContext;
-
-import org.apache.commons.lang3.SystemUtils;
 
 import org.polymap.model2.store.no2.No2Store;
 
@@ -36,8 +32,8 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import ragtime.cc.model.AccountEntity;
-import ragtime.cc.model.Repositories;
+import ragtime.cc.model.ContentRepo;
+import ragtime.cc.model.MainRepo;
 
 /**
  *
@@ -54,8 +50,6 @@ public class CCApp
 
     public static CCAppConfig config;
 
-    private static File workspaceDir;
-
 
     /**
      * Called by the {@link ArecaUIServer} once, when the servlet is loaded.
@@ -71,33 +65,13 @@ public class CCApp
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
 
         config = CCAppConfig.instance;
-
-        workspaceDir = config.workspaceBase.startsWith( "/" )
-                ? new File( config.workspaceBase )
-                : new File( SystemUtils.getUserHome(), config.workspaceBase );
-        LOG.info( "Workspace: %s", workspaceDir.getAbsolutePath() );
-
-        Repositories.init();
     }
 
 
     public static void dispose() {
         LOG.warn( "DISPOSE " );
-        Repositories.dispose();
-    }
-
-
-    /**
-     * The workspace directory of the given {@link AccountEntity#permid}.
-     *
-     * @param permid The permanent ID of the {@link AccountEntity}.
-     */
-    public static File workspaceDir( int permid ) {
-        return new File( workspaceDir, Integer.toString( permid ) );
-    }
-
-    public static File workspaceDir() {
-        return workspaceDir;
+        ContentRepo.dispose();
+        MainRepo.dispose();
     }
 
 
