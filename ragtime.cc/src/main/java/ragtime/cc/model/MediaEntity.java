@@ -48,12 +48,16 @@ public class MediaEntity
 
     public static MediaEntity TYPE;
 
-    public RConsumer<MediaEntity> defaults() {
+    public static RConsumer<MediaEntity> defaults() {
         return proto -> {
-            var account = proto.context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get();
+            var account = proto.context.getUnitOfWork()
+                    .query( AccountEntity.class )
+                    .singleResult().waitForResult().get();
             proto.permid.set( account.permid.get() );
         };
     }
+
+    // instance *******************************************
 
     @Queryable
     public Property<String>             name;
