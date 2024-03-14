@@ -39,7 +39,7 @@ public class MediaContentProvider
                 .waitForResult( media -> {
                     request.httpResponse.setContentType( media.mimetype.get() );
                     try (
-                        var in = media.read();
+                        var in = media.in();
                         var out = request.httpResponse.getOutputStream();
                     ) {
                         IOUtils.copy( in, out );

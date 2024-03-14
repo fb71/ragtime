@@ -13,9 +13,11 @@
  */
 package ragtime.cc.media;
 
+import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
+import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -105,12 +107,23 @@ public class MediasState {
 
     @State.Dispose
     public Promise<Submitted> createMediaAction( FileUpload.File f ) {
-        uow.createEntity( MediaEntity.class, proto -> {
-            MediaEntity.defaults().accept( proto );
-            proto.name.set( f.name() );
-            proto.mimetype.set( f.mimetype() );
-        });
-        return uow.submit();
+        return uow.query( MediaEntity.class )
+                .where( Expressions.eq( MediaEntity.TYPE.name, f.name() ) ).executeCollect()
+                .map( rs -> {
+                    Assert.that( rs.size() <= 1 );
+                    var entity = !rs.isEmpty()
+                            ? rs.get( 0 )
+                            : uow.createEntity( MediaEntity.class, proto -> {
+                                MediaEntity.defaults().accept( proto );
+                                proto.name.set( f.name() );
+                                proto.mimetype.set( f.mimetype() );
+                            });
+                    f.copyInto( entity.out() );
+                    return entity;
+                })
+                .then( entity -> {
+                    return uow.submit();
+                });
     };
 
 }

@@ -249,7 +249,7 @@ public class ContentRepo {
                             proto.permid.set( permid );
                             try (
                                 var in = new URL( "https://www.psychotherapie-gienke.de/wp-content/Bilder/gienke_01.jpg" ).openStream();
-                                var out = proto.write();
+                                var out = proto.out();
                             ){
                                 IOUtils.copy( in, out );
                             }

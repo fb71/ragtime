@@ -50,10 +50,7 @@ public class MediaEntity
 
     public static RConsumer<MediaEntity> defaults() {
         return proto -> {
-            var account = proto.context.getUnitOfWork()
-                    .query( AccountEntity.class )
-                    .singleResult().waitForResult().get();
-            proto.permid.set( account.permid.get() );
+            proto.permid.set( proto.cpermid.get() );
         };
     }
 
@@ -76,7 +73,7 @@ public class MediaEntity
     /**
      * Unbuffered {@link OutputStream} of the content.
      */
-    public OutputStream write() {
+    public OutputStream out() {
         try {
             return /*new BufferedOutputStream(*/ new FileOutputStream( f() );
         }
@@ -88,7 +85,7 @@ public class MediaEntity
     /**
      * Unbuffered {@link InputStream} of the content.
      */
-    public InputStream read() {
+    public InputStream in() {
         try {
             return /*new BufferedInputStream(*/ new FileInputStream( f() );
         }
