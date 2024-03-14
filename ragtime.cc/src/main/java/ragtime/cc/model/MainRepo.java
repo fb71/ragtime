@@ -50,7 +50,10 @@ public class MainRepo {
 
 
     public static void dispose() {
-        instance.ifInitialized( promise -> promise.onSuccess( repo -> repo.close() ) );
+        instance.ifInitialized( promise -> {
+            promise.opt().ifPresent( repo -> repo.close() );
+            LOG.info( "closed" );
+        });
     }
 
     public static EntityRepository waitFor() {

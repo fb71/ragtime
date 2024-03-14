@@ -51,7 +51,10 @@ public class ContentRepo {
 
 
     public static void dispose() {
-        repos.values().forEach( promise -> promise.onSuccess( repo -> repo.close() ) );
+        repos.entrySet().forEach( entry -> {
+            entry.getValue().opt().ifPresent( repo -> repo.close() );
+            LOG.info( "permid=%s: closed ", entry.getKey() );
+        });
         repos.clear();
     }
 

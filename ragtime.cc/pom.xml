@@ -124,6 +124,9 @@
                     <!--reload>manual</!reload-->
                     <!--webAppSourceDirectory>${project.build.directory}/${project.build.finalName}</webAppSourceDirectory-->
                     <webApp>
+                        <!-- No need to scan anything -->
+                        <webInfIncludeJarPattern>^((?!sun).)*$</webInfIncludeJarPattern>
+                        <!--containerIncludeJarPattern>^$com.sun</containerIncludeJarPattern-->
                         <contextPath>/ragtime.cc</contextPath>
                         <resourceBases>
                             ${project.basedir}/src/main/webapp
