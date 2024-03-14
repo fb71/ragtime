@@ -56,7 +56,7 @@
     <footer class="CFooter py-2">
         <div class="container">
             <p class="m-0 text-center small">
-            ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a href="https://fb71.org/">Wizard & Crew</a>
+            ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a>
             </p>
         </div>
     </footer>    
