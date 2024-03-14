@@ -13,8 +13,14 @@
  */
 package ragtime.cc.website.template;
 
+import java.util.Map;
+
+import org.commonmark.node.Link;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.AttributeProvider;
+import org.commonmark.renderer.html.AttributeProviderContext;
+import org.commonmark.renderer.html.AttributeProviderFactory;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import areca.common.log.LogFactory;
@@ -30,13 +36,36 @@ public class Markdown {
 
     private static final Log LOG = LogFactory.getLog( Markdown.class );
 
+    /* Both are thread-safe */
     public static Parser         parser = Parser.builder().build();
 
-    public static HtmlRenderer   renderer = HtmlRenderer.builder().build();
+    public static HtmlRenderer   renderer = HtmlRenderer.builder().attributeProviderFactory( new AttributeFactory() ).build();
 
 
     public static String render( String markdown ) throws TemplateModelException {
-        Node document = parser.parse( markdown );
-        return renderer.render( document );
+        Node doc = parser.parse( markdown );
+        return renderer.render( doc );
+    }
+
+    /**
+     * Adds target="_blanc" to {@link Link} nodes.
+     */
+    protected static class AttributeFactory
+            implements AttributeProviderFactory {
+
+        @Override
+        public AttributeProvider create( AttributeProviderContext context ) {
+            return new AttributeProvider() {
+                @Override
+                public void setAttributes( Node node, String tagName, Map<String,String> attributes ) {
+                    if (node instanceof Link l) {
+                        if (l.getDestination().startsWith( "http" )) {
+                            attributes.put( "target", "_blank" );
+                            attributes.put( "rel", "noopener" );
+                        }
+                    }
+                }
+            };
+        }
     }
 }
