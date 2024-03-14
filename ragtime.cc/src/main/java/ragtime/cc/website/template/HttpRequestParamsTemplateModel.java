@@ -23,7 +23,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
- * Provides the params from the given {@link HttpServletRequest}.
+ * Provides the params and headers from the given {@link HttpServletRequest}.
  *
  * @author Falko Bräutigam
  */
@@ -40,12 +40,17 @@ public class HttpRequestParamsTemplateModel
 
     @Override
     public TemplateModel get( String key ) throws TemplateModelException {
-        return new SimpleScalar( request.getParameter( key ) );
+        String value = request.getParameter( key );
+        if (value == null) {
+            value = request.getHeader( key );
+        }
+        LOG.debug( "%s: %s", key, value );
+        return new SimpleScalar( value );
     }
 
     @Override
     public boolean isEmpty() throws TemplateModelException {
-        return request.getParameterMap().isEmpty();
+        return request.getParameterMap().isEmpty() && request.getHeaderNames().hasMoreElements();
     }
 
 }
