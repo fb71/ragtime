@@ -30,6 +30,8 @@ public class MediaContentProvider
 
     private static final Log LOG = LogFactory.getLog( MediaContentProvider.class );
 
+    public static final String PATH = "media";
+
     @Override
     public void process( Request request ) throws Exception {
         var name = String.join(  "/", request.path );

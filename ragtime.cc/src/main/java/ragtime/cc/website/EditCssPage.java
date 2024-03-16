@@ -23,6 +23,7 @@ import areca.ui.Action;
 import areca.ui.component2.Button;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
+import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.FillLayout;
@@ -77,7 +78,10 @@ public class EditCssPage {
 
             form = new Form();
             add( form.newField()
-                    .viewer( new TextFieldViewer().configure( (TextField t) -> t.multiline.set( true ) ) )
+                    .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                        t.multiline.set( true );
+                        t.type.set( Type.CSS );
+                    }))
                     .model( new PropertyModel<>( config.css ) )
                     .create()
                     .layoutConstraints.set( null ) );

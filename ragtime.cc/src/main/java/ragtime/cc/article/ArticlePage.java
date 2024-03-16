@@ -13,12 +13,18 @@
  */
 package ragtime.cc.article;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import org.polymap.model2.query.Query.Order;
+
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.component2.TextField;
+import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
@@ -28,6 +34,9 @@ import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.UICommon;
+import ragtime.cc.model.Article;
+import ragtime.cc.model.MediaEntity;
+import ragtime.cc.website.http.MediaContentProvider;
 
 /**
  *
@@ -79,7 +88,11 @@ public class ArticlePage {
 
         ui.body.add( form.newField()
                 .model( new PropertyModel<>( state.article.$().content ) )
-                .viewer( new TextFieldViewer().configure( (TextField t) -> t.multiline.set( true ) ) )
+                .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                    t.multiline.set( true );
+                    t.type.set( Type.MARKDOWN );
+                    autocompletes( t );
+                }))
                 .create()
                 .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
 
@@ -110,6 +123,31 @@ public class ArticlePage {
             });
         }});
         return ui;
+    }
+
+
+    protected void autocompletes( TextField t ) {
+        var result = new ArrayList<String>();
+        Platform.schedule( 2000, () -> {
+            return null;
+        })
+        .then( __ -> {
+            return state.uow.query( Article.class ).orderBy( Article.TYPE.title, Order.ASC ).executeCollect();
+        })
+        .then( rs -> {
+            rs.forEach( article -> result.add( article.title.get() ) );
+            result.add( "----" );
+            return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
+        })
+        .onSuccess( rs -> {
+            rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
+            result.add( "----" );
+
+            result.addAll( Arrays.asList( "article", "home", "frontpage?n=", "frontpage?t=") );
+
+            LOG.info( "autocomplete: %s", result );
+            t.autocomplete.set( result );
+        });
     }
 
 

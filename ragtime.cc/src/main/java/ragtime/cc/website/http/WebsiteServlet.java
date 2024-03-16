@@ -115,7 +115,7 @@ public class WebsiteServlet
 //            new SitemapContentProvider().process( request );
 //        }
         // media
-        else if (parts.length >= 2 && parts[1].equals( "media" )) {
+        else if (parts.length >= 2 && parts[1].equals( MediaContentProvider.PATH )) {
             request.path = ArrayUtils.removeAll( parts, 0 , 1);
             new MediaContentProvider().process( request );
         }
