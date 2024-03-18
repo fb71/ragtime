@@ -69,7 +69,7 @@ public class AccountsPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Inhalt/Texte" );
+        ui.init( parent ).title.set( "Accounts" );
 
         // actions
         site.actions.add( new Action() {{
