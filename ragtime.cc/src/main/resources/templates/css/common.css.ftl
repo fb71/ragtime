@@ -1,24 +1,10 @@
 <#--
   Basis settings of the Common template. Based on Bootstrap.
 -->
-@font-face {
-  font-family: 'Roboto';
-  font-weight: normal;
-  font-style: normal;
-  src: url('../fonts/Roboto-Regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-weight: 500;
-  font-style: normal;
-  src: url('../fonts/Roboto-Medium.woff2');
-}
-@font-face {
-  font-family: 'Roboto';
-  font-weight: bold;
-  font-style: normal;
-  src: url('../fonts/Roboto-Bold.woff2');
-}
+
+<#include "Roboto.css">
+<#include "RobotoCondensed.css">
+<#include "Ubuntu.css">
 
 :root {
     --common-page-color: ${config.colors.pageForeground};

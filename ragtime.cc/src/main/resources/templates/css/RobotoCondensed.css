@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: normal;
+  font-style: normal;
+  src: url('../fonts/RobotoCondensed/RobotoCondensed-Regular.ttf');
+}
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: 500;
+  font-style: normal;
+  src: url('../fonts/RobotoCondensed/RobotoCondensed-Medium.ttf');
+}
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: bold;
+  font-style: normal;
+  src: url('../fonts/RobotoCondensed/RobotoCondensed-Bold.ttf');
+}
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: normal;
+  font-style: italic;
+  src: url('../fonts/RobotoCondensed/RobotoCondensed-Italic.ttf');
+}
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: bold;
+  font-style: italic;
+  src: url('../fonts/RobotoCondensed/RobotoCondensed-BoldItalic.ttf');
+}
