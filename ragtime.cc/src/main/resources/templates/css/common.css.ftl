@@ -40,7 +40,7 @@ a {
     text-decoration: none;
 }
 a:hover {
-    filter: brightness(0.9) saturate(1.5);
+<#--     filter: brightness(0.9) saturate(1.5);  -->
     text-decoration: underline;
 }
 
