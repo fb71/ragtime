@@ -25,6 +25,16 @@
     --bs-body-bg-rgb: ${config.colors.pageBackground@rgb};
     --bs-link-color: ${config.colors.link};
     --bs-link-color-rgb: ${config.colors.link@rgb};
+    --bs-link-hover-color: ${config.colors.link};
+    --bs-link-hover-color-rgb: ${config.colors.link@rgb};
+}
+
+a {
+    text-decoration: none;
+}
+a:hover {
+    filter: brightness(0.9) saturate(1.5);
+    text-decoration: underline;
 }
 
 .CHeader {
