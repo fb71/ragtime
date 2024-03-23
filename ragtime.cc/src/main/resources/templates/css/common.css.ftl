@@ -28,6 +28,13 @@
     --bs-link-hover-color: ${config.colors.link};
     --bs-link-hover-color-rgb: ${config.colors.link@rgb};
 }
+ 
+.navbar-nav {
+    --bs-nav-link-color: ${config.colors.link};
+    --bs-nav-link-color-rgb: ${config.colors.link@rgb};
+    --bs-nav-link-hover-color: ${config.colors.link};
+    --bs-nav-link-hover-color-rgb: ${config.colors.link@rgb};
+}
 
 a {
     text-decoration: none;
@@ -50,11 +57,3 @@ a:hover {
 aside {
     color: var(--common-accent-color);
 }
-
-.navbar-nav {
-    --bs-nav-link-color: var(--bs-link-color);
-}            
-.nav-link:hover {
-    --bs-nav-link-color: var(--bs-link-color);
-    text-decoration: underline;
-}            
