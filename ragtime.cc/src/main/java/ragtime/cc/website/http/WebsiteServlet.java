@@ -110,10 +110,6 @@ public class WebsiteServlet
             Assert.that( req.getPathInfo().endsWith( "/" ), "Home URL does not end with a '/'" );
             resp.sendRedirect( "home" );
         }
-        // sitemap / robots.txt
-//        else if (SitemapContentProvider.canProcess( request )) {
-//            new SitemapContentProvider().process( request );
-//        }
         // media
         else if (parts.length >= 2 && parts[1].equals( MediaContentProvider.PATH )) {
             request.path = ArrayUtils.removeAll( parts, 0 , 1);

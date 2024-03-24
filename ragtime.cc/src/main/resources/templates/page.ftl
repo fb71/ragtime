@@ -27,7 +27,7 @@
     </header>
     
     <#-- Responsive navbar-->
-    <nav class="CNavbar navbar navbar-expand-lg mb-4">
+    <nav class="CNavbar navbar navbar-expand-md mb-4">
         <div class="container">
             <a class="navbar-brand" href="#!"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
     </div>
 
     <#-- Footer-->
-    <footer class="CFooter py-2">
+    <footer class="CFooter py-1">
         <div class="container">
             <p class="m-0 text-center small">
             ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a>

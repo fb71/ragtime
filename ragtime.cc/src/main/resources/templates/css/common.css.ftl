@@ -17,6 +17,8 @@
     --common-accent-color-rgb: ${config.colors.accent@rgb};
     --common-header-bg: ${config.colors.headerBackground};
     --common-header-color: ${config.colors.headerForeground};
+    --common-footer-bg: ${config.colors.footerBackground};
+    --common-footer-color: ${config.colors.footerForeground};
     
     --bs-font-sans-serif: Roboto, sans-serif;
     --bs-body-color: ${config.colors.pageForeground};
@@ -50,8 +52,8 @@ a:hover {
 }
 
 .CFooter {
-    background-color: var(--common-header-bg);
-    color: var(--common-header-color);
+    background-color: var(--common-footer-bg);
+    color: var(--common-footer-color);
 }
 
 aside {

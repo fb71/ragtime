@@ -40,6 +40,12 @@ public class Colors
     @DefaultValue( "#212529" )
     public Property<String>     headerForeground;
 
+    @DefaultValue( "#f0eff6" )
+    public Property<String>     footerBackground;
+
+    @DefaultValue( "#212529" )
+    public Property<String>     footerForeground;
+
     @DefaultValue( "#695ea1" )
     public Property<String>     accent;
 

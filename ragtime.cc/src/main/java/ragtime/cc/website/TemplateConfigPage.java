@@ -104,38 +104,59 @@ public class TemplateConfigPage {
 
             // Colors
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 310 ) );
+                layoutConstraints.set( RowConstraints.height( 220 ) );
                 layout.set( uic.verticalL().spacing( uic.space ) );
                 //bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Farben" ) );
 
-                add( form.newField().label( "Hintergrund" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().pageBackground ) )
-                        .create() );
-                add( form.newField().label( "Text" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().pageForeground ) )
-                        .create() );
+                add( new UIComposite() {{
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( form.newField().label( "Hintergrund" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().pageBackground ) )
+                            .create() );
+                    add( form.newField().label( "Text" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().pageForeground ) )
+                            .create() );
+                }});
 
-                add( form.newField().label( "Kopf: Hintergrund" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().headerBackground ) )
-                        .create() );
-                add( form.newField().label( "Kopf: Text" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().headerForeground ) )
-                        .create() );
+                add( new UIComposite() {{
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( form.newField().label( "Kopf - Hintergrund" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().headerBackground ) )
+                            .create() );
+                    add( form.newField().label( "Kopf - Text" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().headerForeground ) )
+                            .create() );
+                }});
 
-                add( form.newField().label( "Akzent" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().accent ) )
-                        .create() );
-                add( form.newField().label( "Link" )
-                        .viewer( new ColorPickerViewer() )
-                        .model( new PropertyModel<>( config.colors.get().link ) )
-                        .create() );
+                add( new UIComposite() {{
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( form.newField().label( "Footer - Hintergrund" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().footerBackground ) )
+                            .create() );
+                    add( form.newField().label( "Footer - Text" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().footerForeground ) )
+                            .create() );
+                }});
+
+                add( new UIComposite() {{
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( form.newField().label( "Akzent" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().accent ) )
+                            .create() );
+                    add( form.newField().label( "Link" )
+                            .viewer( new ColorPickerViewer() )
+                            .model( new PropertyModel<>( config.colors.get().link ) )
+                            .create() );
+                }});
             }});
 
             // NavItems
