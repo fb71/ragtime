@@ -173,14 +173,17 @@ public class ContentRepo {
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Willkommen" );
                                 navItem.href.set( "home" );
+                                navItem.order.set( 1 );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Datenschutz" );
                                 navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
+                                navItem.order.set( 2 );
                             });
                             proto.navItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );
                                 navItem.href.set( String.format( "frontpage?%s=Impressum", ArticleTemplateModel.PARAM_TITLE ) );
+                                navItem.order.set( 3 );
                             });
                         });
                     }

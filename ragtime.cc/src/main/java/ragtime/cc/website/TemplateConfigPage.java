@@ -14,7 +14,6 @@
 package ragtime.cc.website;
 
 import areca.common.Platform;
-import areca.common.Scheduler.Priority;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -24,6 +23,7 @@ import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Label;
 import areca.ui.component2.ScrollableComposite;
+import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.FillLayout;
@@ -33,10 +33,16 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
+import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
+import areca.ui.viewer.model.ListModel;
+import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
+import ragtime.cc.article.EntityCompositeListModel;
 import ragtime.cc.article.PropertyModel;
+import ragtime.cc.website.model.NavItem;
+import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
  *
@@ -74,16 +80,16 @@ public class TemplateConfigPage {
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
-            layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
+            layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.marginsL ).spacing( uic.spaceL ) );
 
-            var config = state.config.get();
+            var config = state.config;
 
             form = new Form();
 
             // PageConfig
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 200 ) );
-                layout.set( uic.verticalL() );
+                //layoutConstraints.set( RowConstraints.height( 200 ) );
+                layout.set( uic.verticalL().fillHeight( false ) );
                 //bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Seite" ) );
@@ -104,14 +110,14 @@ public class TemplateConfigPage {
 
             // Colors
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 220 ) );
-                layout.set( uic.verticalL().spacing( uic.space ) );
+                //layoutConstraints.set( RowConstraints.height( 220 ) );
+                layout.set( uic.verticalL().fillHeight( false ).spacing( uic.space ) );
                 //bordered.set( true );
                 cssClasses.add( "MessageCard" );
                 addDecorator( new Label().content.set( "Farben" ) );
 
                 add( new UIComposite() {{
-                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
                     add( form.newField().label( "Hintergrund" )
                             .viewer( new ColorPickerViewer() )
                             .model( new PropertyModel<>( config.colors.get().pageBackground ) )
@@ -123,7 +129,7 @@ public class TemplateConfigPage {
                 }});
 
                 add( new UIComposite() {{
-                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
                     add( form.newField().label( "Kopf - Hintergrund" )
                             .viewer( new ColorPickerViewer() )
                             .model( new PropertyModel<>( config.colors.get().headerBackground ) )
@@ -135,7 +141,7 @@ public class TemplateConfigPage {
                 }});
 
                 add( new UIComposite() {{
-                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
                     add( form.newField().label( "Footer - Hintergrund" )
                             .viewer( new ColorPickerViewer() )
                             .model( new PropertyModel<>( config.colors.get().footerBackground ) )
@@ -147,7 +153,7 @@ public class TemplateConfigPage {
                 }});
 
                 add( new UIComposite() {{
-                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
                     add( form.newField().label( "Akzent" )
                             .viewer( new ColorPickerViewer() )
                             .model( new PropertyModel<>( config.colors.get().accent ) )
@@ -161,43 +167,58 @@ public class TemplateConfigPage {
 
             // NavItems
             add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 200 ) );
-                layout.set( uic.verticalL() );
-                //bordered.set( true );
+                layout.set( uic.verticalL().fillHeight( false ) );
                 cssClasses.add( "MessageCard" );
-                addDecorator( new Label().content.set( "Navigation / Menüs" ) ).get();
+                addDecorator( new Label().content.set( "Navigation" ) ).get();
 
-                for (var navItem : config.navItems) {
-                    add( new UIComposite() {{
-                        var itemRow = this;
-                        layoutConstraints.set( RowConstraints.height( 35 ) );
-                        layout.set( RowLayout.filled().spacing( uic.space ) );
+                var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.navItems )
+                        .orderBy( NavItem.TYPE.order, () -> isDisposed() );
 
-                        add( form.newField().label( "Titel" )
-                                .viewer( new TextFieldViewer() )
-                                .model( new PropertyModel<>( navItem.title ) )
-                                .create() );
-                        add( form.newField().label( "Ziel" )
-                                .viewer( new TextFieldViewer() )
-                                .model( new PropertyModel<>( navItem.href ) )
-                                .create() );
+                add( form.newField()
+                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) )
+                        .model( items )
+                        .create() );
 
-                        add( new Button() {{
-                            layoutConstraints.set( RowConstraints.width( 50 ) );
-                            bordered.set( false );
-                            icon.set( "delete" );
-                            tooltip.set( "Diesen Eintrag löschen" );
-                            events.on( EventType.SELECT, ev -> {
-                                //state.
-                                var itemRowParent = itemRow.parent();
-                                itemRow.dispose();
-                                itemRowParent.layout();
-                            });
-                        }});
-                    }});
-                }
+                add( new Button() {{
+                    icon.set( "add" );
+                    tooltip.set( "Neues Element hinzufügen" );
+                    events.on( EventType.SELECT, ev -> {
+                        items.createElement( NavItem.defaults() );
+                        ui.body.layout();
+                    });
+                }});
             }});
-            Platform.scheduler.schedule( Priority.BACKGROUND, () -> form.load() );
+
+            // Footer NavItems
+            add( new UIComposite() {{
+                layout.set( uic.verticalL().fillHeight( false ) );
+                cssClasses.add( "MessageCard" );
+                addDecorator( new Label().content.set( "Footer Navigation" ) ).get();
+
+                var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.footerNavItems )
+                        .orderBy( NavItem.TYPE.order, () -> isDisposed() );
+
+                add( form.newField()
+                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) )
+                        .model( items )
+                        .create() );
+
+                add( new Button() {{
+                    //layoutConstraints.set( RowConstraints.height( 40 ) );
+                    icon.set( "add" );
+                    tooltip.set( "Neues Element hinzufügen" );
+                    events.on( EventType.SELECT, ev -> {
+                        items.createElement( NavItem.defaults() );
+                        ui.body.layout();
+                    });
+                }});
+            }});
+            add( new Text().layoutConstraints.set( RowConstraints.height( 10 ) ) );
+
+            Platform.schedule( 750, () -> {
+                form.load();
+                ui.body.layout();
+            });
         }});
 
         // action: submit
@@ -228,6 +249,7 @@ public class TemplateConfigPage {
 //                icon.set( form.isChanged() ? "undo" : "" );
 //            });
 //        }});
+
         // action: CSS
         site.actions.add( new Action() {{
             icon.set( "code" );
@@ -238,6 +260,43 @@ public class TemplateConfigPage {
         }});
 
         return ui;
+    }
+
+
+    /**
+     *
+     */
+    protected class NavItemEditor extends UIComposite {
+
+        public NavItemEditor( NavItem item, ListModel<NavItem> model ) {
+            layoutConstraints.set( RowConstraints.height( 30 ) );
+            layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
+
+            add( form.newField().label( "Titel" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new PropertyModel<>( item.title ) )
+                    .createAndLoad() );
+            add( form.newField().label( "Ziel" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new PropertyModel<>( item.href ) )
+                    .createAndLoad() );
+            add( form.newField().label( "Pos" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new Number2StringTransform(
+                            new PropertyModel<>( item.order ) ) )
+                    .createAndLoad()
+                    .layoutConstraints.set( RowConstraints.width( 35 ) ) );
+
+            add( new Button() {{
+                layoutConstraints.set( RowConstraints.width( 40 ) );
+                icon.set( "delete" );
+                tooltip.set( "Dieses Element löschen" );
+                events.on( EventType.SELECT, ev -> {
+                    ((EntityCompositeListModel<NavItem>)model).removeElement( item );
+                    ui.body.layout();
+                });
+            }});
+        }
     }
 
 

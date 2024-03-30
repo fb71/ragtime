@@ -14,11 +14,14 @@
 package ragtime.cc.website.model;
 
 import org.polymap.model2.Composite;
+import org.polymap.model2.Concerns;
+import org.polymap.model2.Defaults;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
-
+import areca.common.base.Consumer.RConsumer;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.model.PropertyChangeConcern;
 
 @RuntimeInfo
 public class NavItem
@@ -28,10 +31,33 @@ public class NavItem
 
     public static NavItem       TYPE;
 
+    public static RConsumer<NavItem> defaults() {
+        return proto -> {
+            proto.title.set( "Neuer Eintrag" );
+            proto.href.set( "frontpage?n=..." );
+        };
+    }
+
     public Property<String>     title;
 
     public Property<String>     href;
 
     @Nullable
     public Property<String>     description;
+
+    /** The position of this item (ascending order) */
+    @Defaults
+    @Concerns( PropertyChangeConcern.class )
+    public Property<Integer>    order;
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode( this );
+    }
+
+    @Override
+    public boolean equals( Object obj ) {
+        return this == obj;
+    }
+
 }

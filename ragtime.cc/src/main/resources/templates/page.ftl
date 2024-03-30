@@ -35,7 +35,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <#list config.navItems as item>
+                    <#list config.navItems?sequence?sort_by("order") as item>
                         <li class="nav-item"><a class="nav-link" href="${item.href}">${item.title}</a></li>
                     </#list>
 
@@ -56,7 +56,11 @@
     <footer class="CFooter py-2">
         <div class="container">
             <p class="m-0 text-center small">
-            ${config.page.footer}&nbsp;&nbsp;|&nbsp;&nbsp;Powered by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a>
+            <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
+            <#list config.footerNavItems?sequence?sort_by("order") as item>
+                <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
+            </#list>
+            <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
             </p>
         </div>
     </footer>    

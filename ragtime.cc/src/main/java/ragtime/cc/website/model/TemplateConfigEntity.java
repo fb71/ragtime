@@ -16,6 +16,7 @@ package ragtime.cc.website.model;
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Concerns;
 import org.polymap.model2.DefaultValue;
+import org.polymap.model2.Defaults;
 import org.polymap.model2.Entity;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
@@ -45,6 +46,9 @@ public class TemplateConfigEntity
     public Property<PageConfig>         page;
 
     public CollectionProperty<NavItem>  navItems;
+
+    @Defaults
+    public CollectionProperty<NavItem>  footerNavItems;
 
     @Nullable
     @Concerns( DefaultsCompositeConcern.class )

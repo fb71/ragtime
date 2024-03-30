@@ -74,7 +74,7 @@ public class EditCssPage {
         ui.body.add( new ScrollableComposite() {{
             layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
 
-            var config = state.config.get();
+            var config = state.config;
 
             form = new Form();
             add( form.newField()

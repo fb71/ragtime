@@ -25,6 +25,7 @@ import org.polymap.model2.Property;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.Color;
+import freemarker.template.SimpleNumber;
 import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModel;
@@ -81,6 +82,10 @@ public class CompositeTemplateModel
                     case PLAIN: return new SimpleScalar( convert( p.get(), convert ) );
                     default: throw new RuntimeException( "Not yet: " + format );
                 }
+            }
+            // Number
+            else if (Number.class.isAssignableFrom( prop.getType() )) {
+                return new SimpleNumber( (Number)p.get() );
             }
             // Composite
             else if (Composite.class.isAssignableFrom( prop.getType() )) {

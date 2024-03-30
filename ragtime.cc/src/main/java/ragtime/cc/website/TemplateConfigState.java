@@ -25,9 +25,8 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
-import areca.ui.viewer.model.Model;
 import ragtime.cc.UICommon;
-import ragtime.cc.article.EntityModel;
+import ragtime.cc.website.model.NavItem;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
@@ -54,7 +53,7 @@ public class TemplateConfigState {
     protected UnitOfWork    uow;
 
     @State.Model
-    public Model<TemplateConfigEntity> config = new EntityModel<>();
+    public TemplateConfigEntity config;
 
     @State.Context
     @Deprecated // XXX
@@ -64,7 +63,7 @@ public class TemplateConfigState {
     @State.Init
     public void initAction() {
         uow.query( TemplateConfigEntity.class ).singleResult().onSuccess( c -> {
-            config.set( c );
+            config = c;
 
             pageflow.create( page = new TemplateConfigPage() )
                     .putContext( this, Page.Context.DEFAULT_SCOPE )
@@ -88,6 +87,12 @@ public class TemplateConfigState {
     @State.Action
     public Promise<Submitted> submitAction() {
         return uow.submit(); //.onSuccess( __ -> disposeAction() );
+    }
+
+
+    @State.Action
+    public void addFooterNavItem() {
+        config.footerNavItems.createElement( NavItem.defaults() );
     };
 
 }
