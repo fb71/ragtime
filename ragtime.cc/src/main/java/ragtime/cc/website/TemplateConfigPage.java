@@ -175,7 +175,9 @@ public class TemplateConfigPage {
                         .orderBy( NavItem.TYPE.order, () -> isDisposed() );
 
                 add( form.newField()
-                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) )
+                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
+                            spacing.set( 20 );
+                        }})
                         .model( items )
                         .create() );
 
@@ -199,7 +201,9 @@ public class TemplateConfigPage {
                         .orderBy( NavItem.TYPE.order, () -> isDisposed() );
 
                 add( form.newField()
-                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) )
+                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
+                            spacing.set( 20 );
+                        }})
                         .model( items )
                         .create() );
 
@@ -238,17 +242,6 @@ public class TemplateConfigPage {
                 icon.set( _enabled ? "done" : "" );
             });
         }});
-//        // action: revert
-//        site.actions.add( revertBtn = new Action() {{
-//            //icon.set( "undo" );
-//            description.set( "Zurücksetzen" );
-//            handler.set( ev -> {
-//                form.revert();
-//            });
-//            form.subscribe( l -> {
-//                icon.set( form.isChanged() ? "undo" : "" );
-//            });
-//        }});
 
         // action: CSS
         site.actions.add( new Action() {{
@@ -289,7 +282,7 @@ public class TemplateConfigPage {
 
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.width( 40 ) );
-                icon.set( "delete" );
+                icon.set( "close" );
                 tooltip.set( "Dieses Element löschen" );
                 events.on( EventType.SELECT, ev -> {
                     ((EntityCompositeListModel<NavItem>)model).removeElement( item );

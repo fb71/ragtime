@@ -14,6 +14,8 @@
 package ragtime.cc.media;
 
 import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query;
+import org.polymap.model2.query.Query.Order;
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
@@ -30,6 +32,8 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.UICommon;
+import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.MediaEntity;
 
@@ -55,57 +59,59 @@ public class MediasState {
 
     protected MediasPage    page;
 
-    /**
-     * Model: searchTxt
-     */
     @State.Model
     public Model<String>    searchTxt = new Pojo<>( "" );
 
     @State.Model
     public Model<AccountEntity> selected = new Pojo<>();
 
-//    /**
-//     * Model: articles
-//     */
-//    @State.Model
-//    public LazyListModel<AccountEntity> accounts = new EntityListModel<>( AccountEntity.class ) {
-//        {
-//            // re-fire events from searchTxt
-//            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
-//            // fire event on Entity change
-//            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
-//        }
+    @State.Model
+    public EntityListModel<MediaEntity> medias = new EntityListModel<>( MediaEntity.class ) {
+        {
+            // re-fire events from searchTxt
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            // fire event on Entity change
+            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+        }
+        @Override
+        protected Query<MediaEntity> query() {
+            var searchTxtMatch = Expressions.TRUE;
+            if (searchTxt.get().length() > 0) {
+                searchTxtMatch = Expressions.matches( MediaEntity.TYPE.name, searchTxt.get() + "*" );
+            }
+            return uow.query( MediaEntity.class )
+                    .where( searchTxtMatch )
+                    .orderBy( MediaEntity.TYPE.name, Order.ASC );
+        }
 //        @Override
-//        protected Query<AccountEntity> query() {
-//            var searchTxtMatch = Expressions.TRUE;
-//            if (searchTxt.get().length() > 0) {
-//                searchTxtMatch = or(
-//                        matches( AccountEntity.TYPE.login, searchTxt.get() + "*" ),
-//                        matches( AccountEntity.TYPE.email, searchTxt.get() + "*" ) );
-//            }
-//            return uow.query( AccountEntity.class )
-//                    .where( searchTxtMatch )
-//                    .orderBy( AccountEntity.TYPE.lastLogin, Order.DESC );
+//        public void remove( MediaEntity entity ) {
+//            uow.removeEntity( entity );
+//            fireChangeEvent();
 //        }
-//    };
+    };
 
 
     @State.Init
     public void initAction() {
         pageflow.create( page = new MediasPage() )
                 .putContext( MediasState.this, Page.Context.DEFAULT_SCOPE )
+                .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
     };
 
 
     @State.Dispose
-    public void disposeAction() {
-        pageflow.close( page );
+    public boolean disposeAction() {
+        if (!page.site.isClosed()) {
+            pageflow.close( page );
+        }
+        uow.discard();
         site.dispose();
+        return true;
     };
 
 
-    @State.Dispose
+    @State.Action
     public Promise<Submitted> createMediaAction( FileUpload.File f ) {
         return uow.query( MediaEntity.class )
                 .where( Expressions.eq( MediaEntity.TYPE.name, f.name() ) ).executeCollect()
@@ -124,6 +130,18 @@ public class MediasState {
                 .then( entity -> {
                     return uow.submit();
                 });
-    };
+    }
+
+
+    @State.Action
+    public Promise<Submitted> removeMediaAction( MediaEntity entity ) {
+        uow.removeEntity( entity );
+        return uow.submit();
+    }
+
+
+//    public Promise<Submitted> submitAction() {
+//        return uow.submit();
+//    };
 
 }

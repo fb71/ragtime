@@ -24,18 +24,25 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.FileUpload;
 import areca.ui.component2.FileUpload.File;
 import areca.ui.component2.ScrollableComposite;
+import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.FillLayout;
+import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.CompositeListViewer;
+import areca.ui.viewer.ViewerBuilder;
+import areca.ui.viewer.ViewerContext;
+import ragtime.cc.UICommon;
+import ragtime.cc.model.MediaEntity;
 
 /**
  *
@@ -54,99 +61,114 @@ public class MediasPage {
     protected PageContainer     ui;
 
     @Page.Context
-    protected MediasState     state;
+    protected MediasState       state;
 
-//    @Page.Context
-//    protected UICommon          uic;
+    @Page.Context
+    protected UICommon          uic;
 
     @Page.Context
     protected PageSite          site;
 
-    private ScrollableComposite list;
+    private Button              uploadBtn;
 
     private File                uploaded;
 
-    private Button              btn;
+    private ViewerBuilder       medias;
 
 
     @Page.CreateUI
+    @SuppressWarnings( "unchecked" )
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Medien" );
 
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
+        ui.body.layout.set( uic.verticalL() );
+        ui.body.add( new UIComposite() {{
+            layout.set( RowLayout.filled().vertical().spacing( uic.space ) );
 
-        ui.body.add( new FileUpload() {{
-            events.on( EventType.UPLOAD, ev -> {
-                LOG.warn( "Uploaded: %s", data.get().name() );
-                uploaded = data.get();
-                btn.enabled.set( true );
-            });
+            // upload row
+            add( new UIComposite() {{
+                layoutConstraints.set( RowConstraints.height( 35 ) );
+                layout.set( RowLayout.filled().spacing( uic.space ) );
+                add( new FileUpload() {{
+                    events.on( EventType.UPLOAD, ev -> {
+                        LOG.warn( "Uploaded: %s", data.get().name() );
+                        uploaded = data.get();
+                        uploadBtn.enabled.set( true );
+                    });
+                }});
+
+                uploadBtn = add( new Button() {{
+                    layoutConstraints.set( RowConstraints.width( 80 ) );
+                    //label.set( "Upload" );
+                    icon.set( "add" );
+                    tooltip.set( "Das ausgewählte File neu anlegen" );
+                    type.set( Type.SUBMIT );
+                    enabled.set( false );
+                    events.on( EventType.SELECT, ev -> {
+                        state.createMediaAction( uploaded ).onSuccess( __ -> {
+                            enabled.set( false );
+                        });
+                    });
+                }});
+            }});
+
+            // list
+            add( new ScrollableComposite() {{
+                layout.set( FillLayout.defaults() );
+
+                medias = new ViewerContext()
+                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> new UIComposite() {{
+                            LOG.debug( "Creating TableCell for: %s", media );
+                            layoutConstraints.set( RowConstraints.height( 35 ));
+                            layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 5 ) );
+                            add( new Text() {{
+                                content.set( media.name.get() );
+                            }});
+                            add( new Button() {{
+                                layoutConstraints.set( RowConstraints.width( 40 ));
+                                icon.set( "close" );
+                                events.on( EventType.SELECT, ev -> {
+                                    state.removeMediaAction( media );
+                                });
+                            }});
+                        }}) {{
+                            oddEven.set( true );
+                            spacing.set( 0 );
+                            lines.set( true );
+                            onSelect.set( ev -> {
+                                LOG.info( "SELECT: %s", ev );
+                            });
+                        }})
+                        .model( state.medias );
+                add( medias.createAndLoad() );
+            }});
         }});
 
-        btn = ui.body.add( new Button() {{
-            label.set( "Submit" );
-            type.set( Type.SUBMIT );
-            enabled.set( false );
-            events.on( EventType.SELECT, ev -> {
-               state.createMediaAction( uploaded ).onSuccess( __ -> {
-                   enabled.set( false );
-               });
-            });
-        }});
-
-//        // list
-//        ui.body.add( new ScrollableComposite() {{
-//            list = this;
-//            layout.set( RowLayout.filled().vertical().spacing( 10 ) );
-//            add( new Text() {{
-//               content.set( "..." );
-//            }});
-//            state.accounts.subscribe( ev -> refreshArticlesList() )
-//                    .unsubscribeIf( () -> site.isClosed() );
-//            refreshArticlesList();
+//        // Submit
+//        site.actions.add( new Action() {{
+//            description.set( "Speichern" );
+//            type.set( Button.Type.SUBMIT );
+//            //enabled.set( false );
+//            icon.set( "done" );
+//            handler.set( ev -> {
+//                state.submitAction().onSuccess( __ -> {
+//                    enabled.set( false );
+//                });
+//            });
+//            medias.subscribe( ev -> {
+//                var _enabled = true; //medias.isChanged() && medias.isValid();
+//                enabled.set( _enabled );
+//                icon.set( _enabled ? "done" : "" );
+//            });
 //        }});
         return ui;
     }
 
 
-//    protected void refreshArticlesList() {
-//        list.components.disposeAll();  // XXX race cond.
-//        state.accounts.load( 0, 100 ).onSuccess( opt -> {
-//            opt.ifPresent( article -> {
-//                list.add( new AccountListItem( article ) );
-//            } );
-//            opt.ifAbsent( __ -> {
-//                list.layout();
-//            });
-//        });
-//    }
-//
-//
-//    /**
-//     *
-//     */
-//    protected class AccountListItem extends Button {
-//
-//        public AccountListItem( AccountEntity account ) {
-//            layoutConstraints.set( RowConstraints.height( 50 ) );
-//            layout.set( RowLayout.filled().vertical().margins( 10, 10 ).spacing( 8 ) );
-//            bordered.set( false );
-//            add( new Text() {{
-//                //format.set( Format.HTML );
-//                content.set( account.email.get() +
-//                        (account.isAdmin.get() ? " (" + account.login.get() + ")" : "") );
-//            }});
-//            add( new Text() {{
-//                content.set( "Login: " + df.format( account.lastLogin.get() ) );
-//                styles.add( CssStyle.of( "font-size", "10px") );
-//                styles.add( CssStyle.of( "color", "#707070") );
-//                enabled.set( false );
-//            }});
-//            events.on( EventType.SELECT, ev -> {
-//                state.selected.set( account );
-//                state.becomeAccountAction( account );
-//            });
-//        }
-//
-//    }
+    @Page.Close
+    public boolean onClose() {
+        LOG.info( "onClose()" );
+        return state.disposeAction();
+    }
+
 }

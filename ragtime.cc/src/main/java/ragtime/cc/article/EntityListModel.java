@@ -13,6 +13,8 @@
  */
 package ragtime.cc.article;
 
+import java.util.Iterator;
+
 import org.polymap.model2.Entity;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.runtime.Lifecycle.State;
@@ -25,7 +27,9 @@ import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.viewer.model.LazyListModel;
+import areca.ui.viewer.model.ListModel;
 import areca.ui.viewer.model.ModelBaseImpl;
+import areca.ui.viewer.model.ModifiableListModel;
 import ragtime.cc.model.EntityLifecycleEvent;
 
 /**
@@ -34,7 +38,7 @@ import ragtime.cc.model.EntityLifecycleEvent;
  */
 public class EntityListModel<V extends Entity>
         extends ModelBaseImpl
-        implements LazyListModel<V> {
+        implements LazyListModel<V>, ListModel<V> {
 
     private static final Log LOG = LogFactory.getLog( EntityListModel.class );
 
@@ -62,6 +66,16 @@ public class EntityListModel<V extends Entity>
 
 
     /**
+     *
+     * <p>
+     * This does not follow {@link ModifiableListModel} ...
+     */
+    public void remove( V entity ) {
+        throw new UnsupportedOperationException( "remove() is not implemented" );
+    }
+
+
+    /**
      * Causes this model to {@link #fireChangeEvent()} if {@link Entity}s changed.
      */
     public EntityListModel<V> fireChangeEventOnEntitySubmit( RSupplier<Boolean> unsubscribeIf ) {
@@ -75,8 +89,19 @@ public class EntityListModel<V extends Entity>
 
 
     @Override
+    public Iterator<V> iterator() {
+        return query().executeCollect().waitForResult().get().iterator(); // XXX
+    }
+
+
+    @Override
+    public int size() {
+        throw new RuntimeException( "not yet implemented." );
+    }
+
+
+    @Override
     public Promise<Integer> count() {
-        // XXX Auto-generated method stub
         throw new RuntimeException( "not yet implemented." );
     }
 

@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 
 import areca.common.base.Consumer.RConsumer;
 import areca.common.base.Lazy.RLazy;
@@ -69,6 +70,19 @@ public class MediaEntity
     protected RLazy<Integer>            cpermid = new RLazy<>( () ->
             context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get().permid.get() );
 
+
+
+    @Override
+    public void onLifecycleChange( State state ) {
+        super.onLifecycleChange( state );
+        if (state == State.AFTER_SUBMIT && status() == EntityStatus.REMOVED) {
+            var f = f();
+            if (f.exists()) {
+                f.delete();
+            }
+            LOG.info( "Removed: %s", f );
+        }
+    }
 
     /**
      * Unbuffered {@link OutputStream} of the content.
