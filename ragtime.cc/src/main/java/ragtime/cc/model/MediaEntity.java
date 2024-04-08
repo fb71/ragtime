@@ -109,8 +109,8 @@ public class MediaEntity
     }
 
     protected File f() {
-        //var workspace = Workspace.of( permid.get() );
-        var workspace = Workspace.of( cpermid.get() );
+        var workspace = Workspace.of( permid.get() );
+        //var workspace = Workspace.of( cpermid.get() );
         var media = new File( workspace, DIR );
         media.mkdirs();
         return new File( media, name.get() );
