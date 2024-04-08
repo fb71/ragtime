@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -28,6 +29,7 @@ import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.FileUpload;
 import areca.ui.component2.FileUpload.File;
+import areca.ui.component2.Image;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
@@ -119,13 +121,21 @@ public class MediasPage {
                 medias = new ViewerContext()
                         .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> new UIComposite() {{
                             LOG.debug( "Creating TableCell for: %s", media );
-                            layoutConstraints.set( RowConstraints.height( 35 ));
+                            lc( RowConstraints.height( 45 ));
                             layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 5 ) );
                             add( new Text() {{
-                                content.set( media.name.get() );
+                                format.set( Format.HTML );
+                                content.set( media.name.get() + "<br/>" +
+                                            "<span style=\"font-size:10px; color:#808080;\">" + media.mimetype.get() + "</span>" );
                             }});
+                            if (media.mimetype.get().startsWith( "image" )) {
+                                add( new Image() {{
+                                    lc( RowConstraints.width( 40 ));
+                                    Platform.schedule( 750, () -> setData( media.in() ) );
+                                }});
+                            }
                             add( new Button() {{
-                                layoutConstraints.set( RowConstraints.width( 40 ));
+                                lc( RowConstraints.width( 40 ));
                                 icon.set( "close" );
                                 events.on( EventType.SELECT, ev -> {
                                     state.removeMediaAction( media );

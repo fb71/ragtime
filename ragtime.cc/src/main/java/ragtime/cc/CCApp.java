@@ -27,6 +27,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
 import areca.rt.server.ServerApp;
+import areca.rt.server.ServerBrowserHistoryStrategy;
 import areca.rt.server.servlet.ArecaUIServer;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
@@ -97,7 +98,7 @@ public class CCApp
                         //.putContext( new CCAppStatePageMapping( pageflow ), State.Context.DEFAULT_SCOPE )
                         .activate();
 
-                //SimpleBrowserHistoryStrategy.start( Pageflow.current() );
+                ServerBrowserHistoryStrategy.start( pageflow );
             });
         }
         catch (Throwable e) {
