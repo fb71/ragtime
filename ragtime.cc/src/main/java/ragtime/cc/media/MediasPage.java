@@ -123,12 +123,13 @@ public class MediasPage {
                             LOG.debug( "Creating TableCell for: %s", media );
                             lc( RowConstraints.height( 45 ));
                             layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 5 ) );
+                            var mime = media.mimetype.opt().orElse( "null" );
                             add( new Text() {{
                                 format.set( Format.HTML );
                                 content.set( media.name.get() + "<br/>" +
-                                            "<span style=\"font-size:10px; color:#808080;\">" + media.mimetype.opt().orElse( "null" ) + "</span>" );
+                                            "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
                             }});
-                            if (media.mimetype.get().startsWith( "image" )) {
+                            if (mime.startsWith( "image" )) {
                                 add( new Image() {{
                                     lc( RowConstraints.width( 40 ));
                                     Platform.schedule( 750, () -> setData( media.in() ) );
