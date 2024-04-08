@@ -132,7 +132,7 @@ public class MediasPage {
                             if (mime.startsWith( "image" )) {
                                 add( new Image() {{
                                     lc( RowConstraints.width( 40 ));
-                                    Platform.schedule( 750, () -> setData( media.in() ) );
+                                    Platform.schedule( 850, () -> setData( media.in() ) );
                                 }});
                             }
                             add( new Button() {{
