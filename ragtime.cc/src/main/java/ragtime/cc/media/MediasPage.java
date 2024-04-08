@@ -126,7 +126,7 @@ public class MediasPage {
                             add( new Text() {{
                                 format.set( Format.HTML );
                                 content.set( media.name.get() + "<br/>" +
-                                            "<span style=\"font-size:10px; color:#808080;\">" + media.mimetype.get() + "</span>" );
+                                            "<span style=\"font-size:10px; color:#808080;\">" + media.mimetype.opt().orElse( "null" ) + "</span>" );
                             }});
                             if (media.mimetype.get().startsWith( "image" )) {
                                 add( new Image() {{
