@@ -69,7 +69,7 @@ public class WebsiteServlet
             var session = new Session();
 
             ThreadBoundSessionScoper.instance().bind( session, __ -> {
-                var eventLoop = new EventLoop();
+                var eventLoop = EventLoop.create();
                 Session.setInstance( eventLoop );
                 eventLoop.enqueue( "website request", () -> {
                     try {
