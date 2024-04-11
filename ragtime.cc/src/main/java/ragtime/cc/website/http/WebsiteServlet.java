@@ -13,6 +13,7 @@
  */
 package ragtime.cc.website.http;
 
+import static areca.rt.server.EventLoop.FULLY;
 import static org.apache.commons.lang3.StringUtils.split;
 
 import java.io.IOException;
@@ -69,9 +70,9 @@ public class WebsiteServlet
             var session = new Session();
 
             ThreadBoundSessionScoper.instance().bind( session, __ -> {
-                var eventLoop = EventLoop.create();
-                Session.setInstance( eventLoop );
-                eventLoop.enqueue( "website request", () -> {
+                var eventloop = EventLoop.create();
+                Session.setInstance( eventloop );
+                eventloop.enqueue( "website request", () -> {
                     try {
                         process( req, resp );
                     }
@@ -79,7 +80,7 @@ public class WebsiteServlet
                         error( e, resp );
                     }
                 }, 0 );
-                eventLoop.execute();
+                eventloop.execute( FULLY );
             });
 
             session.dispose();
