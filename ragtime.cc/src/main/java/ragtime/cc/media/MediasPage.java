@@ -120,8 +120,8 @@ public class MediasPage {
                 medias = new ViewerContext()
                         .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> new UIComposite() {{
                             LOG.debug( "Creating TableCell for: %s", media );
-                            lc( RowConstraints.height( 45 ));
-                            layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 5 ) );
+                            lc( RowConstraints.height( 54 ));
+                            layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 10 ) );
                             var mime = media.mimetype.opt().orElse( "null" );
                             add( new Text() {{
                                 format.set( Format.HTML );
@@ -145,8 +145,8 @@ public class MediasPage {
                             oddEven.set( true );
                             spacing.set( 0 );
                             lines.set( true );
-                            onSelect.set( ev -> {
-                                LOG.info( "SELECT: %s", ev );
+                            onSelect.set( media -> {
+                                LOG.info( "SELECT: %s", media );
                             });
                         }})
                         .model( state.medias );

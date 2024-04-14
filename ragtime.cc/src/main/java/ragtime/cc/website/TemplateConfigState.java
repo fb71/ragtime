@@ -13,22 +13,22 @@
  */
 package ragtime.cc.website;
 
-import static areca.ui.pageflow.PageflowEvent.EventType.PAGE_CLOSED;
-
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Promise;
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import areca.ui.pageflow.PageflowEvent;
+import areca.ui.pageflow.PageflowEvent.EventType;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.UICommon;
-import ragtime.cc.website.model.NavItem;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
@@ -55,7 +55,7 @@ public class TemplateConfigState {
     protected UnitOfWork    uow;
 
     @State.Model
-    public TemplateConfigEntity config;
+    public Promise<TemplateConfigEntity> config;
 
     @State.Context
     @Deprecated // XXX
@@ -64,25 +64,24 @@ public class TemplateConfigState {
 
     @State.Init
     public void initAction() {
-        uow.query( TemplateConfigEntity.class ).singleResult().onSuccess( c -> {
-            config = c;
+        config = uow.query( TemplateConfigEntity.class ).singleResult();
 
-            pageflow.create( page = new TemplateConfigPage() )
-                    .putContext( this, Page.Context.DEFAULT_SCOPE )
-                    .putContext( uic, Page.Context.DEFAULT_SCOPE )
-                    .open();
+        pageflow.create( page = new TemplateConfigPage() )
+                .putContext( this, Page.Context.DEFAULT_SCOPE )
+                .putContext( uic, Page.Context.DEFAULT_SCOPE )
+                .open();
 
-            page.site.subscribe( PAGE_CLOSED, ev -> disposeAction() );
-//            EventManager.instance()
-//                    .subscribe( ev -> disposeAction() )
-//                    .performIf( PageflowEvent.class, ev -> ev.type == PAGE_CLOSED && ev.page.get() == page)
-//                    .unsubscribeIf( () -> site.isDisposed() );
-        });
+        //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
+        EventManager.instance()
+                .subscribe( ev -> disposeAction() )
+                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.page.get() == page )
+                .unsubscribeIf( () -> site.isDisposed() );
     };
 
 
     @State.Dispose
     public void disposeAction() {
+        LOG.warn( "disposeAction(): ..." );
         if (!page.site.isClosed()) {
             page.site.close();
         }
@@ -98,9 +97,9 @@ public class TemplateConfigState {
     }
 
 
-    @State.Action
-    public void addFooterNavItem() {
-        config.footerNavItems.createElement( NavItem.defaults() );
-    };
+//    @State.Action
+//    public void addFooterNavItem() {
+//        config.footerNavItems.createElement( NavItem.defaults() );
+//    };
 
 }

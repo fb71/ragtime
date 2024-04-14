@@ -82,146 +82,149 @@ public class TemplateConfigPage {
         ui.body.add( new ScrollableComposite() {{
             layout.set( RowLayout.verticals().fillWidth( true ).margins( uic.marginsL ).spacing( uic.spaceL ) );
 
-            var config = state.config;
-
             form = new Form();
 
-            // PageConfig
-            add( new UIComposite() {{
-                //layoutConstraints.set( RowConstraints.height( 200 ) );
-                layout.set( uic.verticalL().fillHeight( false ) );
-                //bordered.set( true );
-                cssClasses.add( "MessageCard" );
-                addDecorator( new Label().content.set( "Seite" ) );
-
-                add( form.newField().label( "Titel" )
-                        .viewer( new TextFieldViewer() )
-                        .model( new PropertyModel<>( config.page.get().title ) )
-                        .create() );
-                add( form.newField().label( "Titel 2" )
-                        .viewer( new TextFieldViewer() )
-                        .model( new PropertyModel<>( config.page.get().title2 ) )
-                        .create() );
-                add( form.newField().label( "Fusszeile" )
-                        .viewer( new TextFieldViewer() )
-                        .model( new PropertyModel<>( config.page.get().footer ) )
-                        .create() );
-            }});
-
-            // Colors
-            add( new UIComposite() {{
-                //layoutConstraints.set( RowConstraints.height( 220 ) );
-                layout.set( uic.verticalL().fillHeight( false ).spacing( uic.space ) );
-                //bordered.set( true );
-                cssClasses.add( "MessageCard" );
-                addDecorator( new Label().content.set( "Farben" ) );
-
+            state.config.onSuccess( config -> {
+                // PageConfig
                 add( new UIComposite() {{
-                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
-                    add( form.newField().label( "Hintergrund" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().pageBackground ) )
+                    //layoutConstraints.set( RowConstraints.height( 200 ) );
+                    layout.set( uic.verticalL().fillHeight( false ) );
+                    //bordered.set( true );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Seite" ) );
+
+                    add( form.newField().label( "Titel" )
+                            .viewer( new TextFieldViewer() )
+                            .model( new PropertyModel<>( config.page.get().title ) )
                             .create() );
-                    add( form.newField().label( "Text" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().pageForeground ) )
+                    add( form.newField().label( "Titel 2" )
+                            .viewer( new TextFieldViewer() )
+                            .model( new PropertyModel<>( config.page.get().title2 ) )
+                            .create() );
+                    add( form.newField().label( "Fusszeile" )
+                            .viewer( new TextFieldViewer() )
+                            .model( new PropertyModel<>( config.page.get().footer ) )
                             .create() );
                 }});
 
+                // Colors
                 add( new UIComposite() {{
-                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
-                    add( form.newField().label( "Kopf - Hintergrund" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().headerBackground ) )
-                            .create() );
-                    add( form.newField().label( "Kopf - Text" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().headerForeground ) )
-                            .create() );
+                    //layoutConstraints.set( RowConstraints.height( 220 ) );
+                    layout.set( uic.verticalL().fillHeight( false ).spacing( uic.space ) );
+                    //bordered.set( true );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Farben" ) );
+
+                    add( new UIComposite() {{
+                        layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
+                        add( form.newField().label( "Hintergrund" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().pageBackground ) )
+                                .create() );
+                        add( form.newField().label( "Text" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().pageForeground ) )
+                                .create() );
+                    }});
+
+                    add( new UIComposite() {{
+                        layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
+                        add( form.newField().label( "Kopf - Hintergrund" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().headerBackground ) )
+                                .create() );
+                        add( form.newField().label( "Kopf - Text" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().headerForeground ) )
+                                .create() );
+                    }});
+
+                    add( new UIComposite() {{
+                        layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
+                        add( form.newField().label( "Footer - Hintergrund" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().footerBackground ) )
+                                .create() );
+                        add( form.newField().label( "Footer - Text" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().footerForeground ) )
+                                .create() );
+                    }});
+
+                    add( new UIComposite() {{
+                        layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
+                        add( form.newField().label( "Akzent" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().accent ) )
+                                .create() );
+                        add( form.newField().label( "Link" )
+                                .viewer( new ColorPickerViewer() )
+                                .model( new PropertyModel<>( config.colors.get().link ) )
+                                .create() );
+                    }});
                 }});
 
+                // NavItems
                 add( new UIComposite() {{
-                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
-                    add( form.newField().label( "Footer - Hintergrund" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().footerBackground ) )
+                    layout.set( uic.verticalL().fillHeight( false ) );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Navigation" ) ).get();
+
+                    var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.navItems )
+                            .orderBy( NavItem.TYPE.order, () -> isDisposed() );
+
+                    add( form.newField()
+                            .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
+                                spacing.set( 20 );
+                            }})
+                            .model( items )
                             .create() );
-                    add( form.newField().label( "Footer - Text" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().footerForeground ) )
-                            .create() );
+
+                    add( new Button() {{
+                        icon.set( "add" );
+                        tooltip.set( "Neues Element hinzufügen" );
+                        events.on( EventType.SELECT, ev -> {
+                            items.createElement( NavItem.defaults() );
+                            ui.body.layout();
+                        });
+                    }});
                 }});
 
+                // Footer NavItems
                 add( new UIComposite() {{
-                    layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
-                    add( form.newField().label( "Akzent" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().accent ) )
+                    layout.set( uic.verticalL().fillHeight( false ) );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Footer Navigation" ) ).get();
+
+                    var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.footerNavItems )
+                            .orderBy( NavItem.TYPE.order, () -> isDisposed() );
+
+                    add( form.newField()
+                            .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
+                                spacing.set( 20 );
+                            }})
+                            .model( items )
                             .create() );
-                    add( form.newField().label( "Link" )
-                            .viewer( new ColorPickerViewer() )
-                            .model( new PropertyModel<>( config.colors.get().link ) )
-                            .create() );
+
+                    add( new Button() {{
+                        //layoutConstraints.set( RowConstraints.height( 40 ) );
+                        icon.set( "add" );
+                        tooltip.set( "Neues Element hinzufügen" );
+                        events.on( EventType.SELECT, ev -> {
+                            items.createElement( NavItem.defaults() );
+                            ui.body.layout();
+                        });
+                    }});
                 }});
-            }});
+                add( new Text().layoutConstraints.set( RowConstraints.height( 10 ) ) );
 
-            // NavItems
-            add( new UIComposite() {{
-                layout.set( uic.verticalL().fillHeight( false ) );
-                cssClasses.add( "MessageCard" );
-                addDecorator( new Label().content.set( "Navigation" ) ).get();
-
-                var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.navItems )
-                        .orderBy( NavItem.TYPE.order, () -> isDisposed() );
-
-                add( form.newField()
-                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
-                            spacing.set( 20 );
-                        }})
-                        .model( items )
-                        .create() );
-
-                add( new Button() {{
-                    icon.set( "add" );
-                    tooltip.set( "Neues Element hinzufügen" );
-                    events.on( EventType.SELECT, ev -> {
-                        items.createElement( NavItem.defaults() );
-                        ui.body.layout();
-                    });
-                }});
-            }});
-
-            // Footer NavItems
-            add( new UIComposite() {{
-                layout.set( uic.verticalL().fillHeight( false ) );
-                cssClasses.add( "MessageCard" );
-                addDecorator( new Label().content.set( "Footer Navigation" ) ).get();
-
-                var items = new EntityCompositeListModel<>( TemplateConfigEntity.class, config.footerNavItems )
-                        .orderBy( NavItem.TYPE.order, () -> isDisposed() );
-
-                add( form.newField()
-                        .viewer( new CompositeListViewer<NavItem>( NavItemEditor::new ) {{
-                            spacing.set( 20 );
-                        }})
-                        .model( items )
-                        .create() );
-
-                add( new Button() {{
-                    //layoutConstraints.set( RowConstraints.height( 40 ) );
-                    icon.set( "add" );
-                    tooltip.set( "Neues Element hinzufügen" );
-                    events.on( EventType.SELECT, ev -> {
-                        items.createElement( NavItem.defaults() );
-                        ui.body.layout();
-                    });
-                }});
-            }});
-            add( new Text().layoutConstraints.set( RowConstraints.height( 10 ) ) );
-
-            Platform.schedule( 750, () -> {
-                form.load();
                 ui.body.layout();
+
+                // split rendering and help browser (?)
+                Platform.schedule( 750, () -> {
+                    form.load();
+                    ui.body.layout();
+                });
             });
         }});
 
@@ -251,7 +254,6 @@ public class TemplateConfigPage {
                 site.createPage( new EditCssPage() ).open();
             });
         }});
-
         return ui;
     }
 

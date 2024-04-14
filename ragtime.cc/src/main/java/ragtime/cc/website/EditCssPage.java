@@ -13,8 +13,6 @@
  */
 package ragtime.cc.website;
 
-import areca.common.Platform;
-import areca.common.Scheduler.Priority;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -74,18 +72,19 @@ public class EditCssPage {
         ui.body.add( new ScrollableComposite() {{
             layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
 
-            var config = state.config;
+            state.config.onSuccess( config -> {
+                form = new Form();
+                add( form.newField()
+                        .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                            t.multiline.set( true );
+                            t.type.set( Type.CSS );
+                        }))
+                        .model( new PropertyModel<>( config.css ) )
+                        .create()
+                        .layoutConstraints.set( null ) );
 
-            form = new Form();
-            add( form.newField()
-                    .viewer( new TextFieldViewer().configure( (TextField t) -> {
-                        t.multiline.set( true );
-                        t.type.set( Type.CSS );
-                    }))
-                    .model( new PropertyModel<>( config.css ) )
-                    .create()
-                    .layoutConstraints.set( null ) );
-            Platform.scheduler.schedule( Priority.BACKGROUND, () -> form.load() );
+                form.load();
+            });
         }});
 
         // action: submit

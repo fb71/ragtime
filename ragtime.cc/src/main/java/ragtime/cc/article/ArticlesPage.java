@@ -33,11 +33,14 @@ import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.CompositeListViewer;
+import areca.ui.viewer.ViewerContext;
 import ragtime.cc.LoginState;
 import ragtime.cc.model.Article;
 
@@ -134,14 +137,19 @@ public class ArticlesPage {
 
         // list
         ui.body.add( new ScrollableComposite() {{
-            list = this;
-            layout.set( RowLayout.filled().vertical().spacing( 10 ) );
-            add( new Text() {{
-               content.set( "..." );
-            }});
-            state.articles.subscribe( ev -> refreshArticlesList() )
-                    .unsubscribeIf( () -> site.isClosed() );
-            refreshArticlesList();
+            layout.set( FillLayout.defaults() );
+
+            add( new ViewerContext<>()
+                    .viewer( new CompositeListViewer<Article>( (article,model) -> new ListItem( article ) ) {{
+                        lines.set( true );
+                        oddEven.set( true );
+                        onSelect.set( article -> {
+                            state.selected.set( article );
+                            state.editArticleAction.run();
+                        });
+                    }})
+                    .model( state.articles )
+                    .createAndLoad() );
         }});
         return ui;
     }
@@ -163,11 +171,28 @@ public class ArticlesPage {
     /**
      *
      */
+    protected class ListItem extends UIComposite {
+
+        protected ListItem( Article article ) {
+            lc( RowConstraints.height( 54 ));
+            layout.set( RowLayout.filled().margins( 10, 10 ) );
+            add( new Text() {{
+                format.set( Format.HTML );
+                content.set( article.title.get() + "<br/>" +
+                        "<span style=\"font-size:10px; color:#808080;\">Geändert:" + df.format( article.modified.get() ) + "</span>" );
+            }});
+        }
+    }
+
+
+    /**
+     *
+     */
     protected class ArticleListItem extends Button {
 
         public ArticleListItem( Article article ) {
             layoutConstraints.set( RowConstraints.height( 50 ) );
-            layout.set( RowLayout.filled().vertical().margins( 10, 10 ).spacing( 8 ) );
+            layout.set( RowLayout.filled().vertical().margins( 10, 7 ).spacing( 8 ) );
             bordered.set( false );
             add( new Text() {{
                 //format.set( Format.HTML );
