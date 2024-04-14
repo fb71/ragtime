@@ -33,6 +33,7 @@ import areca.ui.viewer.model.ModifiableListModel;
 import ragtime.cc.model.EntityLifecycleEvent;
 
 /**
+ * Provides {@link Entity}s depending on a given {@link Query}.
  *
  * @author Falko Bräutigam
  */

@@ -24,15 +24,12 @@ import org.polymap.model2.runtime.Lifecycle.State;
 import org.polymap.model2.runtime.PropertyInfo;
 
 import areca.common.Assert;
-import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
-import areca.common.base.Opt;
 import areca.common.base.Sequence;
 import areca.common.base.Supplier.RSupplier;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.ListModel;
 import areca.ui.viewer.model.ModelBaseImpl;
 import areca.ui.viewer.model.ModifiableListModel;
@@ -45,7 +42,7 @@ import ragtime.cc.model.PropertyChangeConcern.PropertyChangeEvent;
  */
 public class EntityCompositeListModel<V extends Composite>
         extends ModelBaseImpl
-        implements LazyListModel<V>, ListModel<V> {
+        implements ListModel<V> {
 
     private static final Log LOG = LogFactory.getLog( EntityCompositeListModel.class );
 
@@ -61,6 +58,7 @@ public class EntityCompositeListModel<V extends Composite>
         this.coll = coll;
     }
 
+
     @SuppressWarnings( "unchecked" )
     public EntityCompositeListModel<V> orderBy(
             Property<? extends Comparable> newOrderBy,
@@ -74,6 +72,7 @@ public class EntityCompositeListModel<V extends Composite>
                 .unsubscribeIf( unsubscribeIf );
         return this;
     }
+
 
     /**
      * Causes this model to {@link #fireChangeEvent()} if {@link Entity}s changed.
@@ -93,6 +92,7 @@ public class EntityCompositeListModel<V extends Composite>
         return coll.size();
     }
 
+
     @Override
     @SuppressWarnings( "unchecked" )
     public Iterator<V> iterator() {
@@ -108,15 +108,6 @@ public class EntityCompositeListModel<V extends Composite>
         return l.iterator();
     }
 
-    @Override
-    public Promise<Integer> count() {
-        throw new RuntimeException( "not yet implemented." );
-    }
-
-    @Override
-    public Promise<Opt<V>> load( int first, int max ) {
-        throw new RuntimeException( "not yet implemented." );
-    }
 
     /**
      * Creates a new {@link Composite} in the underlying {@link Entity}.

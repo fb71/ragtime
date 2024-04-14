@@ -13,6 +13,8 @@
  */
 package ragtime.cc.website;
 
+import static areca.ui.pageflow.PageflowEvent.EventType.PAGE_CLOSED;
+
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
@@ -69,18 +71,24 @@ public class TemplateConfigState {
                     .putContext( this, Page.Context.DEFAULT_SCOPE )
                     .putContext( uic, Page.Context.DEFAULT_SCOPE )
                     .open();
+
+            page.site.subscribe( PAGE_CLOSED, ev -> disposeAction() );
+//            EventManager.instance()
+//                    .subscribe( ev -> disposeAction() )
+//                    .performIf( PageflowEvent.class, ev -> ev.type == PAGE_CLOSED && ev.page.get() == page)
+//                    .unsubscribeIf( () -> site.isDisposed() );
         });
     };
 
 
     @State.Dispose
-    public boolean disposeAction() {
+    public void disposeAction() {
         if (!page.site.isClosed()) {
-            pageflow.close( page );
+            page.site.close();
         }
         uow.discard();
         site.dispose();
-        return true;
+        //return true;
     }
 
 

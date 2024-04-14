@@ -36,7 +36,7 @@ import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
-import areca.ui.viewer.model.ListModel;
+import areca.ui.viewer.model.ListModelBase;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.EntityCompositeListModel;
@@ -261,7 +261,7 @@ public class TemplateConfigPage {
      */
     protected class NavItemEditor extends UIComposite {
 
-        public NavItemEditor( NavItem item, ListModel<NavItem> model ) {
+        public NavItemEditor( NavItem item, ListModelBase<NavItem> model ) {
             layoutConstraints.set( RowConstraints.height( 30 ) );
             layout.set( RowLayout.defaults().fillWidth( true ).spacing( uic.space ) );
 
@@ -293,9 +293,11 @@ public class TemplateConfigPage {
     }
 
 
-    @Page.Close
-    public boolean onClose() {
-        LOG.info( "onClose()" );
-        return state.disposeAction();
-    }
+//    @Page.Close
+//    public boolean onClose() {
+//        LOG.info( "onClose()" );
+//        //Platform.async( () -> state.disposeAction() );
+//        state.disposeAction();
+//        return true;
+//    }
 }
