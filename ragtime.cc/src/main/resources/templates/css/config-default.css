@@ -36,3 +36,12 @@
    padding-bottom: 0.5rem;
    text-align: center;
 }
+
+@media (min-width: 768px) {
+  .CFooter {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+  }
+}

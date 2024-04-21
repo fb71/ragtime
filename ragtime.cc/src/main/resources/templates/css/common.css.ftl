@@ -55,14 +55,6 @@ a:hover {
     padding-bottom: 2rem;
 }
 
-.CFooter {
-    background-color: var(--common-footer-bg);
-    color: var(--common-footer-color);
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    text-align: center;
-}
-
 .CNavbar {
     margin-bottom: 1.0rem;
 }
@@ -87,6 +79,23 @@ a:hover {
 .CAside.CEnd {
     padding-top: 1.5rem;
     margin-top: 1.5rem;
+}
+
+.CFooter {
+    background-color: var(--common-footer-bg);
+    color: var(--common-footer-color);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+  .CFooter {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+  }
 }
 
 
