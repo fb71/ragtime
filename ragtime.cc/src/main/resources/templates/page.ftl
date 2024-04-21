@@ -17,24 +17,24 @@
 
 <body class="${pageclass}">
     <#-- Page header with logo and tagline-->
-    <header class="CHeader py-3 border-bottom">
+    <header class="CHeader border-bottom">
         <div class="container">
-            <div class="text-center my-5">
-                <h1 class="fw-bolder">${config.page.title}</h1>
+            <!--div class="text-center my-5"-->
+                <h1>${config.page.title}</h1>
                 <p class="lead mb-0">${config.page.title2}</p>
-            </div>
+            <!--/div-->
         </div>
     </header>
     
     <#-- Responsive navbar-->
-    <nav class="CNavbar navbar navbar-expand-md mb-4">
+    <nav class="CNavbar navbar navbar-expand-md">
         <div class="container">
             <a class="navbar-brand" href="#!"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mb-lg-0">
                     <#list config.navItems?sequence?sort_by("order") as item>
                         <li class="nav-item"><a class="nav-link" href="${item.href}">${item.title}</a></li>
                     </#list>
@@ -53,9 +53,9 @@
     </div>
 
     <#-- Footer-->
-    <footer class="CFooter py-2">
+    <footer class="CFooter">
         <div class="container">
-            <p class="m-0 text-center small">
+            <p class="m-0 small">
             <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
             <#list config.footerNavItems?sequence?sort_by("order") as item>
                 <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;

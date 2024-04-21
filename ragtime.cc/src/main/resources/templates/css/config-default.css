@@ -1,0 +1,38 @@
+/**
+ * Default styling of common website elements.
+ */
+  
+.CHeader {
+    /* text-align: center; */
+    /* font-weight: bolder; */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.CNavbar {
+    margin-bottom: 1.0rem;
+}
+
+.CNavbar ul {
+    margin-left: auto;
+    /* margin-right: auto; */
+}
+
+.CAside.CStart {
+    padding-left: 3rem;
+    padding-right: 1rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    margin-left: 3rem;
+}
+
+.CAside.CEnd {
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.CFooter {
+   padding-top: 0.5rem;
+   padding-bottom: 0.5rem;
+   text-align: center;
+}

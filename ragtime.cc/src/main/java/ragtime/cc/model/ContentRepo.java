@@ -164,6 +164,8 @@ public class ContentRepo {
                             proto.tags.add( asideTag );
                         });
                         // TemplateConfig
+                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                        var css = IOUtils.toString( cl.getResource( "templates/css/config-default.css" ), "UTF-8" );
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
                             proto.page.createValue( page -> {
                                 page.title.set( "Titel" );
@@ -185,6 +187,7 @@ public class ContentRepo {
                                 navItem.href.set( String.format( "frontpage?%s=Impressum", ArticleTemplateModel.PARAM_TITLE ) );
                                 navItem.order.set( 3 );
                             });
+                            proto.css.set( css );
                         });
                     }
                     LOG.debug( "Repo: content created" );

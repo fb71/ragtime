@@ -1,6 +1,6 @@
-<#--
-  Basis settings of the Common template. Based on Bootstrap.
--->
+/***
+ * Basis settings of the Common template. Based on Bootstrap.
+ */
 
 <#include "Roboto.css">
 <#include "RobotoCondensed.css">
@@ -20,7 +20,7 @@
     --common-footer-bg: ${config.colors.footerBackground};
     --common-footer-color: ${config.colors.footerForeground};
     
-    --bs-font-sans-serif: Roboto, sans-serif;
+    --bs-font-sans-serif: RobotoC, sans-serif;
     --bs-body-color: ${config.colors.pageForeground};
     --bs-body-color-rgb: ${config.colors.pageForeground@rgb};
     --bs-body-bg: ${config.colors.pageBackground};
@@ -42,20 +42,51 @@ a {
     text-decoration: none;
 }
 a:hover {
-<#--     filter: brightness(0.9) saturate(1.5);  -->
+/*    filter: brightness(0.9) saturate(1.5);  */
     text-decoration: underline;
 }
 
 .CHeader {
     background-color: var(--common-header-bg);
     color: var(--common-header-color);
+    /* text-align: center; */
+    /* font-weight: bolder; */
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 .CFooter {
     background-color: var(--common-footer-bg);
     color: var(--common-footer-color);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;
 }
 
-aside {
+.CNavbar {
+    margin-bottom: 1.0rem;
+}
+
+.CNavbar ul {
+    margin-left: auto;
+    /* margin-right: auto; */
+}
+
+.CAside {
     color: var(--common-accent-color);
 }
+
+.CAside.CStart {
+    padding-left: 3rem;
+    padding-right: 1rem;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    margin-left: 3rem;
+}
+
+.CAside.CEnd {
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+
