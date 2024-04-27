@@ -6,6 +6,8 @@
 
 <@page.layout title="${article.title}" pageclass="CFrontpage">
    
-   ${article.content}
+   <@c.editable msg="article.${article.id}">
+       ${article.content}
+   </@c.editable>
 
 </@page.layout>

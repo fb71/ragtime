@@ -7,13 +7,19 @@
 <@page.layout title="${article.title}" pageclass="CHome">
    
     <aside class="CAside CStart d-none d-md-block float-md-end border-start">
-        ${aside.content}
+        <@c.editable msg="article.${aside.id}">
+          ${aside.content}
+        </@c.editable>
     </aside>
 
-   ${article.content}
+   <@c.editable msg="article.${article.id}">
+     ${article.content}
+   </@c.editable>
    
    <div class="CAside CEnd d-block d-md-none border-top">
-        ${aside.content}
+        <@c.editable msg="article.${aside.id}">
+          ${aside.content}
+        </@c.editable>
    </div>
 
 </@page.layout>

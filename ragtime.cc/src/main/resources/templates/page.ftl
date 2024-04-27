@@ -1,3 +1,5 @@
+<#import "/commons.ftl" as c>
+
 <#--
   The main page layout. 
 -->
@@ -19,9 +21,12 @@
     <#-- Page header with logo and tagline-->
     <header class="CHeader border-bottom">
         <div class="container">
-            <!--div class="text-center my-5"-->
+            <@c.editable msg="page.title">
                 <h1>${config.page.title}</h1>
+            </@c.editable>
+            <@c.editable msg="page.title2">
                 <p class="lead mb-0">${config.page.title2}</p>
+            </@c.editable>
             <!--/div-->
         </div>
     </header>

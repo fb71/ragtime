@@ -7,5 +7,7 @@
 <@c.data name="article" model="EntityByIdTemplateModel" params="type=ragtime.cc.model.Article"/>
 
 <@page.layout title="${article.title}" pageclass="CArticle">
-   ${article.content}
+   <@c.editable msg="article.${article.id}">
+       ${article.content}
+   </@c.editable>
 </@page.layout>

@@ -15,3 +15,17 @@
 <#macro data name model params>
    <#-- data: ${params}  -->
 </#macro>
+
+<#--
+  Wraps element for in-place editing. 
+-->
+<#macro editable msg>
+    <#if params.edit == "true">
+        <div class="Editable" onclick="event.stopPropagation(); event.preventDefault(); window.top.postMessage('${msg}', '*');">
+            <#nested>
+        </div>
+    <#else>
+        <#nested>
+    </#if>
+</#macro>
+

@@ -98,4 +98,15 @@ a:hover {
   }
 }
 
+.Editable:hover {
+    /*border: 1px solid #b72a44;*/
+    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow: 0 0 4px inset rgba(230,0,20,80%);
+    border-radius: 4px;
+    filter: brightness(1.3);
+    transition: 
+        box-shadow 300ms,
+        filter 300ms; 
+}
 
