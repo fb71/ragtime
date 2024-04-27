@@ -43,6 +43,7 @@ import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerContext;
 import ragtime.cc.LoginState;
 import ragtime.cc.model.Article;
+import ragtime.cc.website.WebsiteEditState;
 
 /**
  *
@@ -119,11 +120,25 @@ public class ArticlesPage {
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 
         // website link
-        ui.body.add( new Link() {{
-            layoutConstraints.set( RowConstraints.height( 25 ) );
-            content.set( "Web-Seite ansehen..." );
-            tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
-            href.set( String.format( "website/%s/home", state.account.permid.get() ) );
+        ui.body.add( new UIComposite() {{
+            lc( RowConstraints.height( 30 ) );
+            layout.set( RowLayout.filled().spacing( 20 ) );
+            add( new Button() {{
+                lc( RowConstraints.width( 180 ) );
+                label.set( "Web-Seite bearbeiten..." );
+                tooltip.set( "Web-Seite durch Click auf einzelne Element bearbeiten" );
+                events.on( EventType.SELECT, ev -> {
+                    // XXX
+                    state.site.createState( new WebsiteEditState() ).activate();
+                });
+            }});
+            add( new UIComposite() );
+            add( new Link() {{
+                lc( RowConstraints.width( 150 ) );
+                content.set( "Web-Seite ansehen..." );
+                tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
+                href.set( String.format( "website/%s/home", state.account.permid.get() ) );
+            }});
         }});
 
 //        // search

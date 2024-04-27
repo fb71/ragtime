@@ -11,34 +11,38 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.article;
+package ragtime.cc.website;
 
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Promise;
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import areca.ui.pageflow.PageflowEvent;
+import areca.ui.pageflow.PageflowEvent.EventType;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
-import areca.ui.viewer.model.Model;
 import ragtime.cc.UICommon;
-import ragtime.cc.model.Article;
+import ragtime.cc.model.AccountEntity;
+import ragtime.cc.model.MainRepo;
 
 /**
+ * A UI {@link State} of a {@link WebsiteEditPage}.
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticleEditState {
+public class WebsiteEditState {
 
-    private static final Log LOG = LogFactory.getLog( ArticleEditState.class );
+    private static final Log LOG = LogFactory.getLog( WebsiteEditState.class );
 
-    public static final ClassInfo<ArticleEditState> INFO = ArticleEditStateClassInfo.instance();
+    public static final ClassInfo<WebsiteEditState> INFO = WebsiteEditStateClassInfo.instance();
 
     @State.Context
     protected StateSite     site;
@@ -46,46 +50,39 @@ public class ArticleEditState {
     @State.Context
     protected Pageflow      pageflow;
 
-    @State.Context
-    @Deprecated
-    protected UICommon      uic;
-
-    protected ArticlePage   page;
+    protected WebsiteEditPage page;
 
     @State.Context
     protected UnitOfWork    uow;
 
-    @State.Context(required = false)
-    @State.Model
-    public Model<Article>   article = new EntityModel<>();
-
-//    public boolean          edited;
-//
-//    public boolean          valid;
+    @State.Context( scope=MainRepo.SCOPE )
+    protected AccountEntity account;
 
 
     @State.Init
     public void initAction() {
-        pageflow.create( page = new ArticlePage() )
+        pageflow.create( page = new WebsiteEditPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
-                .putContext( uic, Page.Context.DEFAULT_SCOPE )
+                .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
+
+        //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
+        EventManager.instance()
+                .subscribe( ev -> disposeAction() )
+                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.page.get() == page )
+                .unsubscribeIf( () -> site.isDisposed() );
     };
 
 
     @State.Dispose
-    public boolean disposeAction() {
+    public void disposeAction() {
+        LOG.warn( "disposeAction(): ..." );
         if (!page.site.isClosed()) {
-            pageflow.close( page );
+            page.site.close();
         }
         uow.discard();
         site.dispose();
-        return true;
-    }
-
-
-    public boolean isDisposed() {
-        return site.isDisposed();
+        //return true;
     }
 
 
@@ -93,17 +90,5 @@ public class ArticleEditState {
     public Promise<Submitted> submitAction() {
         return uow.submit(); //.onSuccess( __ -> disposeAction() );
     }
-
-//    @State.Action
-//    public StateAction<Void> submitAction = new StateAction<>() {
-//        @Override
-//        public boolean canRun() {
-//            return edited && valid;
-//        }
-//        @Override
-//        public void run( Void arg ) {
-//            uow.submit(); //.onSuccess( __ -> disposeAction() );
-//        }
-//    };
 
 }

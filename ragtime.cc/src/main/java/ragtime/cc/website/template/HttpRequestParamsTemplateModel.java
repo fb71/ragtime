@@ -14,6 +14,7 @@
 package ragtime.cc.website.template;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -23,7 +24,8 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /**
- * Provides the params and headers from the given {@link HttpServletRequest}.
+ * Provides the params and headers from the given {@link HttpServletRequest}
+ * and attributes from {@link HttpSession} - in this order.
  *
  * @author Falko Bräutigam
  */
@@ -43,6 +45,10 @@ public class HttpRequestParamsTemplateModel
         String value = request.getParameter( key );
         if (value == null) {
             value = request.getHeader( key );
+        }
+        if (value == null) {
+            var session = request.getSession( false );
+            value = (String)session.getAttribute( key );
         }
         LOG.debug( "%s: %s", key, value );
         return new SimpleScalar( value );

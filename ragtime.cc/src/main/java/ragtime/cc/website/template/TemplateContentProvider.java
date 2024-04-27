@@ -19,11 +19,9 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import java.io.StringReader;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
-
 import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.log.LogFactory;
@@ -62,7 +60,22 @@ public class TemplateContentProvider
             Version v2_3_32 = new Version( 2, 3, 32 );
             cfg = new Configuration( v2_3_32 );
 
-            cfg.setTemplateLoader( new ClassTemplateLoader( Thread.currentThread().getContextClassLoader(), "templates" ) );
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            cfg.setTemplateLoader( new ClassTemplateLoader( cl, "templates" ) /*{
+                @Override
+                protected URL getURL( String name ) {
+                    String base = getBasePackagePath();
+                    var res = cl.getResource( base + name + ".ftl" );
+                    if (res != null) {
+                        return res;
+                    }
+                    res = cl.getResource( base + StringUtils.replace( name, ".", ".ftl." ) );
+                    if (res != null) {
+                        return res;
+                    }
+                    return null;
+                }
+            }*/);
 
             cfg.setDefaultEncoding( "ISO-8859-1" );
             cfg.setLocale( Locale.GERMAN );
@@ -77,16 +90,25 @@ public class TemplateContentProvider
 
     @Override
     public void process( Request request ) throws Exception {
-        var templateName = String.join( "/", request.path );
+        var resName = String.join( "/", request.path );
+
         request.httpResponse.setBufferSize( BUFFER_SIZE );
 
+        // Edit mode: preserve param in session
+        var editParam = request.httpRequest.getParameter( "edit" );
+        if (editParam != null) {
+            var session = request.httpRequest.getSession( true );
+            session.setAttribute( "edit", editParam );
+        }
+
         // skip *(.css).map
-        if (templateName.endsWith( ".map" )) {
+        if (resName.endsWith( ".map" )) {
             request.httpResponse.setStatus( 404 );
             return;
         }
+
         // stream resource (*.css, *.woff, ...)
-        var res = getClass().getClassLoader().getResource( "templates/" + templateName );
+        var res = getClass().getClassLoader().getResource( "templates/" + resName );
         if (res != null) {
             try (
                 var in = res.openStream();
@@ -99,17 +121,17 @@ public class TemplateContentProvider
 
         // config.css
         var config = request.uow.query( TemplateConfigEntity.class ).singleResult().waitForResult().get();
-        if (templateName.equals( "config.css" )) {
+        if (resName.equals( "config.css" )) {
             try (var out = request.httpResponse.getWriter()) {
                 IOUtils.copy( new StringReader( config.css.get() ), out );
             }
             return;
         }
 
+        // load template
         try {
-            // load template
-            LOG.info( "Loading template: %s(.ftl)", templateName );
-            var template = cfg.getTemplate( templateName + ".ftl" );
+            LOG.info( "Loading template: %s(.ftl)", resName );
+            var template = cfg.getTemplate( resName + ".ftl" );
 
             var data = loadData( template, request.httpRequest, request.uow );
             data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
