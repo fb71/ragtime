@@ -97,7 +97,7 @@ a:hover {
     width: 100%;
   }
   .CContent {
-    margin-bottom: 3rem;
+    padding-bottom: 3rem;
   }
 }
 
