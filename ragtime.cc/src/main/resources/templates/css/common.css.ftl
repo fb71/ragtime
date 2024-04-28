@@ -96,6 +96,9 @@ a:hover {
     left: 0px;
     width: 100%;
   }
+  .CContent {
+    margin-bottom: 3rem;
+  }
 }
 
 .Editable:hover {
