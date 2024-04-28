@@ -75,10 +75,11 @@ public class CCAppConfig {
     public String workspaceBase;
 
     public String smtpHost;
-
     public String smtpPort;
-
     public String smtpUser;
-
     public String smtpPassword;
+
+    public String igUser;
+    public String igPassword;
+
 }
