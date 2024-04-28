@@ -48,7 +48,9 @@ public class HttpRequestParamsTemplateModel
         }
         if (value == null) {
             var session = request.getSession( false );
-            value = (String)session.getAttribute( key );
+            if (session != null) {
+                value = (String)session.getAttribute( key );
+            }
         }
         LOG.debug( "%s: %s", key, value );
         return new SimpleScalar( value );
