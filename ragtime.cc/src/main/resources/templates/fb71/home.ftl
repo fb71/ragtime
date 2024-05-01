@@ -3,8 +3,10 @@
 
 <@c.data name="article" model="ArticleTemplateModel" params="t=Home"/>
 <@c.data name="ulli" model="ArticleTemplateModel" params="n=Home-Ulli"/>
-<@c.data name="friederike" model="ArticleTemplateModel" params="n=Home-Ulli"/>
-<@c.data name="about" model="ArticleTemplateModel" params="n=About"/>
+<@c.data name="gienke" model="ArticleTemplateModel" params="n=Home-Gienke"/>
+<@c.data name="home1" model="ArticleTemplateModel" params="n=Home1"/>
+<@c.data name="home2" model="ArticleTemplateModel" params="n=Home2"/>
+<@c.data name="home3" model="ArticleTemplateModel" params="n=Home3"/>
 
 <#--
   Page/Body 
@@ -23,27 +25,27 @@
        <@card title="ulrike-philipp.de" content="${ulli.content}" media="media/ulrike-philipp-1.png" link="https://ulrike-philipp.de"/>
      </div>
      <div class="col">
-       <@card title="" content="${friederike.content}" media="" link="#"/>
+       <@card title="psychotherapie-gienke.de" content="${gienke.content}" media="media/gienke-1.png" link="https://psychotherapie-gienke.de/home"/>
      </div>
    </div>
    
    <#-- Articles -->   
    <div class="CSection row row-cols-1 row-cols-md-3">
      <div class="col">
-       ${about.content}
+       ${home1.content}
      </div>
      <div class="col">
-       ${about.content}
+       ${home2.content}
      </div>
      <div class="col">
-       ${about.content}
+       ${home3.content}
      </div>
    </div>
 </@page.layout>
 
 
 <#--
-  Card. 
+  Card
 -->
 <#macro card title content media link>
   <div class="card shadow h-100">
