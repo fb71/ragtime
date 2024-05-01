@@ -68,6 +68,7 @@ public class CCApp
 
         config = CCAppConfig.instance;
 
+        LOG.info( "Templates: ..." );
         // check/fail on startup
         //TemplateInfo.all();
         LOG.info( "Templates: %s", TemplateInfo.all().toList() );
