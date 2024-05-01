@@ -52,11 +52,11 @@
     <div class="row g-0">
       <div class="col-md-8">
         <#-- rounded-start -->
-        <img src="${media}" class="img-fluid" alt="Screenshot">
+        <a href="${link}"><img src="${media}" class="img-fluid" alt="Screenshot"/></a>
       </div>
       <div class="col-md-4">
         <div class="card-body">
-          <h5 class="card-title"><a href="${link}">${title}</a></h5>
+          <h5 class="card-title">${title}</h5>
           ${content}
         </div>
       </div>

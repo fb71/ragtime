@@ -16,10 +16,7 @@ a:hover {
 /*    filter: brightness(0.9) saturate(1.5);  */
     text-decoration: underline;
 }
-.CContent a[href^="http"]::after,
-.CContent a[href^="mailto"]::after,
-.CContent a[href^="https://"]::after
-{
+.CContent a[target="_blank"]::after {
   content: "";
   width: 11px;
   height: 11px;
