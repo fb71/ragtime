@@ -48,8 +48,8 @@
 }
 
 .card {
-    --bs-card-spacer-y: 1rem;
-    --bs-card-spacer-x: 0.5rem;
+    --bs-card-spacer-y: 0.5rem;
+    /*--bs-card-spacer-x: 0.5rem;*/
 
     /*filter: brightness(1.2);*/
     background-color: #333338;
@@ -58,4 +58,11 @@
 
 .card img {
     padding: 0.8rem;
+}
+
+@media (min-width: 800px) {
+  .card {
+    --bs-card-spacer-y: 1rem;
+    --bs-card-spacer-x: 0.5rem;
+  }
 }
