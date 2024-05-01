@@ -35,6 +35,7 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
+import ragtime.cc.website.template.TemplateInfo;
 
 /**
  *
@@ -66,6 +67,9 @@ public class CCApp
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
 
         config = CCAppConfig.instance;
+
+        // check/fail on startup
+        TemplateInfo.all();
     }
 
 

@@ -165,7 +165,7 @@ public class ContentRepo {
                         });
                         // TemplateConfig
                         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                        var css = IOUtils.toString( cl.getResource( "templates/css/config-default.css" ), "UTF-8" );
+                        var css = IOUtils.toString( cl.getResource( "config-default.css" ), "UTF-8" );
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
                             proto.page.createValue( page -> {
                                 page.title.set( "Titel" );

@@ -43,6 +43,10 @@ public class TemplateConfigEntity
 
     public static TemplateConfigEntity  TYPE;
 
+    /** The template (name) to be used for the website. */
+    @DefaultValue( "first" )
+    public Property<String>             templateName;
+
     public Property<PageConfig>         page;
 
     public CollectionProperty<NavItem>  navItems;
@@ -56,7 +60,8 @@ public class TemplateConfigEntity
 
     /**
      * Project specific CSS.
-     * Loaded as config.css from page.ftl via {@link TemplateContentProvider}
+     * Loaded as config.css from page.ftl via {@link TemplateContentProvider}.
+     * Default comes from src/main/resources/templates/config-default.css.
      */
     @DefaultValue( ":root {\n  /*--bs-body-bg: white;*/\n}" )
     public Property<String>             css;

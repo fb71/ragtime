@@ -2,29 +2,29 @@
   font-family: 'RobotoC';
   font-weight: normal;
   font-style: normal;
-  src: url('../fonts/RobotoCondensed/RobotoCondensed-Regular.ttf');
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Regular.ttf');
 }
 @font-face {
   font-family: 'RobotoC';
   font-weight: 500;
   font-style: normal;
-  src: url('../fonts/RobotoCondensed/RobotoCondensed-Medium.ttf');
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Medium.ttf');
 }
 @font-face {
   font-family: 'RobotoC';
   font-weight: bold;
   font-style: normal;
-  src: url('../fonts/RobotoCondensed/RobotoCondensed-Bold.ttf');
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Bold.ttf');
 }
 @font-face {
   font-family: 'RobotoC';
   font-weight: normal;
   font-style: italic;
-  src: url('../fonts/RobotoCondensed/RobotoCondensed-Italic.ttf');
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Italic.ttf');
 }
 @font-face {
   font-family: 'RobotoC';
   font-weight: bold;
   font-style: italic;
-  src: url('../fonts/RobotoCondensed/RobotoCondensed-BoldItalic.ttf');
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-BoldItalic.ttf');
 }

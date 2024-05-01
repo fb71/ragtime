@@ -43,6 +43,7 @@ import ragtime.cc.article.EntityCompositeListModel;
 import ragtime.cc.article.PropertyModel;
 import ragtime.cc.website.model.NavItem;
 import ragtime.cc.website.model.TemplateConfigEntity;
+import ragtime.cc.website.template.TemplateInfo;
 
 /**
  *
@@ -85,6 +86,19 @@ public class TemplateConfigPage {
             form = new Form();
 
             state.config.onSuccess( config -> {
+                // Template
+                add( new UIComposite() {{
+                    layout.set( uic.verticalL().fillHeight( false ) );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Design-Vorlage" ) );
+
+                    var templates = TemplateInfo.choosable().map( t -> t.name ).toArray( String[]::new );
+                    add( form.newField().label( String.format( "Name (%s)", String.join(", ", templates ) ) )
+                            .viewer( new TextFieldViewer() )
+                            .model( new PropertyModel<>( config.templateName ) )
+                            .create() );
+                }});
+
                 // PageConfig
                 add( new UIComposite() {{
                     //layoutConstraints.set( RowConstraints.height( 200 ) );

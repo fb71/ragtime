@@ -16,9 +16,13 @@ package ragtime.cc.website.template;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import java.io.StringReader;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -52,41 +56,6 @@ public class TemplateContentProvider
 
     private static final Pattern    MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
 
-    private static Configuration    cfg;
-
-
-    static {
-        try {
-            Version v2_3_32 = new Version( 2, 3, 32 );
-            cfg = new Configuration( v2_3_32 );
-
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            cfg.setTemplateLoader( new ClassTemplateLoader( cl, "templates" ) /*{
-                @Override
-                protected URL getURL( String name ) {
-                    String base = getBasePackagePath();
-                    var res = cl.getResource( base + name + ".ftl" );
-                    if (res != null) {
-                        return res;
-                    }
-                    res = cl.getResource( base + StringUtils.replace( name, ".", ".ftl." ) );
-                    if (res != null) {
-                        return res;
-                    }
-                    return null;
-                }
-            }*/);
-
-            cfg.setDefaultEncoding( "ISO-8859-1" );
-            cfg.setLocale( Locale.GERMAN );
-            cfg.setTemplateExceptionHandler( TemplateExceptionHandler.RETHROW_HANDLER );
-            LOG.info( "initialized" );
-        }
-        catch (Exception e) {
-            throw new RuntimeException( e );
-        }
-    }
-
 
     @Override
     public void process( Request request ) throws Exception {
@@ -108,6 +77,7 @@ public class TemplateContentProvider
         }
 
         // stream resource (*.css, *.woff, ...)
+        // XXX thread loader?
         var res = getClass().getClassLoader().getResource( "templates/" + resName );
         if (res != null) {
             try (
@@ -131,6 +101,7 @@ public class TemplateContentProvider
         // load template
         try {
             LOG.info( "Loading template: %s(.ftl)", resName );
+            var cfg = TemplateLoader.configuration( config );
             var template = cfg.getTemplate( resName + ".ftl" );
 
             var data = loadData( template, request.httpRequest, request.uow );
@@ -146,6 +117,57 @@ public class TemplateContentProvider
             try (var out = request.httpResponse.getWriter()) {
                 out.write( "Unter dieser Adresse gibt es nichts." );
             }
+        }
+    }
+
+    /**
+     * {@link Configuration} factory and template loader that...
+     */
+    protected static class TemplateLoader
+            extends ClassTemplateLoader {
+
+        private static Map<String,Configuration> cfg = new ConcurrentHashMap<>();
+
+        public static Configuration configuration( TemplateConfigEntity config ) {
+            return cfg.computeIfAbsent( config.templateName.get(), templateName -> {
+                try {
+                    Version v2_3_32 = new Version( 2, 3, 32 );
+                    var result = new Configuration( v2_3_32 );
+                    result.setDefaultEncoding( "ISO-8859-1" );
+                    result.setLocale( Locale.GERMAN );
+                    result.setTemplateExceptionHandler( TemplateExceptionHandler.RETHROW_HANDLER );
+                    //result.setTemplateLookupStrategy( );
+                    result.setLocalizedLookup( false );
+
+                    result.setTemplateLoader( new TemplateLoader( templateName ) );
+                    LOG.warn( "Configuration initialized: %s", templateName );
+                    return result;
+                }
+                catch (Exception e) {
+                    throw new RuntimeException( e );
+                }
+            });
+        }
+
+        // instance ***************************************
+
+        private TemplateInfo    template;
+
+        protected TemplateLoader( String templateName ) {
+            super( TemplateInfo.cl(), TemplateInfo.TEMPLATES_BASE_PATH );
+            this.template = TemplateInfo.forName( templateName );
+        }
+
+        @Override
+        protected URL getURL( String name ) {
+            var t = template;
+            var result = (URL)null;
+            while (result == null && t != null) {
+                result = t.resource( name );
+                t = result == null ? t.parent() : t;
+            }
+            LOG.warn( "TEMPLATE: %s (%s)", name, t.name );
+            return result;
         }
     }
 

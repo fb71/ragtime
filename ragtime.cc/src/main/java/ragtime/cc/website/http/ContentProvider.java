@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.polymap.model2.runtime.UnitOfWork;
 
 /**
- * Provide content (template/HTML, media, etc.) to the {@link WebsiteServlet}.
+ * Provides content (template/HTML, media, etc.) to the {@link WebsiteServlet}.
  *
  * @author Falko Bräutigam
  */
@@ -27,6 +27,9 @@ public interface ContentProvider {
 
     public void process( Request request ) throws Exception;
 
+    /**
+     *
+     */
     public static class Request {
 
         public HttpServletRequest httpRequest;
