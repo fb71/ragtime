@@ -82,7 +82,8 @@ public class TemplateInfo {
     }
 
     protected static ClassLoader cl() {
-        return Thread.currentThread().getContextClassLoader();
+        return TemplateInfo.class.getClassLoader();
+        //return Thread.currentThread().getContextClassLoader();
     }
 
     // instance *******************************************
