@@ -16,6 +16,7 @@ package ragtime.cc.website.template;
 import static java.lang.String.join;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,8 @@ public class TemplateInfo {
 
     static {
         var gson = new GsonBuilder().create();
-        var folders = IOUtils.readLines( cl().getResourceAsStream( TEMPLATES_BASE_PATH + "/" ), "UTF8" );
+        //var folders = IOUtils.readLines( cl().getResourceAsStream( TEMPLATES_BASE_PATH + "/" ), "UTF8" );
+        var folders = Arrays.asList( "common", "first", "fb71" ); // XXX tomcat?
         for (var folder : folders) {
             try {
                 var res = cl().getResource( join( "/", TEMPLATES_BASE_PATH, folder, TEMPLATE_INFO_FILE ) );
@@ -82,8 +84,8 @@ public class TemplateInfo {
     }
 
     protected static ClassLoader cl() {
-        return TemplateInfo.class.getClassLoader();
-        //return Thread.currentThread().getContextClassLoader();
+        //return TemplateInfo.class.getClassLoader();
+        return Thread.currentThread().getContextClassLoader();
     }
 
     // instance *******************************************
