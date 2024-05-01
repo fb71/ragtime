@@ -60,6 +60,7 @@ public class TemplateInfo {
                 LOG.info( "Template: %s/\t'%s'", info.name, info.title );
             }
             catch (JsonSyntaxException | IOException e) {
+                e.printStackTrace();
                 throw new RuntimeException( e );
             }
         }
