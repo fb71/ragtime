@@ -26,16 +26,16 @@
     <#-- Page header -->
     <header class="CHeader border-bottom">
         <div class="container">
-            <div class="row row-cols-3">
+            <div class="row row-cols-2">
                 <#-- Title-->
-                <div class="col-auto">
+                <div class="col">
                     <@c.editable msg="page.title">
                         <h1>${config.page.title}</h1>
                     </@c.editable>
                 </div>
         
                 <#-- navbar-->
-                <div class="col">
+                <div class="col-6">
                     <nav class="CNavbar navbar navbar-expand-md">
                         <div class="container">
                             <a class="navbar-brand" href="#!"></a>
