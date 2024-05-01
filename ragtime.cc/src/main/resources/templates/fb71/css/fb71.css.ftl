@@ -10,6 +10,7 @@
     padding-bottom: 1rem;
     padding-left: 2rem;
 }
+
 .CHeader h1 {
     margin: 0;
     line-height: 1;
@@ -19,9 +20,11 @@
     --bs-navbar-padding-y: 0rem;
     margin-bottom: 0rem;
 }
+
 .CNavbar ul {
     margin-right: auto;
 }
+
 .CNavbar .btn {
     --bs-btn-bg: #333338;
 }
@@ -54,5 +57,5 @@
 }
 
 .card img {
-    padding: 0.5rem;
+    padding: 0.8rem;
 }

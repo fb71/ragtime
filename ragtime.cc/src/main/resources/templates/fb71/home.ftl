@@ -20,7 +20,7 @@
    </@c.editable>
 
    <#-- Screenshots -->   
-   <div class="CSection row row-cols-1 row-cols-md-2">
+   <div class="CSection row g-4 row-cols-1 row-cols-md-2">
      <div class="col">
        <@card title="ulrike-philipp.de" content="${ulli.content}" media="media/ulrike-philipp-1.png" link="https://ulrike-philipp.de"/>
      </div>
@@ -56,7 +56,7 @@
       </div>
       <div class="col-md-4">
         <div class="card-body">
-          <h5 class="card-title">${title}</h5>
+          <a href="${link}"><h5 class="card-title">${title}</h5></a>
           ${content}
         </div>
       </div>
