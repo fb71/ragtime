@@ -166,7 +166,7 @@ public class TemplateContentProvider
                 result = t.resource( name );
                 t = result == null ? t.parent() : t;
             }
-            LOG.warn( "TEMPLATE: %s (%s)", name, t.name );
+            LOG.warn( "TEMPLATE: %s (%s)", name, t != null ? t.name : "not found" );
             return result;
         }
     }
