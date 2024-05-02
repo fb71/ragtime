@@ -60,7 +60,7 @@
     padding: 0.8rem;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .card {
     --bs-card-spacer-y: 1rem;
     --bs-card-spacer-x: 0.5rem;

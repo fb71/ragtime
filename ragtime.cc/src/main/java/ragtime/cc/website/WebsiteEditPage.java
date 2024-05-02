@@ -82,8 +82,8 @@ public class WebsiteEditPage {
 
             // Entity submitted -> reload
             EventManager.instance()
-                    .subscribe( ev -> {
-                        LOG.info( "Entity change: ..." );
+                    .subscribe( (EntityLifecycleEvent ev) -> {
+                        LOG.info( "Submitted: %s", ev.getSource() );
                         reload();
                         Platform.schedule( 750, () -> {
                             if (disposableChildState != null && !disposableChildState.isDisposed()) {
@@ -100,6 +100,7 @@ public class WebsiteEditPage {
 
     protected void onEditableClick( IFrameMsgEvent ev ) {
         LOG.info( "msg: %s", ev.msg );
+        // article
         if (ev.msg.startsWith( "article." )) {
             state.uow.query( Article.class )
                     .where( Expressions.id( substringAfter( ev.msg, "." ) ) )
@@ -109,6 +110,13 @@ public class WebsiteEditPage {
                                 .putContext( article, State.Context.DEFAULT_SCOPE )
                                 .activate();
                     });
+        }
+        // page.title -> settings
+        else if (ev.msg.startsWith( "page." )) {
+            state.site.createState( new TemplateConfigState() ).activate();
+        }
+        else {
+            LOG.warn( "Unhandled msg: %s", ev.msg );
         }
     }
 
