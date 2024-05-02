@@ -128,32 +128,26 @@ public class ArticlePage {
 
     protected void autocompletes( TextField t ) {
         var result = new ArrayList<String>();
-        Platform.schedule( 2000, () -> {
-            return null;
-        })
-        .then( __ -> {
-            return state.uow.query( Article.class ).orderBy( Article.TYPE.title, Order.ASC ).executeCollect();
-        })
-        .then( rs -> {
-            rs.forEach( article -> result.add( article.title.get() ) );
-            result.add( "----" );
-            return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
-        })
-        .onSuccess( rs -> {
-            rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
-            result.add( "----" );
+        Platform.schedule( 2000, () -> null )
+                .then( __ -> {
+                    return state.uow.query( Article.class )
+                            .orderBy( Article.TYPE.title, Order.ASC )
+                            .executeCollect();
+                })
+                .then( rs -> {
+                    rs.forEach( article -> result.add( article.title.get() ) );
+                    result.add( "----" );
+                    return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
+                })
+                .onSuccess( rs -> {
+                    rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
+                    result.add( "----" );
 
-            result.addAll( Arrays.asList( "article", "home", "frontpage?n=", "frontpage?t=") );
+                    result.addAll( Arrays.asList( "article", "home", "frontpage?n=", "frontpage?t=") );
 
-            LOG.info( "autocomplete: %s", result );
-            t.autocomplete.set( result );
-        });
+                    LOG.info( "autocomplete: %s", result );
+                    t.autocomplete.set( result );
+                });
     }
 
-
-    @Page.Close
-    public boolean onClose() {
-        LOG.info( "onClose()" );
-        return state.disposeAction();
-    }
 }

@@ -13,19 +13,14 @@
  */
 package ragtime.cc.article;
 
-import org.polymap.model2.runtime.UnitOfWork;
-import org.polymap.model2.runtime.UnitOfWork.Submitted;
-
-import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
-import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
+import ragtime.cc.BaseState;
 import ragtime.cc.UICommon;
 import ragtime.cc.model.Article;
 
@@ -34,26 +29,16 @@ import ragtime.cc.model.Article;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticleEditState {
+public class ArticleEditState
+        extends BaseState<ArticlePage> {
 
     private static final Log LOG = LogFactory.getLog( ArticleEditState.class );
 
     public static final ClassInfo<ArticleEditState> INFO = ArticleEditStateClassInfo.instance();
 
     @State.Context
-    protected StateSite     site;
-
-    @State.Context
-    protected Pageflow      pageflow;
-
-    @State.Context
     @Deprecated
     protected UICommon      uic;
-
-    protected ArticlePage   page;
-
-    @State.Context
-    protected UnitOfWork    uow;
 
     @State.Context(required = false)
     @State.Model
@@ -66,44 +51,11 @@ public class ArticleEditState {
 
     @State.Init
     public void initAction() {
+        super.initAction();
         pageflow.create( page = new ArticlePage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( uic, Page.Context.DEFAULT_SCOPE )
                 .open();
     };
-
-
-    @State.Dispose
-    public boolean disposeAction() {
-        if (!page.site.isClosed()) {
-            pageflow.close( page );
-        }
-        uow.discard();
-        site.dispose();
-        return true;
-    }
-
-
-    public boolean isDisposed() {
-        return site.isDisposed();
-    }
-
-
-    @State.Action
-    public Promise<Submitted> submitAction() {
-        return uow.submit(); //.onSuccess( __ -> disposeAction() );
-    }
-
-//    @State.Action
-//    public StateAction<Void> submitAction = new StateAction<>() {
-//        @Override
-//        public boolean canRun() {
-//            return edited && valid;
-//        }
-//        @Override
-//        public void run( Void arg ) {
-//            uow.submit(); //.onSuccess( __ -> disposeAction() );
-//        }
-//    };
 
 }

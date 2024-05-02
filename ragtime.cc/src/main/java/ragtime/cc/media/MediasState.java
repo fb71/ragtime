@@ -16,7 +16,6 @@ package ragtime.cc.media;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
-import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Assert;
@@ -27,11 +26,10 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.component2.FileUpload;
 import areca.ui.pageflow.Page;
-import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.BaseState;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
@@ -42,25 +40,15 @@ import ragtime.cc.model.MediaEntity;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class MediasState {
+public class MediasState
+        extends BaseState<MediasPage> {
 
     private static final Log LOG = LogFactory.getLog( MediasState.class );
 
     public static final ClassInfo<MediasState> INFO = MediasStateClassInfo.instance();
 
-    @State.Context
-    protected StateSite     site;
-
-    @State.Context
-    protected Pageflow      pageflow;
-
-    @State.Context
-    protected UnitOfWork    uow;
-
-    protected MediasPage    page;
-
     @State.Model
-    public Model<String>    searchTxt = new Pojo<>( "" );
+    public Model<String>        searchTxt = new Pojo<>( "" );
 
     @State.Model
     public Model<AccountEntity> selected = new Pojo<>();
@@ -93,21 +81,11 @@ public class MediasState {
 
     @State.Init
     public void initAction() {
+        super.initAction();
         pageflow.create( page = new MediasPage() )
                 .putContext( MediasState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
-    };
-
-
-    @State.Dispose
-    public boolean disposeAction() {
-        if (!page.site.isClosed()) {
-            pageflow.close( page );
-        }
-        uow.discard();
-        site.dispose();
-        return true;
     };
 
 
@@ -138,10 +116,5 @@ public class MediasState {
         uow.removeEntity( entity );
         return uow.submit();
     }
-
-
-//    public Promise<Submitted> submitAction() {
-//        return uow.submit();
-//    };
 
 }

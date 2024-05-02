@@ -174,11 +174,4 @@ public class MediasPage {
         return ui;
     }
 
-
-    @Page.Close
-    public boolean onClose() {
-        LOG.info( "onClose()" );
-        return state.disposeAction();
-    }
-
 }

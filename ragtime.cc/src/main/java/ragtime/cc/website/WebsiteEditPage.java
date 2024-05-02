@@ -33,13 +33,14 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.statenaction.State;
+import ragtime.cc.BaseState;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ArticleEditState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.EntityLifecycleEvent;
 
 /**
- * In-Place editing of content and website/template config.
+ * In-place editing of content and website/template config.
  *
  * @author Falko Bräutigam
  */
@@ -62,7 +63,7 @@ public class WebsiteEditPage {
     @Page.Context
     protected UICommon          uic;
 
-    private ArticleEditState    disposableChildState;
+    private BaseState<?>        disposableChildState;
 
 
     @Page.CreateUI
@@ -113,7 +114,7 @@ public class WebsiteEditPage {
         }
         // page.title -> settings
         else if (ev.msg.startsWith( "page." )) {
-            state.site.createState( new TemplateConfigState() ).activate();
+            disposableChildState = state.site.createState( new TemplateConfigState() ).activate();
         }
         else {
             LOG.warn( "Unhandled msg: %s", ev.msg );

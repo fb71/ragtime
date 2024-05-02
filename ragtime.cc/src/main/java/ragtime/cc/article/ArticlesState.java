@@ -16,26 +16,21 @@ package ragtime.cc.article;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
-import org.polymap.model2.runtime.UnitOfWork;
-
 import areca.common.Assert;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
-import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateAction;
-import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
 import ragtime.cc.AccountsState;
+import ragtime.cc.BaseState;
 import ragtime.cc.media.MediasState;
-import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
-import ragtime.cc.model.MainRepo;
 import ragtime.cc.website.TemplateConfigState;
 
 /**
@@ -43,25 +38,12 @@ import ragtime.cc.website.TemplateConfigState;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticlesState {
+public class ArticlesState
+        extends BaseState<ArticlesPage> {
 
     private static final Log LOG = LogFactory.getLog( ArticlesState.class );
 
     public static final ClassInfo<ArticlesState> INFO = ArticlesStateClassInfo.instance();
-
-    @State.Context
-    protected StateSite     site;
-
-    @State.Context
-    protected Pageflow      pageflow;
-
-    @State.Context
-    protected UnitOfWork    uow;
-
-    @State.Context( scope=MainRepo.SCOPE )
-    protected AccountEntity account;
-
-    protected ArticlesPage  page;
 
     /**
      * Model: searchTxt
@@ -100,17 +82,12 @@ public class ArticlesState {
 
     @State.Init
     public void initAction() {
+        super.initAction();
         pageflow.create( page = new ArticlesPage() )
                 .putContext( ArticlesState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };
 
-
-    @State.Dispose
-    public void disposeAction() {
-        pageflow.close( page );
-        site.dispose();
-    };
 
     @State.Action
     public void openSettingsAction() {
@@ -146,6 +123,5 @@ public class ArticlesState {
                     .activate();
         }
     };
-
 
 }
