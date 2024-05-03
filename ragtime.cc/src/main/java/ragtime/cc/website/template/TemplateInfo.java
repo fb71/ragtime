@@ -72,7 +72,8 @@ public class TemplateInfo {
         return Sequence.of( infos.values() );
     }
 
-    public static Sequence<TemplateInfo,RuntimeException> choosable() {
+    /** All templates a user can select */
+    public static Sequence<TemplateInfo,RuntimeException> user() {
         return all().filter( t -> StringUtils.isNotBlank( t.title ) );
     }
 

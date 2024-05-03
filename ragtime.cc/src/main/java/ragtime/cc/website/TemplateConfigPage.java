@@ -34,6 +34,7 @@ import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.CompositeListViewer;
+import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.model.ListModelBase;
@@ -92,9 +93,15 @@ public class TemplateConfigPage {
                     cssClasses.add( "MessageCard" );
                     addDecorator( new Label().content.set( "Design-Vorlage" ) );
 
-                    var templates = TemplateInfo.choosable().map( t -> t.name ).toArray( String[]::new );
-                    add( form.newField().label( String.format( "Name (%s)", String.join(", ", templates ) ) )
-                            .viewer( new TextFieldViewer() )
+//                    var templates = TemplateInfo.user().map( t -> t.name ).toArray( String[]::new );
+//                    add( form.newField().label( String.format( "Name (%s)", String.join(", ", templates ) ) )
+//                            .viewer( new TextFieldViewer() )
+//                            .model( new PropertyModel<>( config.templateName ) )
+//                            .create() );
+
+                    var templates = TemplateInfo.user().map( t -> t.name ).toList();
+                    add( form.newField()
+                            .viewer( new SelectViewer( templates ) )
                             .model( new PropertyModel<>( config.templateName ) )
                             .create() );
                 }});
