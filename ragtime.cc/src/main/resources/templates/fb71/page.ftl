@@ -36,7 +36,6 @@
         
                 <#-- navbar-->
                 <div class="col-6">
-                    <@c.editable msg="page.navigation">
                     <nav class="CNavbar navbar navbar-expand-md">
                         <div class="container">
                             <a class="navbar-brand" href="#!"></a>
@@ -56,7 +55,6 @@
                             </div>
                         </div>
                     </nav>
-                    </@c.editable>
                 </div>
 
                 <#-- div class="col-auto">
@@ -78,13 +76,13 @@
         <div class="container">
             <p class="m-0 small">
             <@c.editable msg="page.footer">
-                  <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
+                <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
             </@c.editable>
-            <@c.editable msg="page.navigation">
-                <#list config.footerNavItems?sequence?sort_by("order") as item>
+            <#list config.footerNavItems?sequence?sort_by("order") as item>
+                <@c.editable msg="page.navigation">
                     <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
-                </#list>
-            </@c.editable>
+                </@c.editable>
+            </#list>
             <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
             </p>
         </div>
