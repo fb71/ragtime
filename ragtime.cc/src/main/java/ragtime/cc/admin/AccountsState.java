@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc;
+package ragtime.cc.admin;
 
 import static org.polymap.model2.query.Expressions.matches;
 import static org.polymap.model2.query.Expressions.or;
@@ -26,12 +26,11 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.pageflow.Page;
-import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
+import ragtime.cc.BaseState;
 import ragtime.cc.article.ArticlesState;
 import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
@@ -43,22 +42,15 @@ import ragtime.cc.model.MainRepo;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class AccountsState {
+public class AccountsState
+        extends BaseState<AccountsPage> {
 
     private static final Log LOG = LogFactory.getLog( AccountsState.class );
 
     public static final ClassInfo<AccountsState> INFO = AccountsStateClassInfo.instance();
 
-    @State.Context
-    protected StateSite     site;
-
-    @State.Context
-    protected Pageflow      pageflow;
-
     @State.Context(scope = MainRepo.SCOPE)
-    protected UnitOfWork    uow;
-
-    protected AccountsPage  page;
+    protected UnitOfWork    mainUow;
 
     /**
      * Model: searchTxt
@@ -88,7 +80,7 @@ public class AccountsState {
                         matches( AccountEntity.TYPE.login, searchTxt.get() + "*" ),
                         matches( AccountEntity.TYPE.email, searchTxt.get() + "*" ) );
             }
-            return uow.query( AccountEntity.class )
+            return mainUow.query( AccountEntity.class )
                     .where( searchTxtMatch )
                     .orderBy( AccountEntity.TYPE.lastLogin, Order.DESC );
         }
@@ -97,21 +89,15 @@ public class AccountsState {
 
     @State.Init
     public void initAction() {
+        super.initAction();
         pageflow.create( page = new AccountsPage() )
                 .putContext( AccountsState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };
 
 
-    @State.Dispose
-    public void disposeAction() {
-        pageflow.close( page );
-        site.dispose();
-    };
-
-
     @State.Action
-    public void becomeAccountAction( AccountEntity account ) {
+    public void becomeAccountAction( @SuppressWarnings( "hiding" ) AccountEntity account ) {
         var contentRepo = ContentRepo.waitFor( account );
         var contentUow = contentRepo.newUnitOfWork();
         site.createState( new ArticlesState() )
@@ -120,28 +106,5 @@ public class AccountsState {
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )
                 .activate();
     }
-
-
-//    @State.Action
-//    public void createAccountAction() {
-//        site.createState( new AccountCreateState() ).activate();
-//    }
-//
-//
-//    @State.Action
-//    public StateAction<Void> editArticleAction = new StateAction<>() {
-//        @Override
-//        public boolean canRun() {
-//            return selected.$() != null;
-//        }
-//        @Override
-//        public void run( Void arg ) {
-//            Assert.that( canRun(), "StateAction: !canRun() " );
-//            site.createState( new ArticleEditState() )
-//                    .putContext( Assert.notNull( selected.$() ), State.Context.DEFAULT_SCOPE )
-//                    .onChange( ev -> LOG.info( "STATE CHANGE: %s", ev ) )
-//                    .activate();
-//        }
-//    };
 
 }

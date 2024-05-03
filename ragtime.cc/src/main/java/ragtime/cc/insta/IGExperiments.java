@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc;
+package ragtime.cc.insta;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;

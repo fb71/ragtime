@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc;
+package ragtime.cc.admin;
 
 import static java.text.DateFormat.MEDIUM;
 
@@ -133,6 +133,5 @@ public class AccountsPage {
                 state.becomeAccountAction( account );
             });
         }
-
     }
 }
