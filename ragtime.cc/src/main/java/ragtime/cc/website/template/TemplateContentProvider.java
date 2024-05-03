@@ -113,9 +113,25 @@ public class TemplateContentProvider
             }
         }
         catch (TemplateNotFoundException e) {
-            request.httpResponse.setStatus( 404 );
+            //request.httpResponse.setStatus( 404 );
+            //request.httpResponse.sendRedirect( "https://fb71.org/" ); // catch old atlas/polymap customers
+
             try (var out = request.httpResponse.getWriter()) {
-                out.write( "Unter dieser Adresse gibt es nichts." );
+                //out.write( "Unter dieser Adresse gibt es nichts." );
+
+                // catch old atlas/polymap customers
+                out.write( "<!DOCTYPE HTML>\n"
+                        + "<html>\n"
+                        + "    <head>\n"
+                        + "        <meta charset=\"UTF-8\">\n"
+                        + "        <meta http-equiv=\"refresh\" content=\"5; url=https://fb71.org/\">\n"
+                        + "        <title>Page does not exist</title>\n"
+                        + "    </head>\n"
+                        + "    <body style=\"font-family: sans-serif;\">\n"
+                        + "        <h1>Page does not exist</h1>\n"
+                        + "        <h3>Your are redirected to: <a href='https://fb71.org/'>fb71.org</a></h3>\n"
+                        + "    </body>\n"
+                        + "</html>" );
             }
         }
     }
