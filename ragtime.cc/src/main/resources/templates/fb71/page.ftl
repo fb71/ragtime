@@ -78,11 +78,11 @@
             <@c.editable msg="page.footer">
                 <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
             </@c.editable>
-            <#list config.footerNavItems?sequence?sort_by("order") as item>
-                <@c.editable msg="page.navigation">
+            <@c.editable msg="page.navigation">
+                <#list config.footerNavItems?sequence?sort_by("order") as item>
                     <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
-                </@c.editable>
-            </#list>
+                </#list>
+            </@c.editable>
             <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
             </p>
         </div>

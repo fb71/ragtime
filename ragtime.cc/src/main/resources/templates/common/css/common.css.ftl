@@ -38,16 +38,30 @@
     --bs-nav-link-hover-color-rgb: ${config.colors.link@rgb};
 }
 
-
-.Editable:hover {
-    /*border: 1px solid #b72a44;*/
+.CEditable {
     box-sizing: border-box;
     cursor: pointer;
-    box-shadow: 0 0 4px inset rgba(230,0,20,80%);
-    border-radius: 4px;
-    filter: brightness(1.3);
     transition: 
         box-shadow 300ms,
         filter 300ms; 
 }
 
+.CEditable:hover {
+    /*border: 1px solid #b72a44;*/
+    box-shadow: 0 0 4px inset rgba(230,0,20,80%);
+    border-radius: 4px;
+    filter: brightness(1.3);
+}
+
+.CBadge {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 1rem;
+    height: 1rem;
+    
+    border-radius: 1rem;
+    background-color: #f78b1c;
+    border: 2px solid #ffc79c;
+    box-shadow: 0 3px 3px rgba(0,0,0,0.5);
+}
