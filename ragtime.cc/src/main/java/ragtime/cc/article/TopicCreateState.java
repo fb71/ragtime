@@ -11,44 +11,33 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.model;
-
-import org.polymap.model2.Association;
-import org.polymap.model2.ManyAssociation;
-import org.polymap.model2.Property;
-import org.polymap.model2.Queryable;
-import org.polymap.model2.store.no2.Fulltext;
+package ragtime.cc.article;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.statenaction.State;
+import ragtime.cc.model.TopicEntity;
 
 /**
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class Article
-        extends Common {
+public class TopicCreateState
+        extends TopicEditState {
 
-    private static final Log LOG = LogFactory.getLog( Article.class );
+    private static final Log LOG = LogFactory.getLog( TopicCreateState.class );
 
-    public static final ClassInfo<Article> info = ArticleClassInfo.instance();
+    @SuppressWarnings( "hiding" )
+    public static final ClassInfo<TopicCreateState> INFO = TopicCreateStateClassInfo.instance();
 
-    public static Article TYPE;
+    @State.Init
+    @Override
+    public void initAction() {
+        topic = uow.createEntity( TopicEntity.class, TopicEntity.defaults() );
+        super.initAction();
+    };
 
-    @Queryable
-    public Property<String>             title;
-
-    @Queryable
-    @Fulltext
-    @Format( Format.FormatType.MARKDOWN )
-    public Property<String>             content;
-
-    @Queryable
-    public ManyAssociation<TagEntity>   tags;
-
-    @Queryable
-    public Association<TopicEntity>     topic;
 }

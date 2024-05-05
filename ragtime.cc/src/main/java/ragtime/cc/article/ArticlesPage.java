@@ -20,12 +20,16 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.lang3.RandomUtils;
+
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
+import areca.ui.component2.Badge;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
@@ -98,6 +102,7 @@ public class ArticlesPage {
                     ui.body.components.disposeAll();
                     ui.body.add( new Text() {{
                         content.set( "Logout complete. Reload browser!" );
+                        ui.body.layout();
                     }});
                 });
             });
@@ -116,10 +121,16 @@ public class ArticlesPage {
             description.set( "Medien" );
             handler.set( ev -> state.openMediasAction() );
         }});
+        // action: topics
+        site.actions.add( new Action() {{
+            icon.set( "topic" );
+            description.set( "Topics" );
+            handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
+        }});
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 
-        // website link
+        // website links
         ui.body.add( new UIComposite() {{
             lc( RowConstraints.height( 30 ) );
             layout.set( RowLayout.filled().spacing( 20 ) );
@@ -170,19 +181,6 @@ public class ArticlesPage {
     }
 
 
-    protected void refreshArticlesList() {
-        list.components.disposeAll();  // XXX race cond.
-        state.articles.load( 0, 100 ).onSuccess( opt -> {
-            opt.ifPresent( article -> {
-                list.add( new ArticleListItem( article ) );
-            } );
-            opt.ifAbsent( __ -> {
-                list.layout();
-            });
-        });
-    }
-
-
     /**
      *
      */
@@ -194,8 +192,17 @@ public class ArticlesPage {
             add( new Text() {{
                 format.set( Format.HTML );
                 content.set( article.title.get() + "<br/>" +
-                        "<span style=\"font-size:10px; color:#808080;\">Geändert:" + df.format( article.modified.get() ) + "</span>" );
+                        "<span style=\"font-size:10px; color:#808080;\">" + df.format( article.modified.get() ) + "</span>" );
             }});
+            Platform.schedule( 2000, () -> {
+                var comments = RandomUtils.nextInt( 1, 8 );
+                if (comments < 3) {
+                    addDecorator( new Badge() {{
+                        content.set( "" + comments );
+                        tooltip.set( "Ungelesene Kommentare: " + comments );
+                    }});
+                }
+            });
         }
     }
 

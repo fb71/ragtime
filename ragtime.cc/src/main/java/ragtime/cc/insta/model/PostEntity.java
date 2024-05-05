@@ -11,44 +11,37 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.model;
+package ragtime.cc.insta.model;
 
 import org.polymap.model2.Association;
-import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
-import org.polymap.model2.store.no2.Fulltext;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.model.Article;
+import ragtime.cc.model.Common;
 
 /**
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class Article
+public class PostEntity
         extends Common {
 
-    private static final Log LOG = LogFactory.getLog( Article.class );
+    private static final Log LOG = LogFactory.getLog( PostEntity.class );
 
-    public static final ClassInfo<Article> info = ArticleClassInfo.instance();
+    public static final ClassInfo<PostEntity> info = PostEntityClassInfo.instance();
 
-    public static Article TYPE;
-
-    @Queryable
-    public Property<String>             title;
+    public static PostEntity TYPE;
 
     @Queryable
-    @Fulltext
-    @Format( Format.FormatType.MARKDOWN )
-    public Property<String>             content;
+    public Association<Article> article;
 
     @Queryable
-    public ManyAssociation<TagEntity>   tags;
+    public Property<String>     instaRef;
 
-    @Queryable
-    public Association<TopicEntity>     topic;
 }

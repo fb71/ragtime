@@ -13,11 +13,6 @@
  */
 package ragtime.cc.article;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.polymap.model2.query.Query.Order;
-
-import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -31,27 +26,21 @@ import areca.ui.layout.RowConstraints;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import areca.ui.viewer.SelectViewer;
+import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
-import ragtime.cc.AssociationModel;
-import ragtime.cc.EntityTransform;
 import ragtime.cc.UICommon;
-import ragtime.cc.model.Article;
-import ragtime.cc.model.MediaEntity;
-import ragtime.cc.model.TopicEntity;
-import ragtime.cc.website.http.MediaContentProvider;
 
 /**
  *
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticlePage {
+public class TopicPage {
 
-    private static final Log LOG = LogFactory.getLog( ArticlePage.class );
+    private static final Log LOG = LogFactory.getLog( TopicPage.class );
 
-    public static final ClassInfo<ArticlePage> INFO = ArticlePageClassInfo.instance();
+    public static final ClassInfo<TopicPage> INFO = TopicPageClassInfo.instance();
 
     @Page.Part
     protected PageContainer     ui;
@@ -63,7 +52,7 @@ public class ArticlePage {
     protected PageSite          site;
 
     @Page.Context
-    protected ArticleEditState  state;
+    protected TopicEditState    state;
 
     protected Action            submitBtn;
 
@@ -72,7 +61,7 @@ public class ArticlePage {
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
-        ui.init( parent ).title.set( state.article.$().title.get() );
+        ui.init( parent ).title.set( "Topic" );
 
         form = new Form();
         form.subscribe( ev -> {
@@ -94,49 +83,38 @@ public class ArticlePage {
 //            });
 //        }});
 
-        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.name,
-                new AssociationModel<>( state.article.$().topic ) );
-        ui.body.add( form.newField()
-                .viewer( new SelectViewer( topics.values() ) )
-                .model( topics )
-                .create()
-                .lc( RowConstraints.height( 35 ) )
-                .tooltip.set( "Das Topic dieses Textes" ) );
-
-        ui.body.add( form.newField().label( "Titel" )
-                .model( new PropertyModel<>( state.article.$().title ) )
+        ui.body.add( form.newField().label( "Name" )
+                .model( new PropertyModel<>( state.topic.name ) )
                 .viewer( new TextFieldViewer() )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
-        ui.body.add( form.newField()
-                .model( new PropertyModel<>( state.article.$().content ) )
+        ui.body.add( form.newField().label( "Titel" )
+                .model( new PropertyModel<>( state.topic.title ) )
+                .viewer( new TextFieldViewer() )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
+        ui.body.add( form.newField().label( "Farbe" )
+                .model( new PropertyModel<>( state.topic.color ) )
+                .viewer( new ColorPickerViewer() )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
+        ui.body.add( form.newField() //.label( "Beschreibung" )
+                .model( new PropertyModel<>( state.topic.description ) )
                 .viewer( new TextFieldViewer().configure( (TextField t) -> {
                     t.multiline.set( true );
                     t.type.set( Type.MARKDOWN );
-                    autocompletes( t );
                 }))
                 .create()
                 .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
-
-//        ui.body.add( new Text() {{
-//            content.set( "Angelegt: " + state.article.$().created.get() );
-//            layoutConstraints.set( RowConstraints.height( 15 ) );
-//        }});
-//
-//        ui.body.add( new Text() {{
-//            content.set( "Geändert: " + state.article.$().created.get() );
-//            enabled.set( false );
-//            layoutConstraints.set( RowConstraints.height( 15 ) );
-//        }});
 
         form.load();
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
-            //icon.set( "done" );
             description.set( "Speichern" );
-            //type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
                 form.submit();
@@ -146,31 +124,6 @@ public class ArticlePage {
             });
         }});
         return ui;
-    }
-
-
-    protected void autocompletes( TextField t ) {
-        var result = new ArrayList<String>();
-        Platform.schedule( 2000, () -> null )
-                .then( __ -> {
-                    return state.uow.query( Article.class )
-                            .orderBy( Article.TYPE.title, Order.ASC )
-                            .executeCollect();
-                })
-                .then( rs -> {
-                    rs.forEach( article -> result.add( article.title.get() ) );
-                    result.add( "----" );
-                    return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
-                })
-                .onSuccess( rs -> {
-                    rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
-                    result.add( "----" );
-
-                    result.addAll( Arrays.asList( "article", "home", "frontpage?n=", "frontpage?t=") );
-
-                    LOG.info( "autocomplete: %s", result );
-                    t.autocomplete.set( result );
-                });
     }
 
 }
