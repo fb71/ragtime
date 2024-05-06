@@ -15,6 +15,7 @@ package ragtime.cc.model;
 
 import org.polymap.model2.Association;
 import org.polymap.model2.ManyAssociation;
+import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import org.polymap.model2.store.no2.Fulltext;
@@ -49,6 +50,11 @@ public class Article
     @Queryable
     public ManyAssociation<TagEntity>   tags;
 
+    @Nullable
     @Queryable
     public Association<TopicEntity>     topic;
+
+    @Queryable
+    public ManyAssociation<MediaEntity> medias;
+
 }

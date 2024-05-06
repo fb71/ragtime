@@ -13,6 +13,8 @@
  */
 package ragtime.cc.model;
 
+import java.util.List;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +25,10 @@ import java.io.OutputStream;
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 
+import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
@@ -70,11 +74,19 @@ public class MediaEntity
     protected RLazy<Integer>            cpermid = new RLazy<>( () ->
             context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get().permid.get() );
 
-
+    /**
+     * Computed back association of {@link Article#medias}
+     */
+    public Promise<List<Article>> article() {
+        return context.getUnitOfWork().query( Article.class )
+                .where( Expressions.anyOf( Article.TYPE.medias, Expressions.id( id() ) ) )
+                .executeCollect();
+    }
 
     @Override
     public void onLifecycleChange( State state ) {
         super.onLifecycleChange( state );
+        // delete file
         if (state == State.AFTER_SUBMIT && status() == EntityStatus.REMOVED) {
             var f = f();
             if (f.exists()) {
@@ -82,6 +94,13 @@ public class MediaEntity
             }
             LOG.info( "Removed: %s", f );
         }
+//        // remove back association
+//        if (state == State.AFTER_REMOVED) {
+//            article().onSuccess( articles -> articles.forEach( article -> {
+//                LOG.info( "Removing back link: %s", article.title.get() );
+//                article.medias.remove( MediaEntity.this );
+//            }));
+//        }
     }
 
     /**

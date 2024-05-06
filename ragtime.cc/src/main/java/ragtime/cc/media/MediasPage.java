@@ -118,30 +118,9 @@ public class MediasPage {
                 layout.set( FillLayout.defaults() );
 
                 medias = new ViewerContext()
-                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> new UIComposite() {{
-                            LOG.debug( "Creating TableCell for: %s", media );
-                            lc( RowConstraints.height( 54 ));
-                            layout.set( RowLayout.filled().spacing( uic.space ).margins( 10, 10 ) );
-                            var mime = media.mimetype.opt().orElse( "null" );
-                            add( new Text() {{
-                                format.set( Format.HTML );
-                                content.set( media.name.get() + "<br/>" +
-                                            "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
-                            }});
-                            if (mime.startsWith( "image" )) {
-                                add( new Image() {{
-                                    lc( RowConstraints.width( 40 ));
-                                    // Platform.schedule( 1000, () -> setData( media.in() ) );
-                                }});
-                            }
-                            add( new Button() {{
-                                lc( RowConstraints.width( 40 ));
-                                icon.set( "close" );
-                                events.on( EventType.SELECT, ev -> {
-                                    state.removeMediaAction( media );
-                                });
-                            }});
-                        }}) {{
+                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                            return new MediaListItem( media, () -> state.removeMediaAction( media ) );
+                        }) {{
                             oddEven.set( true );
                             spacing.set( 0 );
                             lines.set( true );
@@ -174,4 +153,33 @@ public class MediasPage {
         return ui;
     }
 
+
+    public static class MediaListItem
+            extends UIComposite {
+
+        public MediaListItem( MediaEntity media, Runnable removeAction ) {
+            LOG.debug( "Creating TableCell for: %s", media );
+            lc( RowConstraints.height( 54 ));
+            layout.set( RowLayout.filled().spacing( 10 ).margins( 10, 10 ) );
+            var mime = media.mimetype.opt().orElse( "null" );
+            add( new Text() {{
+                format.set( Format.HTML );
+                content.set( media.name.get() + "<br/>" +
+                            "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
+            }});
+            if (mime.startsWith( "image" )) {
+                add( new Image() {{
+                    lc( RowConstraints.width( 40 ));
+                    // Platform.schedule( 1000, () -> setData( media.in() ) );
+                }});
+            }
+            add( new Button() {{
+                lc( RowConstraints.width( 40 ));
+                icon.set( "close" );
+                events.on( EventType.SELECT, ev -> {
+                    removeAction.run();
+                });
+            }});
+        }
+    }
 }

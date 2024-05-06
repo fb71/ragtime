@@ -15,6 +15,7 @@ package ragtime.cc.article;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import org.polymap.model2.query.Query.Order;
 
 import areca.common.Platform;
@@ -23,20 +24,30 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.component2.Button;
+import areca.ui.component2.Events.EventType;
+import areca.ui.component2.FileUpload;
+import areca.ui.component2.FileUpload.File;
+import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowConstraints;
+import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
+import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.AssociationModel;
 import ragtime.cc.EntityTransform;
 import ragtime.cc.UICommon;
+import ragtime.cc.media.MediasPage.MediaListItem;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.model.TopicEntity;
@@ -69,6 +80,9 @@ public class ArticlePage {
 
     private Form                form;
 
+    private Button              uploadBtn;
+
+    private File                uploaded;
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
@@ -83,16 +97,6 @@ public class ArticlePage {
         });
 
         ui.body.layout.set( uic.verticalL().fillHeight( true ) );
-
-//        ui.body.add( new Select() {{
-//            lc( RowConstraints.height( 35 ) );
-//            tooltip.set( "Das Topic dieses Textes" );
-//            options.set( Arrays.asList( "Erstens", "Zweitens", "Drittens" ) );
-//            value.set( "Zweitens" );
-//            events.on( EventType.TEXT, ev -> {
-//                LOG.info( "Selected: %s", value.get() );
-//            });
-//        }});
 
         var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.name,
                 new AssociationModel<>( state.article.$().topic ) );
@@ -118,6 +122,52 @@ public class ArticlePage {
                 }))
                 .create()
                 .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
+
+        // media upload
+        ui.body.add( new UIComposite() {{
+            lc( RowConstraints.height( 35 ) );
+            layout.set( RowLayout.filled().spacing( uic.space ) );
+            add( new FileUpload() {{
+                events.on( EventType.UPLOAD, ev -> {
+                    LOG.warn( "Uploaded: %s", data.get().name() );
+                    uploaded = data.get();
+                    uploadBtn.enabled.set( true );
+                });
+            }});
+
+            uploadBtn = add( new Button() {{
+                layoutConstraints.set( RowConstraints.width( 80 ) );
+                //label.set( "Upload" );
+                icon.set( "add" );
+                tooltip.set( "Das ausgewählte File neu anlegen" );
+                type.set( Type.SUBMIT );
+                enabled.set( false );
+                events.on( EventType.SELECT, ev -> {
+                    state.createMediaAction( uploaded );
+                    enabled.set( false );
+                });
+            }});
+        }});
+
+        // medias
+        ui.body.add( new ScrollableComposite() {{
+            lc( RowConstraints.height( 80 ) );
+            layout.set( FillLayout.defaults() );
+
+            var medias = new ViewerContext<>()
+                    .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                        return new MediaListItem( media, () -> state.removeMediaAction( media ) );
+                    }) {{
+                        oddEven.set( true );
+                        spacing.set( 0 );
+                        lines.set( true );
+                        onSelect.set( media -> {
+                            LOG.info( "SELECT: %s", media );
+                        });
+                    }})
+                    .model( state.medias );
+            add( medias.createAndLoad() );
+        }});
 
 //        ui.body.add( new Text() {{
 //            content.set( "Angelegt: " + state.article.$().created.get() );
