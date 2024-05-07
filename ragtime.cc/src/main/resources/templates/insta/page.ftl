@@ -29,11 +29,11 @@
                 <h1>${config.page.title}</h1>
             </@c.editable>
             <#-- Face -->
-            <@c.editable msg="page.title">
                 <div class="IFace">
+            <@c.editable msg="page.title">
                     <img class="IFaceBordered" src="media/RikeRingeisCoaching.jpg"></img>
-                </div>        
             </@c.editable>
+                </div>        
             </div>
         </div>
     </header>
