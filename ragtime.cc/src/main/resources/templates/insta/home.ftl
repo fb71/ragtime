@@ -2,9 +2,11 @@
 <#import "/commons.ftl" as c>
 
 <@c.data name="article" model="ArticleTemplateModel" params="n=Rike"/>
+<#--    
 <@c.data name="home1" model="ArticleTemplateModel" params="n=Home1"/>
 <@c.data name="home2" model="ArticleTemplateModel" params="n=Home2"/>
 <@c.data name="home3" model="ArticleTemplateModel" params="n=Home3"/>
+-->
 
 <#--
   Page/Body 
