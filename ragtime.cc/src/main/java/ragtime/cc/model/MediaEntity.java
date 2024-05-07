@@ -13,14 +13,19 @@
  */
 package ragtime.cc.model;
 
+import static org.apache.commons.lang3.ArrayUtils.EMPTY_BYTE_ARRAY;
+
 import java.util.List;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
@@ -29,12 +34,16 @@ import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 
 import areca.common.Promise;
+import areca.common.Promise.Completable;
+import areca.common.Session;
+import areca.common.Timer;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.rt.server.EventLoop;
 import ragtime.cc.Workspace;
 
 /**
@@ -127,11 +136,73 @@ public class MediaEntity
         }
     }
 
+    /**
+     * Async reading the content in chunks.
+     */
+    public Promise<byte[]> read() {
+        return new FileReader( f() ).read();
+    }
+
+    /**
+     * Async reading the complete content.
+     */
+    public Promise<byte[]> readFully() {
+        return new FileReader( f() ).read()
+                .reduce( new ByteArrayOutputStream( 128*1024 ), (buf,chunk) -> {
+                    buf.write( chunk != null ? chunk : EMPTY_BYTE_ARRAY );
+                })
+                .map( buf -> buf.toByteArray() );
+    }
+
     protected File f() {
         var workspace = Workspace.of( permid.get() );
         //var workspace = Workspace.of( cpermid.get() );
         var media = new File( workspace, DIR );
         media.mkdirs();
         return new File( media, name.get() );
+    }
+
+    /**
+     *
+     */
+    public static class FileReader
+            extends Thread {
+
+        private File f;
+
+        private Completable<byte[]> promise = new Completable<>();
+
+        private EventLoop eventloop;
+
+        public FileReader( File f ) {
+            super( "FileReader" );
+            setDaemon( true );
+            this.f = f;
+            this.eventloop = Session.instanceOf( EventLoop.class );
+        }
+
+        public Promise<byte[]> read() {
+            start();
+            return promise;
+        }
+
+        @Override
+        public void run() {
+            try (var in = new FileInputStream( f )) {
+                var t = Timer.start();
+                var size = 0;
+                var buf = new byte[4096];
+                for (int c = in.read( buf ); c > -1; c = in.read( buf )) {
+                    size += c;
+                    var result = ArrayUtils.subarray( buf, 0, c );
+                    eventloop.enqueue( "FileReader", () -> promise.consumeResult( result ), 0 );
+                }
+                eventloop.enqueue( "FileReader", () -> promise.complete( null ), 0 );
+                LOG.info( "FileReader: %s - %s (%s)", f.getName(), size, t );
+            }
+            catch (Throwable e) {
+                promise.completeWithError( e );
+            }
+        }
     }
 }

@@ -20,16 +20,12 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.apache.commons.lang3.RandomUtils;
-
-import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
-import areca.ui.component2.Badge;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
@@ -194,43 +190,42 @@ public class ArticlesPage {
                 content.set( article.title.get() + "<br/>" +
                         "<span style=\"font-size:10px; color:#808080;\">" + df.format( article.modified.get() ) + "</span>" );
             }});
-            Platform.schedule( 2000, () -> {
-                var comments = RandomUtils.nextInt( 1, 8 );
-                if (comments < 3) {
-                    addDecorator( new Badge() {{
-                        content.set( "" + comments );
-                        tooltip.set( "Ungelesene Kommentare: " + comments );
-                    }});
-                }
-            });
+//            Platform.schedule( 2000, () -> {
+//                var comments = RandomUtils.nextInt( 1, 8 );
+//                if (comments < 3) {
+//                    addDecorator( new Badge() {{
+//                        content.set( "" + comments );
+//                        tooltip.set( "Ungelesene Kommentare: " + comments );
+//                    }});
+//                }
+//            });
         }
     }
 
 
-    /**
-     *
-     */
-    protected class ArticleListItem extends Button {
-
-        public ArticleListItem( Article article ) {
-            layoutConstraints.set( RowConstraints.height( 50 ) );
-            layout.set( RowLayout.filled().vertical().margins( 10, 7 ).spacing( 8 ) );
-            bordered.set( false );
-            add( new Text() {{
-                //format.set( Format.HTML );
-                content.set( article.title.get() );
-            }});
-            add( new Text() {{
-                content.set( "Geändert: " + df.format( article.modified.get() ) );
-                styles.add( CssStyle.of( "font-size", "10px") );
-                styles.add( CssStyle.of( "color", "#707070") );
-                enabled.set( false );
-            }});
-            events.on( EventType.SELECT, ev -> {
-                state.selected.set( article );
-                state.editArticleAction.run();
-            });
-        }
-
-    }
+//    /**
+//     *
+//     */
+//    protected class ArticleListItem extends Button {
+//
+//        public ArticleListItem( Article article ) {
+//            layoutConstraints.set( RowConstraints.height( 50 ) );
+//            layout.set( RowLayout.filled().vertical().margins( 10, 7 ).spacing( 8 ) );
+//            bordered.set( false );
+//            add( new Text() {{
+//                //format.set( Format.HTML );
+//                content.set( article.title.get() );
+//            }});
+//            add( new Text() {{
+//                content.set( "Geändert: " + df.format( article.modified.get() ) );
+//                styles.add( CssStyle.of( "font-size", "10px") );
+//                styles.add( CssStyle.of( "color", "#707070") );
+//                enabled.set( false );
+//            }});
+//            events.on( EventType.SELECT, ev -> {
+//                state.selected.set( article );
+//                state.editArticleAction.run();
+//            });
+//        }
+//    }
 }

@@ -51,8 +51,10 @@ public class TemplateInfo {
 
     static {
         var gson = new GsonBuilder().create();
+        // XXX tomcat!? :(
         //var folders = IOUtils.readLines( cl().getResourceAsStream( TEMPLATES_BASE_PATH + "/" ), "UTF8" );
-        var folders = Arrays.asList( "common", "first", "fb71" ); // XXX tomcat?
+        var folders = Arrays.asList( "common", "first", "fb71", "insta" );
+
         for (var folder : folders) {
             try {
                 var res = cl().getResource( join( "/", TEMPLATES_BASE_PATH, folder, TEMPLATE_INFO_FILE ) );
