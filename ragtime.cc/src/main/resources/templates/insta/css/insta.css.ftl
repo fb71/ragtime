@@ -15,11 +15,17 @@ a:hover {
 
 .IHeader {
     height: 180px;
+    box-shadow: 0 0px 6px rgb(0 0 0 / 40%);
+    
+    max-width: 1280;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.IBgImage {
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
-    margin-bottom: 90px;
-    box-shadow: 0 0px 6px rgb(0 0 0 / 40%);
 }
 
 .IHeader h1 {
@@ -47,18 +53,67 @@ a:hover {
     //border: 2px solid #cdcdcd;
 }
 
+.ITopics {
+    padding-left: 220px;
+}
+
+.ITopicsScroller {
+    overflow-x: scroll;
+    scrollbar-width: none;
+    /*box-shadow: 0px 0 15px inset rgba(${config.colors.pageBackground@rgb},100%);*/
+}
+.ITopicsScroller::-webkit-scrollbar {
+  display: none;
+}
+
+.ITopic {
+    margin-top: 8px;
+    --bs-gutter-x: 2.5rem;
+    font-size: smaller;
+    text-align: center;
+    color: var(--common-link-color);
+}
+.ITopic:hover {
+    filter: brightness(1.1);
+    cursor: pointer;
+}
+.ITopic img {
+    height: 50px;
+    border-radius: 50px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
+    
+    /* for inset shadow */
+    z-index: -1;
+    position: relative;
+}
+
+.IContent {
+    margin-top: 40px;
+}
+
 @media (max-width: 768px) {
   .IHeader {
     height: 120px;
-    margin-bottom: 80px;
   }
   .IHeader h1 {
-    padding-top: 1rem;
+    padding-top: 2.5rem;
   }
   .IHeader .IFace {
     top: 70px;
     width: 110px;
     height: 110px;
+  }
+  .ITopics {
+    padding-left: 180px;
+  }
+  .ITopic {
+    --bs-gutter-x: 1.5rem;
+  }
+  .ITopic img {
+    height: 40px;
+  }
+  .IContent {
+    margin-top: 25px;
   }
 }
 

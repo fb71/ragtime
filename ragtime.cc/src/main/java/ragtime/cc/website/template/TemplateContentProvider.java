@@ -38,6 +38,7 @@ import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateNotFoundException;
 import freemarker.template.Version;
+import ragtime.cc.model.TopicEntity;
 import ragtime.cc.website.http.ContentProvider;
 import ragtime.cc.website.model.TemplateConfigEntity;
 
@@ -107,6 +108,7 @@ public class TemplateContentProvider
             var data = loadData( template, request.httpRequest, request.uow );
             data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
             data.put( "config", new CompositeTemplateModel( config ) );
+            data.put( "topics", new QueryTemplateModel( request.uow.query( TopicEntity.class ) ) );
 
             try (var out = request.httpResponse.getWriter()) {
                 template.process( data, out );

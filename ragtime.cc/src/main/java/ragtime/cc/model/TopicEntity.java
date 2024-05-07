@@ -18,11 +18,13 @@ import static org.polymap.model2.query.Expressions.anyOf;
 import java.util.List;
 
 import org.polymap.model2.DefaultValue;
+import org.polymap.model2.Defaults;
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import org.polymap.model2.query.Expressions;
+
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
@@ -51,20 +53,27 @@ public class TopicEntity
 
     // instance *******************************************
 
+    /** Humand readable, changable label of this Topic */
     @Queryable
     @DefaultValue( "" )
-    public Property<String> name;
+    public Property<String>     name;
 
+    /** Human readable, changable label of this Topic */
     @Queryable
     @DefaultValue( "" )
-    public Property<String> title;
+    public Property<String>     title;
 
     @DefaultValue( "" )
-    public Property<String> description;
+    public Property<String>     description;
 
     @Nullable
     @DefaultValue( "#905090" )
-    public Property<String> color;
+    public Property<String>     color;
+
+    /** The position of this item (ascending order) */
+    @Defaults
+    //@Concerns( PropertyChangeConcern.class )
+    public Property<Integer>    order;
 
     @Queryable
     public ManyAssociation<TopicEntity> members;

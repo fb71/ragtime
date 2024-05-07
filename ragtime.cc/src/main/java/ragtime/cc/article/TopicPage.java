@@ -29,6 +29,7 @@ import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
+import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
 
 /**
@@ -84,20 +85,27 @@ public class TopicPage {
 //        }});
 
         ui.body.add( form.newField().label( "Name" )
-                .model( new PropertyModel<>( state.topic.name ) )
                 .viewer( new TextFieldViewer() )
+                .model( new PropertyModel<>( state.topic.name ) )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
         ui.body.add( form.newField().label( "Titel" )
-                .model( new PropertyModel<>( state.topic.title ) )
                 .viewer( new TextFieldViewer() )
+                .model( new PropertyModel<>( state.topic.title ) )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
+        ui.body.add( form.newField().label( "Reihenfolge" )
+                .viewer( new TextFieldViewer() )
+                .model( new Number2StringTransform(
+                        new PropertyModel<>( state.topic.order ) ) )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
         ui.body.add( form.newField().label( "Farbe" )
-                .model( new PropertyModel<>( state.topic.color ) )
                 .viewer( new ColorPickerViewer() )
+                .model( new PropertyModel<>( state.topic.color ) )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
@@ -108,7 +116,7 @@ public class TopicPage {
                     t.type.set( Type.MARKDOWN );
                 }))
                 .create()
-                .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
+                .lc( RowConstraints.height( 100 ) ) );
 
         form.load();
 

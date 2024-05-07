@@ -23,8 +23,8 @@
 
 <body class="${pageclass}">
     <#-- Page header -->
-    <header class="IHeader" style="background-image: url('media/Raumfoto.jpg')">
-        <div class="container">
+    <header class="IHeader IBgImage" style="background-image: url('media/Raumfoto.jpg')">
+        <div class="IBgImage container" style="height:100%">
             <@c.editable msg="page.title">
                 <h1>${config.page.title}</h1>
             </@c.editable>
@@ -36,12 +36,25 @@
             </@c.editable>
             </div>
         </div>
-
-        <#-- Actions... -->
     </header>
+
+    <#-- Topics -->
+    <div class="ITopics container">
+        <div class="ITopicsScroller">
+        <div class="row flex-nowrap">
+            <#list topics?sequence?sort_by("order") as topic>
+                <div class="ITopic col-auto">
+                    <img src="media/bubble+R01_klein.png"></img>
+                    <br/>
+                    ${topic.title}
+                </div>
+            </#list>
+        </div>
+        </div>
+    </div>
     
     <#-- Content -->
-    <div class="CContent container">
+    <div class="IContent container">
     <#nested>
     </div>
 
