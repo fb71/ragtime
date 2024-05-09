@@ -27,6 +27,8 @@ public class UICommon {
 
     private static final Log LOG = LogFactory.getLog( UICommon.class );
 
+    public static final String ICON_SAVE = "save";
+
     /** Default space in the UI */
     public int space = 15;
 

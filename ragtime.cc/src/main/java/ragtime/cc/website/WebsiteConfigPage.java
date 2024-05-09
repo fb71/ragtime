@@ -27,6 +27,7 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import ragtime.cc.UICommon;
 
 /**
  *
@@ -57,7 +58,7 @@ public class WebsiteConfigPage {
 
         // header
         site.actions.add( submitBtn = new Action() {{
-            //icon.set( "done" );
+            //icon.set( UICommon.ICON_SAVE );
             description.set( "Speichern" );
             handler.set( ev -> {
                 state.submitAction.run();
@@ -87,7 +88,7 @@ public class WebsiteConfigPage {
 
     protected void updateEnabled() {
         LOG.info( "updateEnabled(): %s", state.submitAction.canRun() );
-        submitBtn.icon.set( state.submitAction.canRun() ? "done" : "cancel" );
+        submitBtn.icon.set( state.submitAction.canRun() ? UICommon.ICON_SAVE : "cancel" );
     }
 
 

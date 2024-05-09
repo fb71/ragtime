@@ -92,7 +92,7 @@ public class ArticlePage {
         form.subscribe( ev -> {
             LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
             boolean enabled = form.isChanged() && form.isValid();
-            submitBtn.icon.set( enabled ? "done" : "" );
+            submitBtn.icon.set( enabled ? UICommon.ICON_SAVE : "" );
             submitBtn.enabled.set( enabled );
         });
 
@@ -184,9 +184,9 @@ public class ArticlePage {
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
-            //icon.set( "done" );
+            //icon.set( UICommon.ICON_SAVE );
             description.set( "Speichern" );
-            //type.set( Button.Type.SUBMIT );
+            type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
                 form.submit();

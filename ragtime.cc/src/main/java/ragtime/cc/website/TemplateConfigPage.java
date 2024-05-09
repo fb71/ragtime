@@ -251,6 +251,7 @@ public class TemplateConfigPage {
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
+            order.set( 10 );
             description.set( "Speichern" );
             type.set( Button.Type.SUBMIT );
             enabled.set( false );
@@ -263,7 +264,7 @@ public class TemplateConfigPage {
             form.subscribe( ev -> {
                 var _enabled = form.isChanged() && form.isValid();
                 enabled.set( _enabled );
-                icon.set( _enabled ? "done" : "" );
+                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
             });
         }});
 

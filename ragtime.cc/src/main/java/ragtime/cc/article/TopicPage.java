@@ -18,6 +18,7 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.component2.Button;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
@@ -57,7 +58,7 @@ public class TopicPage {
 
     protected Action            submitBtn;
 
-    private Form                form;
+    protected Form              form;
 
 
     @Page.CreateUI
@@ -68,7 +69,7 @@ public class TopicPage {
         form.subscribe( ev -> {
             LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
             boolean enabled = form.isChanged() && form.isValid();
-            submitBtn.icon.set( enabled ? "done" : "" );
+            submitBtn.icon.set( enabled ? UICommon.ICON_SAVE : "" );
             submitBtn.enabled.set( enabled );
         });
 
@@ -122,6 +123,7 @@ public class TopicPage {
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
+            type.set( Button.Type.SUBMIT );
             description.set( "Speichern" );
             enabled.set( false );
             handler.set( ev -> {

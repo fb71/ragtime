@@ -139,7 +139,7 @@ public class MediasPage {
 //            description.set( "Speichern" );
 //            type.set( Button.Type.SUBMIT );
 //            //enabled.set( false );
-//            icon.set( "done" );
+//            icon.set( UICommon.ICON_SAVE );
 //            handler.set( ev -> {
 //                state.submitAction().onSuccess( __ -> {
 //                    enabled.set( false );
@@ -148,7 +148,7 @@ public class MediasPage {
 //            medias.subscribe( ev -> {
 //                var _enabled = true; //medias.isChanged() && medias.isValid();
 //                enabled.set( _enabled );
-//                icon.set( _enabled ? "done" : "" );
+//                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
 //            });
 //        }});
         return ui;

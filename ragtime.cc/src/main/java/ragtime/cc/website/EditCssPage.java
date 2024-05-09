@@ -101,7 +101,7 @@ public class EditCssPage {
             form.subscribe( ev -> {
                 var _enabled = form.isChanged() && form.isValid();
                 enabled.set( _enabled );
-                icon.set( _enabled ? "done" : "" );
+                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
             });
         }});
 //        // action: revert
