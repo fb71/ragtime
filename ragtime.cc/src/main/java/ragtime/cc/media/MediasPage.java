@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -170,10 +171,10 @@ public class MediasPage {
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    //Platform.schedule( 1000, () -> setData( media.in() ) );
-
-                    media.readFully().onSuccess( buf -> {
-                        setData( buf );
+                    Platform.schedule( 1000, () -> {
+                        media.readFully().onSuccess( buf -> {
+                            setData( buf );
+                        });
                     });
                 }});
             }
