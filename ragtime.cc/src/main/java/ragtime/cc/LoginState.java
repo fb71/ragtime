@@ -95,6 +95,8 @@ public class LoginState {
             var remembered = remembered();
             if (remembered != null) {
                 LOG.warn( "Remembered: %s", remembered );
+                remembered.lastLogin.set( new Date() );
+                uow.submit();
                 advanceState( remembered );
             }
             else {

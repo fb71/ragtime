@@ -101,8 +101,8 @@ public class ArticlesPage {
                     ui.body.components.disposeAll();
                     ui.body.add( new Text() {{
                         content.set( "Logout complete. Reload browser!" );
-                        ui.body.layout();
                     }});
+                    ui.body.layout();
                 });
             });
         }});
