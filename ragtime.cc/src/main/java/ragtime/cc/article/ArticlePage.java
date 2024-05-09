@@ -76,8 +76,6 @@ public class ArticlePage {
     @Page.Context
     protected ArticleEditState  state;
 
-    protected Action            submitBtn;
-
     private Form                form;
 
     private Button              uploadBtn;
@@ -88,15 +86,9 @@ public class ArticlePage {
     public UIComponent createUI( UIComposite parent ) {
         ui.init( parent ).title.set( state.article.$().title.get() );
 
-        form = new Form();
-        form.subscribe( ev -> {
-            LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
-            boolean enabled = form.isChanged() && form.isValid();
-            submitBtn.icon.set( enabled ? UICommon.ICON_SAVE : "" );
-            submitBtn.enabled.set( enabled );
-        });
-
         ui.body.layout.set( uic.verticalL().fillHeight( true ) );
+
+        form = new Form();
 
         var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.name,
                 new AssociationModel<>( state.article.$().topic ) );
@@ -151,7 +143,7 @@ public class ArticlePage {
 
         // medias
         ui.body.add( new ScrollableComposite() {{
-            lc( RowConstraints.height( 60 ) );
+            lc( RowConstraints.height( 70 ) );
             layout.set( FillLayout.defaults() );
 
             var medias = new ViewerContext<>()
@@ -169,31 +161,27 @@ public class ArticlePage {
             add( medias.createAndLoad() );
         }});
 
-//        ui.body.add( new Text() {{
-//            content.set( "Angelegt: " + state.article.$().created.get() );
-//            layoutConstraints.set( RowConstraints.height( 15 ) );
-//        }});
-//
-//        ui.body.add( new Text() {{
-//            content.set( "Geändert: " + state.article.$().created.get() );
-//            enabled.set( false );
-//            layoutConstraints.set( RowConstraints.height( 15 ) );
-//        }});
-
         form.load();
 
         // action: submit
-        site.actions.add( submitBtn = new Action() {{
-            //icon.set( UICommon.ICON_SAVE );
+        site.actions.add( new Action() {{
             description.set( "Speichern" );
             type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
                 form.submit();
                 state.submitAction().onSuccess( __ -> {
-                    submitBtn.enabled.set( false );
+                    enabled.set( false );
                 });
             });
+            Runnable updateEnabled = () -> {
+                boolean _enabled = state.modelChanged || (form.isChanged() && form.isValid() );
+                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
+                this.enabled.set( _enabled );
+            };
+
+            form.subscribe( ev -> updateEnabled.run() );
+            state.medias.subscribe( ev -> updateEnabled.run() );
         }});
         return ui;
     }

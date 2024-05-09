@@ -52,12 +52,14 @@ public class ArticleEditState
     @Deprecated
     protected UICommon      uic;
 
-    @State.Context(required = false)
     @State.Model
+    @State.Context(required = false)
     public Model<Article>   article = new EntityModel<>();
 
     @State.Model
     public AssocListModel<MediaEntity> medias;
+
+    public boolean          modelChanged;
 
 
     @State.Init
@@ -89,12 +91,14 @@ public class ArticleEditState
                 throw new RuntimeException( e );
             }
         });
+        modelChanged = true;
         medias.fireChangeEvent();
     }
 
 
     public void removeMediaAction( MediaEntity media ) {
         uow.removeEntity( media );
+        modelChanged = true;
         medias.fireChangeEvent();
     }
 
@@ -129,7 +133,6 @@ public class ArticleEditState
         public void fireChangeEvent() {
             super.fireChangeEvent();
         }
-
     }
 
 }
