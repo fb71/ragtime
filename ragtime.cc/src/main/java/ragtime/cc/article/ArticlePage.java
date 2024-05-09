@@ -151,7 +151,7 @@ public class ArticlePage {
 
         // medias
         ui.body.add( new ScrollableComposite() {{
-            lc( RowConstraints.height( 80 ) );
+            lc( RowConstraints.height( 60 ) );
             layout.set( FillLayout.defaults() );
 
             var medias = new ViewerContext<>()

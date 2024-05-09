@@ -61,7 +61,7 @@ public class LoginPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Login" );
+        ui.init( parent ).title.set( "fb71.org" );
 
         ui.body.layout.set( MaxWidthLayout.width( 320 ) );
         ui.body.add( new UIComposite() {{
