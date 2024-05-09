@@ -213,6 +213,10 @@ public class ArticlePage {
                     return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
                 })
                 .onSuccess( rs -> {
+                    if (t.isDisposed()) {
+                        LOG.warn( "autocomplete: TextField already disposed" );
+                        return;
+                    }
                     rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
                     result.add( "----" );
 

@@ -79,18 +79,21 @@ public class ArticlesPage {
 
         // action: new
         site.actions.add( new Action() {{
+            order.set( 9 );
             icon.set( "add" );
             description.set( "Neuen Artikel/Text anlegen" );
             handler.set( ev -> state.createArticleAction() );
         }});
         // action: settings
         site.actions.add( new Action() {{
+            order.set( 10 );
             icon.set( "settings" );
             description.set( "Einstellungen" );
             handler.set( ev -> state.openSettingsAction() );
         }});
         // action: logout
         site.actions.add( new Action() {{
+            order.set( 0 );
             icon.set( "logout" );
             description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
             handler.set( ev -> {
@@ -106,6 +109,7 @@ public class ArticlesPage {
         if (state.account.isAdmin.get()) {
             // action: settings
             site.actions.add( new Action() {{
+                order.set( 20 );
                 icon.set( "face4" );
                 description.set( "Accounts" );
                 handler.set( ev -> state.openAccountsAction() );

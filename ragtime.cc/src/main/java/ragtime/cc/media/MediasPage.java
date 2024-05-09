@@ -171,7 +171,7 @@ public class MediasPage {
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    Platform.schedule( 1000, () -> {
+                    Platform.schedule( 750, () -> {
                         media.readFully().onSuccess( buf -> {
                             setData( buf );
                         });
