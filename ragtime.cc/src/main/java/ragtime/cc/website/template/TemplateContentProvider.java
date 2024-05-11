@@ -13,34 +13,23 @@
  */
 package ragtime.cc.website.template;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 import java.util.regex.Pattern;
-
-import java.io.StringReader;
-import java.net.URL;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.IOUtils;
 import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import freemarker.cache.ClassTemplateLoader;
 import freemarker.core.DirectiveCallPlace;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateExceptionHandler;
 import freemarker.template.TemplateModel;
-import freemarker.template.TemplateNotFoundException;
-import freemarker.template.Version;
 import ragtime.cc.model.TopicEntity;
-import ragtime.cc.website.http.ContentProvider;
-import ragtime.cc.website.model.TemplateConfigEntity;
 
 /**
  * Provides HTML content created from templates + data/model with FreeMarker and
@@ -49,144 +38,34 @@ import ragtime.cc.website.model.TemplateConfigEntity;
  * @author Falko Bräutigam
  */
 public class TemplateContentProvider
-        implements ContentProvider {
+        extends TemplateContentProviderBase {
 
     private static final Log LOG = LogFactory.getLog( TemplateContentProvider.class );
 
-    public static final int         BUFFER_SIZE = 32 * 1024;
+    /** XXX The templates that are compatible with {@link TemplateContentProvider} */
+    public static final List<String> templates = Arrays.asList( "common", "first", "fb71" );
 
     private static final Pattern    MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
 
 
     @Override
-    public void process( Request request ) throws Exception {
+    protected Promise<Boolean> doProcess() throws Exception {
         var resName = String.join( "/", request.path );
 
-        request.httpResponse.setBufferSize( BUFFER_SIZE );
+        LOG.info( "Loading template: %s(.ftl)", resName );
+        var cfg = TemplateLoader.configuration( config );
+        var template = cfg.getTemplate( resName + ".ftl" );
 
-        // Edit mode: preserve param in session
-        var editParam = request.httpRequest.getParameter( "edit" );
-        if (editParam != null) {
-            var session = request.httpRequest.getSession( true );
-            session.setAttribute( "edit", editParam );
+        var data = loadData( template, request.httpRequest, request.uow );
+        data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
+        data.put( "config", new CompositeTemplateModel( config ) );
+        data.put( "topics", new QueryTemplateModel( request.uow.query( TopicEntity.class ) ) );
+
+        try (var out = request.httpResponse.getWriter()) {
+            template.process( data, out );
         }
-
-        // skip *(.css).map
-        if (resName.endsWith( ".map" )) {
-            request.httpResponse.setStatus( 404 );
-            return;
-        }
-
-        // stream resource (*.css, *.woff, ...)
-        // XXX thread loader?
-        var res = getClass().getClassLoader().getResource( "templates/" + resName );
-        if (res != null) {
-            try (
-                var in = res.openStream();
-                var out = request.httpResponse.getOutputStream();
-            ) {
-                IOUtils.copy( in, out, BUFFER_SIZE );
-            }
-            return;
-        }
-
-        // config.css
-        var config = request.uow.query( TemplateConfigEntity.class ).singleResult().waitForResult().get();
-        if (resName.equals( "config.css" )) {
-            try (var out = request.httpResponse.getWriter()) {
-                IOUtils.copy( new StringReader( config.css.get() ), out );
-            }
-            return;
-        }
-
-        // load template
-        try {
-            LOG.info( "Loading template: %s(.ftl)", resName );
-            var cfg = TemplateLoader.configuration( config );
-            var template = cfg.getTemplate( resName + ".ftl" );
-
-            var data = loadData( template, request.httpRequest, request.uow );
-            data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
-            data.put( "config", new CompositeTemplateModel( config ) );
-            data.put( "topics", new QueryTemplateModel( request.uow.query( TopicEntity.class ) ) );
-
-            try (var out = request.httpResponse.getWriter()) {
-                template.process( data, out );
-            }
-        }
-        catch (TemplateNotFoundException e) {
-            //request.httpResponse.setStatus( 404 );
-            //request.httpResponse.sendRedirect( "https://fb71.org/" ); // catch old atlas/polymap customers
-
-            try (var out = request.httpResponse.getWriter()) {
-                //out.write( "Unter dieser Adresse gibt es nichts." );
-
-                // catch old atlas/polymap customers
-                out.write( "<!DOCTYPE HTML>\n"
-                        + "<html>\n"
-                        + "    <head>\n"
-                        + "        <meta charset=\"UTF-8\">\n"
-                        + "        <meta http-equiv=\"refresh\" content=\"5; url=https://fb71.org/\">\n"
-                        + "        <title>Page does not exist</title>\n"
-                        + "    </head>\n"
-                        + "    <body style=\"font-family: sans-serif;\">\n"
-                        + "        <h1>Page does not exist</h1>\n"
-                        + "        <h3>Your are redirected to: <a href='https://fb71.org/'>fb71.org</a></h3>\n"
-                        + "    </body>\n"
-                        + "</html>" );
-            }
-        }
-    }
-
-    /**
-     * {@link Configuration} factory and template loader that...
-     */
-    protected static class TemplateLoader
-            extends ClassTemplateLoader {
-
-        private static Map<String,Configuration> cfg = new ConcurrentHashMap<>();
-
-        public static Configuration configuration( TemplateConfigEntity config ) {
-            return cfg.computeIfAbsent( config.templateName.get(), templateName -> {
-                try {
-                    Version v2_3_32 = new Version( 2, 3, 32 );
-                    var result = new Configuration( v2_3_32 );
-                    result.setDefaultEncoding( "ISO-8859-1" );
-                    result.setLocale( Locale.GERMAN );
-                    result.setTemplateExceptionHandler( TemplateExceptionHandler.RETHROW_HANDLER );
-                    //result.setTemplateLookupStrategy( );
-                    result.setLocalizedLookup( false );
-
-                    result.setTemplateLoader( new TemplateLoader( templateName ) );
-                    LOG.warn( "Configuration initialized: %s", templateName );
-                    return result;
-                }
-                catch (Exception e) {
-                    throw new RuntimeException( e );
-                }
-            });
-        }
-
-        // instance ***************************************
-
-        private TemplateInfo    template;
-
-        protected TemplateLoader( String templateName ) {
-            super( TemplateInfo.cl(), TemplateInfo.TEMPLATES_BASE_PATH );
-            this.template = TemplateInfo.forName( templateName );
-        }
-
-        @Override
-        protected URL getURL( String name ) {
-            var t = template;
-            var result = (URL)null;
-            while (result == null && t != null) {
-                result = t.resource( name );
-                t = result == null ? t.parent() : t;
-            }
-            LOG.warn( "TEMPLATE: %s (%s)", name, t != null ? t.name : "not found" );
-            return result;
-        }
+        // XXX template models have async stuff
+        return done( true );
     }
 
 
@@ -200,7 +79,7 @@ public class TemplateContentProvider
      * </pre>
      */
     @SuppressWarnings({"deprecation", "unchecked"})
-    protected HashMap<Object,Object> loadData( Template template, HttpServletRequest request, UnitOfWork uow ) throws Exception {
+    protected HashMap<Object,Object> loadData( Template template, HttpServletRequest req, UnitOfWork uow ) throws Exception {
         var result = new HashMap<>();
         for (var child : Collections.list( template.getRootTreeNode().children() )) {
             // find macro calls
@@ -209,7 +88,7 @@ public class TemplateContentProvider
                 if (m.matches()) {
                     var modelParams = new ModelParams();
 
-                    modelParams.addHttpParams( request );
+                    modelParams.addHttpParams( req );
 
                     // macro params
                     String name = m.group( 1 );

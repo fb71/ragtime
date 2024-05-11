@@ -34,6 +34,7 @@ import areca.common.log.LogFactory.Log;
 import ragtime.cc.Workspace;
 import ragtime.cc.website.http.WebsiteServlet;
 import ragtime.cc.website.model.TemplateConfigEntity;
+import ragtime.cc.website.model.TopicTemplateConfigEntity;
 import ragtime.cc.website.model.WebsiteConfigEntity;
 import ragtime.cc.website.template.ArticleTemplateModel;
 
@@ -99,7 +100,7 @@ public class ContentRepo {
                 .entities.set( Arrays.asList(
                         AccountEntity.info,
                         Article.info, MediaEntity.info, TagEntity.info, TopicEntity.info,
-                        WebsiteConfigEntity.info, TemplateConfigEntity.info,
+                        WebsiteConfigEntity.info, TemplateConfigEntity.info, TopicTemplateConfigEntity.info,
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )
                 .create()

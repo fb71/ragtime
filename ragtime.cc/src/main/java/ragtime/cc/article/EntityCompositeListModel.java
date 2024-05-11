@@ -59,7 +59,6 @@ public class EntityCompositeListModel<V extends Composite>
     }
 
 
-    @SuppressWarnings( "unchecked" )
     public EntityCompositeListModel<V> orderBy(
             Property<? extends Comparable> newOrderBy,
             RSupplier<Boolean> unsubscribeIf ) {

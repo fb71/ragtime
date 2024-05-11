@@ -91,8 +91,9 @@ public class TopicEntity
      * Computed bidi association of {@link Article#topic}.
      */
     public Promise<List<Article>> articles() {
+        LOG.warn( "XXX articles(): ALL!!!!" );
         return context.getUnitOfWork().query( Article.class )
-                .where( Expressions.is( Article.TYPE.topic, this ) )
+                //.where( Expressions.is( Article.TYPE.topic, this ) )
                 .executeCollect();
     }
 

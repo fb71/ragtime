@@ -16,6 +16,7 @@ package ragtime.cc.website.http;
 import org.apache.commons.io.IOUtils;
 import org.polymap.model2.query.Expressions;
 
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.model.MediaEntity;
@@ -33,12 +34,12 @@ public class MediaContentProvider
     public static final String PATH = "media";
 
     @Override
-    public void process( Request request ) throws Exception {
+    public Promise<Boolean> process( Request request ) throws Exception {
         var name = String.join(  "/", request.path );
-        request.uow.query( MediaEntity.class )
+        return request.uow.query( MediaEntity.class )
                 .where( Expressions.eq( MediaEntity.TYPE.name, name ) )
                 .singleResult()
-                .waitForResult( media -> {
+                .map( media -> {
                     request.httpResponse.setContentType( media.mimetype.get() );
                     try (
                         var in = media.in();
@@ -46,6 +47,7 @@ public class MediaContentProvider
                     ) {
                         IOUtils.copy( in, out );
                     }
+                    return true;
                 });
     }
 

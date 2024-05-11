@@ -13,8 +13,6 @@
  */
 package ragtime.cc.website.template;
 
-import java.util.Iterator;
-
 import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.CollectionProperty;
@@ -27,11 +25,9 @@ import areca.common.log.LogFactory.Log;
 import areca.ui.Color;
 import freemarker.template.SimpleNumber;
 import freemarker.template.SimpleScalar;
-import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import freemarker.template.TemplateModelIterator;
 import ragtime.cc.model.Format;
 import ragtime.cc.model.Format.FormatType;
 
@@ -94,25 +90,11 @@ public class CompositeTemplateModel
         }
         // list
         else {
-            var p = (CollectionProperty<?>)prop.get( composite );
             // Composite
             if (Composite.class.isAssignableFrom( prop.getType() )) {
-                return new TemplateCollectionModel() {
-                    @Override
-                    public TemplateModelIterator iterator() throws TemplateModelException {
-                        return new TemplateModelIterator() {
-                            Iterator it = p.iterator();
-                            @Override
-                            public TemplateModel next() throws TemplateModelException {
-                                return new CompositeTemplateModel( (Composite)it.next() );
-                            }
-                            @Override
-                            public boolean hasNext() throws TemplateModelException {
-                                return it.hasNext();
-                            }
-                        };
-                    }
-                };
+                @SuppressWarnings( "unchecked" )
+                var p = (CollectionProperty<Composite>)prop.get( composite );
+                return new IterableAdapterTemplateModel<>( p, c -> new CompositeTemplateModel( c ) );
             }
         }
         throw new RuntimeException( "Not yet: " + prop);

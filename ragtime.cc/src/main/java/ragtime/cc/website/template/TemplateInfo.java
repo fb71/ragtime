@@ -16,7 +16,7 @@ package ragtime.cc.website.template;
 import static java.lang.String.join;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +53,10 @@ public class TemplateInfo {
         var gson = new GsonBuilder().create();
         // XXX tomcat!? :(
         //var folders = IOUtils.readLines( cl().getResourceAsStream( TEMPLATES_BASE_PATH + "/" ), "UTF8" );
-        var folders = Arrays.asList( "common", "first", "fb71", "insta" );
+        var folders = new ArrayList<String>() {{
+            addAll( TemplateContentProvider.templates );
+            addAll( TopicTemplateContentProvider.templates );
+        }};
 
         for (var folder : folders) {
             try {

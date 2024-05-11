@@ -18,6 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.Promise;
+import areca.common.Scheduler.Priority;
+import ragtime.cc.website.model.TemplateConfigEntity;
+
 /**
  * Provides content (template/HTML, media, etc.) to the {@link WebsiteServlet}.
  *
@@ -25,7 +29,12 @@ import org.polymap.model2.runtime.UnitOfWork;
  */
 public interface ContentProvider {
 
-    public void process( Request request ) throws Exception;
+    public Promise<Boolean> process( Request request ) throws Exception;
+
+    default <R> Promise<R> done( R value ) {
+        return Promise.completed( value, Priority.MAIN_EVENT_LOOP );
+    }
+
 
     /**
      *
@@ -40,5 +49,7 @@ public interface ContentProvider {
 
         /** The parts of the URI path specific for this provider. */
         public String[] path;
+
+        public TemplateConfigEntity config;
     }
 }

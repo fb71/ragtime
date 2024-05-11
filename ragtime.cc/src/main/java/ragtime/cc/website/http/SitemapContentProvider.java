@@ -15,6 +15,7 @@ package ragtime.cc.website.http;
 
 import org.apache.commons.io.IOUtils;
 
+import areca.common.Promise;
 import areca.common.base.Sequence;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -37,7 +38,7 @@ public class SitemapContentProvider
 
 
     @Override
-    public void process( Request request ) throws Exception {
+    public Promise<Boolean> process( Request request ) throws Exception {
         var name = Sequence.of( request.path ).last().get();
         var content = switch (name) {
             case "robots.txt" -> processRobotsTxt( request );
@@ -47,6 +48,7 @@ public class SitemapContentProvider
         try (var out = request.httpResponse.getOutputStream()) {
             IOUtils.write( content, out, "UTF-8" );
         }
+        return done( true );
     }
 
 
