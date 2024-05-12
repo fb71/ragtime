@@ -18,6 +18,7 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.query.Expressions;
 
@@ -49,7 +50,7 @@ public class MediaContentProvider
                 .map( media -> {
                     request.httpResponse.setContentType( media.mimetype.get() );
                     try (
-                        var in = media.in();
+                        var in = IOUtils.buffer( media.in() );
                         var out = request.httpResponse.getOutputStream();
                     ){
                         if (request.httpRequest.getParameterMap().isEmpty()) {
@@ -64,7 +65,8 @@ public class MediaContentProvider
                                     .crop( Positions.CENTER )
                                     .asBufferedImages();
 
-                            ImageIO.write( bi.get( 0 ), "jpg", out );
+                            var encoder = StringUtils.substringAfterLast( media.mimetype.get(), "/" );
+                            ImageIO.write( bi.get( 0 ), encoder, out );
                         }
                     }
                     return true;

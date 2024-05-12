@@ -125,7 +125,7 @@ public class MediaEntity
     }
 
     /**
-     * Unbuffered {@link InputStream} of the content.
+     * Unbuffered {@link InputStream} of the content. Has to be closed by the caller.
      */
     public InputStream in() {
         try {

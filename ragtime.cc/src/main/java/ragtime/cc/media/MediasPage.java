@@ -15,12 +15,20 @@ package ragtime.cc.media;
 
 import static java.text.DateFormat.MEDIUM;
 
+import java.util.Arrays;
 import java.util.Locale;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.IOUtils;
+
 import areca.common.Platform;
+import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -43,6 +51,8 @@ import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerBuilder;
 import areca.ui.viewer.ViewerContext;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import ragtime.cc.UICommon;
 import ragtime.cc.model.MediaEntity;
 
@@ -171,11 +181,30 @@ public class MediasPage {
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    Platform.schedule( 750, () -> {
-                        media.readFully().onSuccess( buf -> {
-                            setData( buf );
+                    if (media.mimetype.get().startsWith( "image" )) {
+                        Platform.schedule( 750, () -> {
+                            try (var in = IOUtils.buffer( media.in() )) {
+                                var t = Timer.start();
+                                var bi = Thumbnails.fromInputStreams( Arrays.asList( in ) )
+                                        .size( 40, 40 )
+                                        .crop( Positions.CENTER )
+                                        //.imageType( BufferedImage.TYPE_4BYTE_ABGR )
+                                        .asBufferedImages();
+
+                                var out = new ByteArrayOutputStream( 8 * 1024 );
+                                ImageIO.write( bi.get( 0 ), "png", out );
+                                setData( out.toByteArray() );
+                                LOG.warn( "%s: %s (%s)", media.name.get(), out.size(), t );
+                            }
+                            catch (IOException e) {
+                                throw new RuntimeException( e );
+                            }
+
+                            //                        media.readFully().onSuccess( buf -> {
+                            //                            setData( buf );
+                            //                        });
                         });
-                    });
+                    }
                 }});
             }
             add( new Button() {{
