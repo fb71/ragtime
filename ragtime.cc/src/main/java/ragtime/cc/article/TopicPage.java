@@ -28,10 +28,12 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
+import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
+import ragtime.cc.website.template.TopicTemplate;
 
 /**
  *
@@ -75,22 +77,6 @@ public class TopicPage {
 
         ui.body.layout.set( uic.verticalL().fillHeight( true ) );
 
-//        ui.body.add( new Select() {{
-//            lc( RowConstraints.height( 35 ) );
-//            tooltip.set( "Das Topic dieses Textes" );
-//            options.set( Arrays.asList( "Erstens", "Zweitens", "Drittens" ) );
-//            value.set( "Zweitens" );
-//            events.on( EventType.TEXT, ev -> {
-//                LOG.info( "Selected: %s", value.get() );
-//            });
-//        }});
-
-        ui.body.add( form.newField().label( "Name" )
-                .viewer( new TextFieldViewer() )
-                .model( new PropertyModel<>( state.topic.name ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
         ui.body.add( form.newField().label( "Titel" )
                 .viewer( new TextFieldViewer() )
                 .model( new PropertyModel<>( state.topic.title ) )
@@ -119,6 +105,23 @@ public class TopicPage {
                 .create()
                 .lc( RowConstraints.height( 100 ) ) );
 
+        ui.body.add( form.newField().label( "Darstellung" )
+                .viewer( new SelectViewer( TopicTemplate.availableNames() ) )
+                .model( new PropertyModel<>( state.topic.topicTemplateName ) )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
+        ui.body.add( form.newField().label( "URL (Test)" )
+                .viewer( new TextFieldViewer() )
+                .model( new PropertyModel<>( state.topic.urlPart ) )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
+//        form.subscribe( ev -> {
+//            if (ev.getSource() instanceof TextFieldViewer viewer && viewer.) {
+//                urlPart.getValue().content.set( ev.newValue.toString() );
+//            }
+//        });
         form.load();
 
         // action: submit

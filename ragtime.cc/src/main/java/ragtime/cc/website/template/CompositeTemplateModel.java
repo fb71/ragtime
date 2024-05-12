@@ -13,6 +13,8 @@
  */
 package ragtime.cc.website.template;
 
+import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.CollectionProperty;
@@ -23,8 +25,10 @@ import org.polymap.model2.Property;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.Color;
+import freemarker.template.SimpleDate;
 import freemarker.template.SimpleNumber;
 import freemarker.template.SimpleScalar;
+import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -82,6 +86,10 @@ public class CompositeTemplateModel
             // Number
             else if (Number.class.isAssignableFrom( prop.getType() )) {
                 return new SimpleNumber( (Number)p.get() );
+            }
+            // Date
+            else if (Date.class.isAssignableFrom( prop.getType() )) {
+                return new SimpleDate( (Date)p.get(), TemplateDateModel.DATETIME );
             }
             // Composite
             else if (Composite.class.isAssignableFrom( prop.getType() )) {

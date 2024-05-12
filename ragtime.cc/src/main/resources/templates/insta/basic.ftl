@@ -4,8 +4,13 @@
 <#--
   Page/Body 
 -->
-<@page.layout title="Basic!" pageclass="CHome">
-   ${article.content}
+<@page.layout title="Basic" pageclass="CHome">
+    <#list articles?sequence?sort_by("modified")?reverse as article>
+        <@c.editable msg="article.${article.id}">
+            ${article.content}
+        </@c.editable>
+        <hr/>
+    </#list>
 </@page.layout>
 
 <#--

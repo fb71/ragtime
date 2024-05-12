@@ -31,6 +31,8 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.website.model.TopicTemplateConfigEntity;
+import ragtime.cc.website.template.TopicTemplate;
 
 /**
  *
@@ -53,11 +55,6 @@ public class TopicEntity
 
     // instance *******************************************
 
-    /** Humand readable, changable label of this Topic */
-    @Queryable
-    @DefaultValue( "" )
-    public Property<String>     name;
-
     /** Human readable, changable label of this Topic */
     @Queryable
     @DefaultValue( "" )
@@ -75,6 +72,22 @@ public class TopicEntity
     //@Concerns( PropertyChangeConcern.class )
     public Property<Integer>    order;
 
+    /**
+     * The name of the {@link TopicTemplate} to use.
+     * @deprecated {@link TopicTemplateConfigEntity#topic}
+     */
+    @Queryable
+    @DefaultValue( "Basic" )
+    public Property<String>     topicTemplateName;
+
+    /**
+     * The URL path that identifies this {@link #topic}
+     * @deprecated {@link TopicTemplateConfigEntity}
+     */
+    @Queryable
+    @Nullable
+    public Property<String>     urlPart;
+
     @Queryable
     public ManyAssociation<TopicEntity> members;
 
@@ -91,9 +104,9 @@ public class TopicEntity
      * Computed bidi association of {@link Article#topic}.
      */
     public Promise<List<Article>> articles() {
-        LOG.warn( "XXX articles(): ALL!!!!" );
+        //LOG.warn( "XXX articles(): ALL!!!!" );
         return context.getUnitOfWork().query( Article.class )
-                //.where( Expressions.is( Article.TYPE.topic, this ) )
+                .where( Expressions.is( Article.TYPE.topic, this ) )
                 .executeCollect();
     }
 

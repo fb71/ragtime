@@ -13,9 +13,12 @@
  */
 package ragtime.cc.website.template;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import areca.common.Promise;
+import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
@@ -32,10 +35,21 @@ public abstract class TopicTemplate {
 
     private static final Log LOG = LogFactory.getLog( TopicTemplate.class );
 
-    public static Map<String,Class<TopicTemplate>> available;
+    public static final Map<String,Class<? extends TopicTemplate>> available = new HashMap<>() {{
+        put( "Basic", BasicTopicTemplate.class );
+    }};
 
-    public static TopicTemplate forKey( String key ) {
-        return new BasicTopicTemplate();
+    public static Set<String> availableNames() {
+        return available.keySet();
+    }
+
+    public static Opt<TopicTemplate> forName( String name ) {
+        try {
+            return Opt.of( available.get( name ) ).map( cl -> cl.getDeclaredConstructor().newInstance() );
+        }
+        catch (ReflectiveOperationException e) {
+            throw new RuntimeException( e );
+        }
     }
 
     public static class Site {

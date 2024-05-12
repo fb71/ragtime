@@ -90,7 +90,7 @@ public class ArticlePage {
 
         form = new Form();
 
-        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.name,
+        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
                 new AssociationModel<>( state.article.$().topic ) );
         ui.body.add( form.newField()
                 .viewer( new SelectViewer( topics.values() ) )

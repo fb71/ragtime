@@ -26,7 +26,6 @@ import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.TopicEntity;
 import ragtime.cc.website.model.TopicTemplateConfigEntity;
-import ragtime.cc.website.template.tt.BasicTopicTemplate;
 
 /**
  * Processes... {@link TopicTemplate}.
@@ -63,18 +62,20 @@ public class TopicTemplateContentProvider
             data.put( "topics", new IterableAdapterTemplateModel<>( rs, t -> new CompositeTemplateModel( t ) ) );
         });
 
-        // hack a config
-        var loadHack = request.uow.query( TopicEntity.class ).executeCollect().onSuccess( rs -> {
-            LOG.info( "Hack" );
-            request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
-                proto.topic.set( rs.get( 0 ) );
-                proto.urlPart.set( "home" );
-                proto.topicTemplateName.set( BasicTopicTemplate.class.getSimpleName() );
-            });
-        });
+        // XXX hack a config
+        var topicUrlPart = request.path[0];
+        var loadHack = request.uow.query( TopicEntity.class )
+                .where( Expressions.eq( TopicEntity.TYPE.urlPart, topicUrlPart ) )
+                .singleResult().onSuccess( topic -> {
+                    LOG.info( "Hack" );
+                    request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
+                        proto.topic.set( topic );
+                        proto.urlPart.set( topic.urlPart.get() );
+                        proto.topicTemplateName.set( topic.topicTemplateName.get() );
+                    });
+                });
 
         // find TopicTemplateConfigEntity
-        var topicUrlPart = request.path[0];
         LOG.info( "Loading Topic/Config for: %s ...", topicUrlPart );
         var loadTemplate = loadHack
                 .then( __ -> {
@@ -105,8 +106,9 @@ public class TopicTemplateContentProvider
         return loadTopics
                 .then( __ -> loadTemplate )
                 .then( topic -> {
-                    var topicTemplate = TopicTemplate.forKey( topicTemplateSite.config.topicTemplateName.get() );
-                    return topicTemplate.process( topicTemplateSite );
+                    return TopicTemplate.forName( topicTemplateSite.config.topicTemplateName.get() )
+                            .orElseThrow( () -> new RuntimeException( "No such TopicTemplate: " + topicTemplateSite.config.topicTemplateName.get() ) )
+                            .process( topicTemplateSite );
                 })
                 .map( ftl -> {
                     LOG.info( "Loading topic template: %s", ftl );

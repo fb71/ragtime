@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.ArrayUtils;
 
 import areca.common.Assert;
+import areca.common.Platform;
 import areca.common.Promise;
 import areca.common.Scheduler.Priority;
 import areca.common.Session;
@@ -76,10 +77,11 @@ public class WebsiteServlet
             }
             else {
                 resp.setStatus( 500 );
-                out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden." );
+                out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden.\n\n" );
+                out.write( e.toString() );
 
                 LOG.warn( "Error while processing: %s", e.toString() );
-                e.printStackTrace( System.err );
+                Platform.rootCause( e ).printStackTrace( System.err );
             }
         }
         catch (IOException ee) {

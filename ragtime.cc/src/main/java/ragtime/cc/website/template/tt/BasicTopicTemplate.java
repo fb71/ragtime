@@ -14,7 +14,6 @@
 package ragtime.cc.website.template.tt;
 
 import areca.common.Promise;
-import areca.common.base.Sequence;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
@@ -44,8 +43,8 @@ public class BasicTopicTemplate
             return site.topic.articles().map( articles -> {
                 site.data.put( "articles", new IterableAdapterTemplateModel<>( articles, a -> new CompositeTemplateModel( a ) ) );
 
-                var rike = Sequence.of( articles ).first( a -> a.title.get().equalsIgnoreCase( "rike" ) ).orElseError();
-                site.data.put( "article", new CompositeTemplateModel( rike ) );
+                //var rike = Sequence.of( articles ).first( a -> a.title.get().equalsIgnoreCase( "rike" ) ).orElseError();
+                //site.data.put( "article", new CompositeTemplateModel( rike ) );
                 return "basic.ftl";
             });
         }

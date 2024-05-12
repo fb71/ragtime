@@ -43,7 +43,7 @@
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
             <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto">
+                <div class="ITopic col-auto" onclick="location.href='${topic.urlPart}';">
                     <img src="media/bubble+R01_klein.png"></img>
                     <br/>
                     ${topic.title}
