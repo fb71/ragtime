@@ -26,6 +26,7 @@ import ragtime.cc.model.TopicEntity;
 import ragtime.cc.website.http.ContentProvider.Request;
 import ragtime.cc.website.model.TopicTemplateConfigEntity;
 import ragtime.cc.website.template.tt.BasicTopicTemplate;
+import ragtime.cc.website.template.tt.TilesTopicTemplate;
 
 /**
  *
@@ -37,6 +38,7 @@ public abstract class TopicTemplate {
 
     public static final Map<String,Class<? extends TopicTemplate>> available = new HashMap<>() {{
         put( "Basic", BasicTopicTemplate.class );
+        put( "Tiles", TilesTopicTemplate.class );
     }};
 
     public static Set<String> availableNames() {

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Composite;
 import org.polymap.model2.Entity;
+import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Property;
 
 import areca.common.log.LogFactory;
@@ -98,8 +99,15 @@ public class CompositeTemplateModel
         }
         // list
         else {
+            // ManyAssociation
+            if (prop.isAssociation()) {
+                @SuppressWarnings( "unchecked" )
+                var p = (ManyAssociation<Entity>)prop.get( composite );
+                var associated = p.fetchCollect().waitForResult().get();
+                return new IterableAdapterTemplateModel<>( associated, e -> new CompositeTemplateModel( e ) );
+            }
             // Composite
-            if (Composite.class.isAssignableFrom( prop.getType() )) {
+            else if (Composite.class.isAssignableFrom( prop.getType() )) {
                 @SuppressWarnings( "unchecked" )
                 var p = (CollectionProperty<Composite>)prop.get( composite );
                 return new IterableAdapterTemplateModel<>( p, c -> new CompositeTemplateModel( c ) );

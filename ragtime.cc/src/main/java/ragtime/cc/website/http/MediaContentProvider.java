@@ -13,12 +13,19 @@
  */
 package ragtime.cc.website.http;
 
+import java.util.Arrays;
+
+import javax.imageio.ImageIO;
+
 import org.apache.commons.io.IOUtils;
+
 import org.polymap.model2.query.Expressions;
 
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import ragtime.cc.model.MediaEntity;
 
 /**
@@ -44,8 +51,21 @@ public class MediaContentProvider
                     try (
                         var in = media.in();
                         var out = request.httpResponse.getOutputStream();
-                    ) {
-                        IOUtils.copy( in, out );
+                    ){
+                        if (request.httpRequest.getParameterMap().isEmpty()) {
+                            IOUtils.copy( in, out );
+                        }
+                        else {
+                            var w = Integer.parseInt( request.httpRequest.getParameter( "w" ) );
+                            var h = Integer.parseInt( request.httpRequest.getParameter( "h" ) );
+
+                            var bi = Thumbnails.fromInputStreams( Arrays.asList( in ) )
+                                    .size( w, h )
+                                    .crop( Positions.CENTER )
+                                    .asBufferedImages();
+
+                            ImageIO.write( bi.get( 0 ), "jpg", out );
+                        }
                     }
                     return true;
                 });

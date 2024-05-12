@@ -13,6 +13,17 @@ a:hover {
     text-decoration: underline;
 }
 
+.ITiles {
+    --bs-gutter-x: 0.3rem;
+}
+
+.ITile {
+}
+
+.IClickable {
+    cursor: pointer;
+}
+
 .IHeader {
     height: 180px;
     box-shadow: 0 0px 6px rgb(0 0 0 / 40%);
