@@ -73,7 +73,7 @@ public class TopicsState
             }
             return uow.query( TopicEntity.class )
                     .where( searchTxtMatch )
-                    .orderBy( TopicEntity.TYPE.title, Order.ASC );
+                    .orderBy( TopicEntity.TYPE.order, Order.ASC );
         }
     };
 

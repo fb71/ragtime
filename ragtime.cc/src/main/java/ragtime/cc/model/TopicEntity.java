@@ -68,6 +68,7 @@ public class TopicEntity
     public Property<String>     color;
 
     /** The position of this item (ascending order) */
+    @Queryable
     @Defaults
     //@Concerns( PropertyChangeConcern.class )
     public Property<Integer>    order;
