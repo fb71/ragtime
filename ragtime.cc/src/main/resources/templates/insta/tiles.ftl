@@ -13,7 +13,7 @@
                     ${article.content}
                 <#else>
                     <#list article.medias?sequence as media>
-                        <img src="media/${media.name}?w=200&h=200" class="img-fluid" alt="${media.name}"/>
+                        <img src="media/${media.name}?w=300&h=300" class="img-fluid" alt="${media.name}"/>
                     </#list>
                 </#if>
             </div>
