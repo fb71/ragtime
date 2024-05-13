@@ -21,7 +21,7 @@
 -->
 <#macro editable msg>
     <#if params.edit == "true">
-        <div class="CEditable" onclick="event.stopPropagation(); event.preventDefault(); window.top.postMessage('${msg}', '*');">
+        <div class="CEditable" oncontextmenu="event.stopPropagation(); event.preventDefault(); window.top.postMessage('${msg}', '*');">
             <#-- div class="CBadge"></div-->
             <#nested>
         </div>
