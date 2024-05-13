@@ -75,7 +75,7 @@ public class ArticlesPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
-        ui.init( parent ).title.set( "Texte" );
+        ui.init( parent ).title.set( "Beiträge" );
 
         // action: new
         site.actions.add( new Action() {{
