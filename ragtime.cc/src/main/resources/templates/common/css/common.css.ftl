@@ -40,17 +40,28 @@
 
 .CEditable {
     box-sizing: border-box;
-    cursor: pointer;
+    /* cursor: pointer; */
     transition: 
         box-shadow 300ms,
-        filter 300ms; 
+        filter 300ms,
+        transform 300ms;
+    
+    /* disable text selection on long tap */
+    user-select:none;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -khtml-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
 }
 
 .CEditable:hover {
-    /*border: 1px solid #b72a44;*/
+    /* border: 1px solid #b72a44; */
     box-shadow: 0 0 4px inset rgba(230,0,20,80%);
     border-radius: 4px;
-    filter: brightness(1.3);
+    filter: brightness(1.1);
+    transform: scale(1.05);
 }
 
 .CBadge {

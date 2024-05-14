@@ -186,7 +186,7 @@ public class MediasPage {
                             try (var in = IOUtils.buffer( media.in() )) {
                                 var t = Timer.start();
                                 var bi = Thumbnails.fromInputStreams( Arrays.asList( in ) )
-                                        .size( 40, 40 )
+                                        .size( 40, 34 )
                                         .crop( Positions.CENTER )
                                         //.imageType( BufferedImage.TYPE_4BYTE_ABGR )
                                         .asBufferedImages();
