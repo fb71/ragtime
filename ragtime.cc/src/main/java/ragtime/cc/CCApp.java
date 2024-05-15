@@ -26,6 +26,7 @@ import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
+import areca.rt.server.EventLoop;
 import areca.rt.server.ServerApp;
 import areca.rt.server.ServerBrowserHistoryStrategy;
 import areca.rt.server.servlet.ArecaUIServer;
@@ -64,7 +65,9 @@ public class CCApp
         LogFactory.setPackageLevel( State.class, Level.DEBUG );
         //LogFactory.setClassLevel( UIEventCollector.class, Level.DEBUG );
 
+        // Mostly assertions
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
+        EventLoop.setDefaultErrorHandler( defaultErrorHandler() ); // process click events
 
         config = CCAppConfig.instance;
 
@@ -130,26 +133,25 @@ public class CCApp
     }
 
     /**
-     *
+     * The {@link Promise#defaultErrorHandler}
      */
     private static RConsumer<Throwable> defaultErrorHandler() {
         return (Throwable e) -> {
             if (e instanceof ProgressMonitor.CancelledException || e instanceof Promise.CancelledException) {
                 LOG.info( "Operation cancelled." );
+                return;
             }
-            else if (debug) {
-                LOG.warn( "defaultErrorHandler(): ", e );
-                e.printStackTrace( System.err );
+            if (debug) {
+                LOG.warn( "defaultErrorHandler(): %s", e.toString() );
+                e.printStackTrace( System.out );
                 //throw rootCauseForTeaVM( e );
             }
-            else {
-                //Pageflow.current().open( new GeneralErrorPage( e ), null );
-            }
+            ErrorPage.tryOpen( e );
         };
     }
 
     /**
-     * get a meaningfull stracktrace in TeaVM
+     * Get a meaningfull stracktrace in TeaVM
      */
     private static RuntimeException rootCauseForTeaVM( Throwable e ) {
         LOG.warn( "Exception: " + e );
