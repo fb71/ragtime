@@ -53,9 +53,11 @@ public class MediaContentProvider
                         var in = IOUtils.buffer( media.in() );
                         var out = request.httpResponse.getOutputStream();
                     ){
+                        //
                         if (request.httpRequest.getParameterMap().isEmpty()) {
                             IOUtils.copy( in, out );
                         }
+                        // thumbnail
                         else {
                             var w = Integer.parseInt( request.httpRequest.getParameter( "w" ) );
                             var h = Integer.parseInt( request.httpRequest.getParameter( "h" ) );

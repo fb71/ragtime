@@ -15,16 +15,24 @@ package ragtime.cc.model;
 
 import static org.apache.commons.lang3.ArrayUtils.EMPTY_BYTE_ARRAY;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import org.polymap.model2.ManyAssociation;
@@ -33,6 +41,7 @@ import org.polymap.model2.Queryable;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 
+import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.Promise.Completable;
 import areca.common.Session;
@@ -44,6 +53,10 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.rt.server.EventLoop;
+import areca.ui.Size;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
+import ragtime.cc.AsyncWorker;
 import ragtime.cc.Workspace;
 
 /**
@@ -83,6 +96,8 @@ public class MediaEntity
     protected RLazy<Integer>            cpermid = new RLazy<>( () ->
             context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get().permid.get() );
 
+    protected Map<ThumbnailBuilder,Promise<byte[]>> thumbnails = new ConcurrentHashMap<>();
+
     /**
      * Computed back association of {@link Article#medias}
      */
@@ -103,6 +118,11 @@ public class MediaEntity
             }
             LOG.info( "Removed: %s", f );
         }
+        // clean thumbnails
+        if (state == State.AFTER_SUBMIT) {
+            thumbnails.clear();
+        }
+
 //        // remove back association
 //        if (state == State.AFTER_REMOVED) {
 //            article().onSuccess( articles -> articles.forEach( article -> {
@@ -112,11 +132,75 @@ public class MediaEntity
 //        }
     }
 
+
+    public ThumbnailBuilder thumbnail() {
+        return new ThumbnailBuilder();
+    }
+
+    public class ThumbnailBuilder {
+        private Size    size;
+        private String  outputFormat;
+
+        public ThumbnailBuilder size( int w, int h ) {
+            this.size = Size.of( w, h );
+            return this;
+        }
+
+        /** {@link ImageIO} image output format: jpg, png */
+        public ThumbnailBuilder outputFormat( String format ) {
+            this.outputFormat = format;
+            return this;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 7;
+            result = 31 * result + ((outputFormat == null) ? 0 : outputFormat.hashCode());
+            return 31 * result + ((size == null) ? 0 : size.hashCode());
+        }
+
+        @Override
+        public boolean equals( Object obj ) {
+            return (obj instanceof ThumbnailBuilder rhs)
+                    ? Objects.equals( rhs.outputFormat, outputFormat ) && Objects.equals( rhs.size, size )
+                    : false;
+        }
+
+        public Promise<byte[]> create() {
+            Assert.notNull( size, "No 'size' specified for thumbnail" );
+            Assert.notNull( outputFormat, "No 'imageType' specified for thumbnail" );
+
+            return thumbnails.computeIfAbsent( this, __ -> {
+                return AsyncWorker.pool( () -> {
+                    var t = Timer.start();
+                    try (var in = IOUtils.buffer( in() )) {
+                        var out = new ByteArrayOutputStream( 64 * 1024 );
+                        Thumbnails.fromInputStreams( Arrays.asList( in ) )
+                                .size( size.width(), size.height() )
+                                .crop( Positions.CENTER )
+                                //.imageType( BufferedImage.TYPE_USHORT_565_RGB )
+                                //.addFilter( new Canvas( size.width(), size.height(), Positions.CENTER, Color.WHITE ) )
+                                .outputFormat( outputFormat )
+                                .toOutputStream( out );
+
+                        LOG.warn( "%s: %s (%s)", name.get(), out.size(), t );
+                        return out.toByteArray();
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException( e );
+                    }
+                });
+            });
+        }
+    }
+
+
     /**
      * Unbuffered {@link OutputStream} of the content.
      */
     public OutputStream out() {
         try {
+            thumbnails.clear();
             return /*new BufferedOutputStream(*/ new FileOutputStream( f() );
         }
         catch (FileNotFoundException e) {

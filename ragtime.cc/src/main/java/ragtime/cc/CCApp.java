@@ -78,6 +78,7 @@ public class CCApp
         LOG.warn( "DISPOSE " );
         ContentRepo.dispose();
         MainRepo.dispose();
+        AsyncWorker.dispose();
     }
 
 
