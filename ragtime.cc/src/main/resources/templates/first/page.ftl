@@ -16,6 +16,7 @@
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
     <script src="common/bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="common/js/common.js" type="text/javascript"></script>
 </head>
 
 <body class="${pageclass}">

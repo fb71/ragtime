@@ -61,7 +61,7 @@
     box-shadow: 0 0 4px inset rgba(230,0,20,80%);
     border-radius: 4px;
     filter: brightness(1.1);
-    transform: scale(1.05);
+    /*transform: scale(1.05);*/
 }
 
 .CBadge {

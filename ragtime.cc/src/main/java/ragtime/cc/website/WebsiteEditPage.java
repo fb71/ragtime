@@ -16,8 +16,6 @@ package ragtime.cc.website;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
-import org.polymap.model2.query.Expressions;
-
 import areca.common.Platform;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
@@ -36,8 +34,10 @@ import areca.ui.statenaction.State;
 import ragtime.cc.BaseState;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ArticleEditState;
+import ragtime.cc.article.TopicEditState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.EntityLifecycleEvent;
+import ragtime.cc.model.TopicEntity;
 
 /**
  * In-place editing of content and website/template config.
@@ -101,20 +101,26 @@ public class WebsiteEditPage {
 
     protected void onEditableClick( IFrameMsgEvent ev ) {
         LOG.info( "msg: %s", ev.msg );
+        var id = substringAfter( ev.msg, "." );
         // article
         if (ev.msg.startsWith( "article." )) {
-            state.uow.query( Article.class )
-                    .where( Expressions.id( substringAfter( ev.msg, "." ) ) )
-                    .singleResult()
-                    .onSuccess( article -> {
-                        disposableChildState = state.site.createState( new ArticleEditState() )
-                                .putContext( article, State.Context.DEFAULT_SCOPE )
-                                .activate();
-                    });
+            state.uow.entity( Article.class, id ).onSuccess( article -> {
+                disposableChildState = state.site.createState( new ArticleEditState() )
+                        .putContext( article, State.Context.DEFAULT_SCOPE )
+                        .activate();
+            });
         }
         // page.title -> settings
         else if (ev.msg.startsWith( "page." )) {
             disposableChildState = state.site.createState( new TemplateConfigState() ).activate();
+        }
+        // topic
+        else if (ev.msg.startsWith( "topic." )) {
+            state.uow.entity( TopicEntity.class, id ).onSuccess( topic -> {
+                disposableChildState = state.site.createState( new TopicEditState() )
+                        .putContext( topic, State.Context.DEFAULT_SCOPE )
+                        .activate();
+            });
         }
         else {
             LOG.warn( "Unhandled msg: %s", ev.msg );

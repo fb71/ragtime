@@ -12,6 +12,7 @@
     <title>${title} - ${config.page.title}</title>
     <meta charset="iso-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
@@ -19,7 +20,9 @@
     <link href="css/fb71.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
+
     <script src="common/bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="common/js/common.js" type="text/javascript"></script>
 </head>
 
 <body class="${pageclass}">
