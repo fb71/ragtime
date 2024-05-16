@@ -31,11 +31,11 @@ import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
 import ragtime.cc.BaseState;
-import ragtime.cc.article.ArticlesState;
 import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
+import ragtime.cc.website.WebsiteEditState;
 
 /**
  *
@@ -100,7 +100,7 @@ public class AccountsState
     public void becomeAccountAction( @SuppressWarnings( "hiding" ) AccountEntity account ) {
         var contentRepo = ContentRepo.waitFor( account );
         var contentUow = contentRepo.newUnitOfWork();
-        site.createState( new ArticlesState() )
+        site.createState( new WebsiteEditState() )
                 .putContext( account, MainRepo.SCOPE )
                 .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )

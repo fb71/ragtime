@@ -44,11 +44,12 @@ import areca.ui.statenaction.State;
 import areca.ui.statenaction.StateSite;
 import areca.ui.viewer.model.Model;
 import areca.ui.viewer.model.Pojo;
-import ragtime.cc.article.ArticlesState;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
 import ragtime.cc.model.PasswordEncryption;
+import ragtime.cc.website.WebsiteEditPage;
+import ragtime.cc.website.WebsiteEditState;
 
 /**
  * The start {@link State} of the application.
@@ -96,8 +97,9 @@ public class LoginState {
             if (remembered != null) {
                 LOG.warn( "Remembered: %s", remembered );
                 remembered.lastLogin.set( new Date() );
-                uow.submit();
-                advanceState( remembered );
+                uow.submit().onSuccess( __ -> {
+                    advanceState( remembered );
+                });
             }
             else {
                 pageflow.create( new LoginPage() )
@@ -138,13 +140,22 @@ public class LoginState {
     protected void advanceState( AccountEntity account ) {
         var contentRepo = ContentRepo.waitFor( account );
         var contentUow = contentRepo.newUnitOfWork();
-        site.createState( new ArticlesState() )
+        site.createState( new WebsiteEditState() )
                 .putContext( account, MainRepo.SCOPE )
                 .putContext( repo, MainRepo.SCOPE )
                 .putContext( uow, MainRepo.SCOPE )
                 .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )
                 .activate();
+
+        if (!account.helpSeen.get()) {
+            Platform.schedule( 2000, () -> {
+                Pageflow.current().create( new HelpPage() )
+                        .putContext( account, Page.Context.DEFAULT_SCOPE )
+                        .putContext( WebsiteEditPage.class.getSimpleName(), Page.Context.DEFAULT_SCOPE )
+                        .open();
+            });
+        }
     }
 
 

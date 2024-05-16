@@ -16,6 +16,7 @@ package ragtime.cc.article;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
+
 import areca.common.Assert;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -89,13 +90,14 @@ public class ArticlesState
     };
 
 
+    public void openAccountsAction() {
+        site.createState( new AccountsState() ).activate();
+    }
+
+
     @State.Action
     public void openSettingsAction() {
         site.createState( new TemplateConfigState() ).activate();
-    }
-
-    public void openAccountsAction() {
-        site.createState( new AccountsState() ).activate();
     }
 
     public void openMediasAction() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023, the @authors. All rights reserved.
+ * Copyright (C) 2024, the @authors. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -52,7 +52,13 @@ public class ErrorPage {
         var page = new ErrorPage();
         page.error = e;
         try {
-            Pageflow.current().create( page ).open();
+            var pageflow = Pageflow.current();
+            if (!pageflow.pages().anyMatches( p -> p instanceof ErrorPage )) {
+                pageflow.create( page ).open();
+            }
+            else {
+                LOG.warn( "Pageflow already contains an ErrorPage" );
+            }
         }
         catch (AssertionException ee) {
             // no Pageflow
@@ -102,7 +108,7 @@ public class ErrorPage {
         ui.body.add( new Button() {{
             lc( RowConstraints.height( 40 ) );
             label.set( "Abschicken" );
-            type.set( Button.Type.SUBMIT );
+            //type.set( Button.Type.SUBMIT );
             events.on( EventType.SELECT, ev -> {
                 try {
                     var out = new StringWriter( 32*1024 );

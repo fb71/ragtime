@@ -157,7 +157,7 @@ abstract class TemplateContentProviderBase
                 result = t.resource( name );
                 t = result == null ? t.parent() : t;
             }
-            LOG.warn( "TEMPLATE: %s (%s)", name, t != null ? t.name : "not found" );
+            //LOG.warn( "TEMPLATE: %s (%s)", name, t != null ? t.name : "not found" );
             return result;
         }
     }

@@ -22,19 +22,29 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Action;
+import areca.ui.component2.Button;
+import areca.ui.component2.Events.EventType;
 import areca.ui.component2.IFrame;
 import areca.ui.component2.IFrame.IFrameMsgEvent;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.FillLayout;
+import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.BaseState;
+import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
+import ragtime.cc.admin.AccountsState;
 import ragtime.cc.article.ArticleEditState;
+import ragtime.cc.article.ArticlesState;
 import ragtime.cc.article.TopicEditState;
+import ragtime.cc.article.TopicsState;
+import ragtime.cc.media.MediasState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.EntityLifecycleEvent;
 import ragtime.cc.model.TopicEntity;
@@ -70,15 +80,14 @@ public class WebsiteEditPage {
     public UIComponent createUI( UIComposite parent ) {
         ui.init( parent ).title.set( "Bearbeiten" );
 
-        ui.body.layout.set( FillLayout.defaults() );
-        ui.body.add( new IFrame() {{
-            //layout.set( RowLayout.filled().vertical().margins( uic.margins ).spacing( uic.spaceL ) );
+        // IFrame
+        var iframe = new IFrame() {{
             src.set( String.format( "website/%s/home?edit=true", state.account.permid.get() ) );
 
             // IFrame msg
             EventManager.instance()
                     .subscribe( (IFrameMsgEvent ev) -> onEditableClick( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> true )
+                    .performIf( IFrameMsgEvent.class, ev -> Pageflow.current().pages().first().orNull() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
@@ -94,13 +103,62 @@ public class WebsiteEditPage {
                     })
                     .performIf( EntityLifecycleEvent.class, ev -> ev.state == AFTER_SUBMIT )
                     .unsubscribeIf( () -> isDisposed() );
+        }};
+        // check admin
+        if (state.account.isAdmin.get()) {
+            ui.body.layout.set( RowLayout.filled().margins( 50, 100 ) );
+            ui.body.add( new Button() {{
+                type.set( Button.Type.NAVIGATE );
+                label.set( "Load..." );
+                events.on( EventType.SELECT, ev -> {
+                    ui.body.components.disposeAll();
+                    ui.body.layout.set( FillLayout.defaults() );
+                    ui.body.add( iframe );
+                    ui.body.layout();
+                });
+            }});
+        }
+        else {
+            ui.body.layout.set( FillLayout.defaults() );
+            ui.body.add( iframe );
+        }
+
+        // action: articles
+        site.actions.add( new Action() {{
+            icon.set( "article" );
+            description.set( "Beiträge" );
+            handler.set( ev -> state.site.createState( new ArticlesState() ).activate() );
         }});
+        // action: medias
+        site.actions.add( new Action() {{
+            icon.set( "image" );
+            description.set( "Bilder und Medien" );
+            handler.set( ev -> state.site.createState( new MediasState() ).activate() );
+        }});
+        // action: topics
+        site.actions.add( new Action() {{
+            icon.set( "topic" );
+            description.set( "Topics" );
+            handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
+        }});
+        // help
+        HelpPage.addAction( WebsiteEditPage.class, site );
+        //
+        if (state.account.isAdmin.get()) {
+            // action: settings
+            site.actions.add( new Action() {{
+                order.set( 20 );
+                icon.set( "manage_accounts" );
+                description.set( "Accounts" );
+                handler.set( ev -> state.site.createState( new AccountsState() ).activate() );
+            }});
+        }
         return ui;
     }
 
 
     protected void onEditableClick( IFrameMsgEvent ev ) {
-        LOG.info( "msg: %s", ev.msg );
+        LOG.info( "IFrame: %s (%s)", ev.msg, state.account.email.get() );
         var id = substringAfter( ev.msg, "." );
         // article
         if (ev.msg.startsWith( "article." )) {

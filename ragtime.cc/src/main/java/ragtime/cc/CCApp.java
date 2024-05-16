@@ -62,7 +62,7 @@ public class CCApp
         LogFactory.DEFAULT_LEVEL = debug ? Level.INFO : Level.WARN;
         LogFactory.setClassLevel( CCApp.class, Level.INFO );
         LogFactory.setPackageLevel( No2Store.class, Level.DEBUG );
-        LogFactory.setPackageLevel( State.class, Level.DEBUG );
+        //LogFactory.setPackageLevel( State.class, Level.DEBUG );
         //LogFactory.setClassLevel( UIEventCollector.class, Level.DEBUG );
 
         // Mostly assertions

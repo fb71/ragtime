@@ -4,6 +4,23 @@
 .btn:hover {
     margin-top: -1px;
 }
+
+.HelpPage h1, h2, h3, h4, h5 {
+    margin-top: 0px;
+    margin-bottom: 0.5em;
+}
+.HelpPage h2, h3, h4, h5 {
+    border-bottom: 1px solid #505050;
+}
+.HelpPage p {
+    margin-top: 0.5em;
+}
+.HelpPage hr {
+    border-top: 1px solid #505050;
+    border-bottom: none;
+    overflow: visible;    
+}
+
 .MessageCard {
     background-color: #252525;
     border-top: 1px solid #444444;

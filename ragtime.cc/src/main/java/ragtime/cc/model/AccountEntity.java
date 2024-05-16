@@ -80,6 +80,9 @@ public class AccountEntity
     @Defaults
     public Property<Date>       lastLogin;
 
+    @Defaults
+    public Property<Boolean>    helpSeen;
+
     @Queryable
     public Property<String>     rememberMe;
 

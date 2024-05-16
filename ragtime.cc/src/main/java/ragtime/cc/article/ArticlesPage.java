@@ -26,8 +26,6 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
-import areca.ui.component2.Button;
-import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
@@ -41,9 +39,8 @@ import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerContext;
-import ragtime.cc.LoginState;
+import ragtime.cc.HelpPage;
 import ragtime.cc.model.Article;
-import ragtime.cc.website.WebsiteEditState;
 
 /**
  *
@@ -77,6 +74,8 @@ public class ArticlesPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Beiträge" );
 
+        HelpPage.addAction( ArticlesPage.class, site );
+
         // action: new
         site.actions.add( new Action() {{
             order.set( 9 );
@@ -84,49 +83,28 @@ public class ArticlesPage {
             description.set( "Neuen Artikel/Text anlegen" );
             handler.set( ev -> state.createArticleAction() );
         }});
-        // action: settings
-        site.actions.add( new Action() {{
-            order.set( 10 );
-            icon.set( "settings" );
-            description.set( "Einstellungen" );
-            handler.set( ev -> state.openSettingsAction() );
-        }});
-        // action: logout
-        site.actions.add( new Action() {{
-            order.set( 0 );
-            icon.set( "logout" );
-            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
-            handler.set( ev -> {
-                LoginState.logout( state.account ).onSuccess( __ -> {
-                    ui.body.components.disposeAll();
-                    ui.body.add( new Text() {{
-                        content.set( "Logout complete. Reload browser!" );
-                    }});
-                    ui.body.layout();
-                });
-            });
-        }});
-        if (state.account.isAdmin.get()) {
-            // action: settings
-            site.actions.add( new Action() {{
-                order.set( 20 );
-                icon.set( "face4" );
-                description.set( "Accounts" );
-                handler.set( ev -> state.openAccountsAction() );
-            }});
-        }
-        // action: medias
-        site.actions.add( new Action() {{
-            icon.set( "image" );
-            description.set( "Medien" );
-            handler.set( ev -> state.openMediasAction() );
-        }});
-        // action: topics
-        site.actions.add( new Action() {{
-            icon.set( "topic" );
-            description.set( "Topics" );
-            handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
-        }});
+//        // action: settings
+//        site.actions.add( new Action() {{
+//            order.set( 10 );
+//            icon.set( "settings" );
+//            description.set( "Einstellungen" );
+//            handler.set( ev -> state.openSettingsAction() );
+//        }});
+//        // action: logout
+//        site.actions.add( new Action() {{
+//            order.set( 0 );
+//            icon.set( "logout" );
+//            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
+//            handler.set( ev -> {
+//                LoginState.logout( state.account ).onSuccess( __ -> {
+//                    ui.body.components.disposeAll();
+//                    ui.body.add( new Text() {{
+//                        content.set( "Logout complete. Reload browser!" );
+//                    }});
+//                    ui.body.layout();
+//                });
+//            });
+//        }});
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 
@@ -134,15 +112,15 @@ public class ArticlesPage {
         ui.body.add( new UIComposite() {{
             lc( RowConstraints.height( 30 ) );
             layout.set( RowLayout.filled().spacing( 20 ) );
-            add( new Button() {{
-                lc( RowConstraints.width( 180 ) );
-                label.set( "Web-Seite bearbeiten..." );
-                tooltip.set( "Web-Seite durch Click auf einzelne Element bearbeiten" );
-                events.on( EventType.SELECT, ev -> {
-                    // XXX
-                    state.site.createState( new WebsiteEditState() ).activate();
-                });
-            }});
+//            add( new Button() {{
+//                lc( RowConstraints.width( 180 ) );
+//                label.set( "Web-Seite bearbeiten..." );
+//                tooltip.set( "Web-Seite durch Click auf einzelne Elemente bearbeiten" );
+//                events.on( EventType.SELECT, ev -> {
+//                    // XXX
+//                    state.site.createState( new WebsiteEditState() ).activate();
+//                });
+//            }});
             add( new UIComposite() );
             add( new Link() {{
                 lc( RowConstraints.width( 150 ) );
