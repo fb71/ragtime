@@ -13,6 +13,7 @@
  */
 package ragtime.cc.website.template.tt;
 
+import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -39,23 +40,23 @@ public class TilesTopicTemplate
 
     @Override
     public Promise<String> process( Site site ) throws TemplateNotFoundException {
-        // topic
-        if (site.r.path.length == 1) {
-            return site.topic.articles().map( articles -> {
-                site.data.put( "articles", new IterableAdapterTemplateModel<>( articles, a -> new CompositeTemplateModel( a ) ) );
-                return "tiles.ftl";
-            });
-        }
-        // article
-        else if (site.r.path.length == 2) {
-            var id = site.r.path[1];
-            return site.r.uow.entity( Article.class, id ).map( article -> {
+        Assert.isEqual( 1, site.r.path.length );
+
+        // article: ?a=<id>
+        var articleIdParam = site.r.httpRequest.getParameter( "a" );
+        if (articleIdParam != null) {
+            return site.r.uow.entity( Article.class, articleIdParam ).map( article -> {
                 site.data.put( "article", new CompositeTemplateModel( article ) );
                 return "article.ftl";
             });
         }
+        // topic
         else {
-            throw new TemplateNotFoundException( "", null, "" );
+            //Assert.isEqual( 0, site.r.httpRequest.getParameterMap().size() ); edit=true
+            return site.topic.articles().map( articles -> {
+                site.data.put( "articles", new IterableAdapterTemplateModel<>( articles, a -> new CompositeTemplateModel( a ) ) );
+                return "tiles.ftl";
+            });
         }
     }
 
