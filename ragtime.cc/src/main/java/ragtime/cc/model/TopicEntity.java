@@ -17,6 +17,7 @@ import static org.polymap.model2.query.Expressions.anyOf;
 
 import java.util.List;
 
+import org.polymap.model2.Association;
 import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Defaults;
 import org.polymap.model2.ManyAssociation;
@@ -55,17 +56,22 @@ public class TopicEntity
 
     // instance *******************************************
 
-    /** Human readable, changable label of this Topic */
+    /** Human readable, changeable label of this Topic */
     @Queryable
     @DefaultValue( "" )
     public Property<String>     title;
 
     @DefaultValue( "" )
+    @Format( Format.FormatType.MARKDOWN )
     public Property<String>     description;
 
     @Nullable
     @DefaultValue( "#905090" )
     public Property<String>     color;
+
+    @Queryable
+    @Nullable
+    public Association<MediaEntity> titleImage;
 
     /** The position of this item (ascending order) */
     @Queryable

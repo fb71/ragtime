@@ -4,7 +4,7 @@
 <#--
   Page/Body 
 -->
-<@page.layout title="Basic" pageclass="CHome">
+<@page.layout title="Basic">
     <#list articles?sequence?sort_by("modified")?reverse as article>
         <@c.editable msg="article.${article.id}">
             ${article.content}

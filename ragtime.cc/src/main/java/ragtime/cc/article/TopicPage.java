@@ -32,6 +32,7 @@ import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
+import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.website.template.TopicTemplate;
 
@@ -83,6 +84,21 @@ public class TopicPage {
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
+        ui.body.add( form.newField() //.label( "Beschreibung" )
+                .model( new PropertyModel<>( state.topic.description ) )
+                .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                    t.multiline.set( true );
+                    t.type.set( Type.MARKDOWN );
+                }))
+                .create()
+                .lc( RowConstraints.height( 200 ) ) );
+
+        ui.body.add( form.newField().label( "Darstellung" )
+                .viewer( new SelectViewer( TopicTemplate.availableNames() ) )
+                .model( new PropertyModel<>( state.topic.topicTemplateName ) )
+                .create()
+                .lc( RowConstraints.height( 35 ) ) );
+
         ui.body.add( form.newField().label( "Reihenfolge" )
                 .viewer( new TextFieldViewer() )
                 .model( new Number2StringTransform(
@@ -93,21 +109,6 @@ public class TopicPage {
         ui.body.add( form.newField().label( "Farbe" )
                 .viewer( new ColorPickerViewer() )
                 .model( new PropertyModel<>( state.topic.color ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
-        ui.body.add( form.newField() //.label( "Beschreibung" )
-                .model( new PropertyModel<>( state.topic.description ) )
-                .viewer( new TextFieldViewer().configure( (TextField t) -> {
-                    t.multiline.set( true );
-                    t.type.set( Type.MARKDOWN );
-                }))
-                .create()
-                .lc( RowConstraints.height( 100 ) ) );
-
-        ui.body.add( form.newField().label( "Darstellung" )
-                .viewer( new SelectViewer( TopicTemplate.availableNames() ) )
-                .model( new PropertyModel<>( state.topic.topicTemplateName ) )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
@@ -136,6 +137,9 @@ public class TopicPage {
                 });
             });
         }});
+
+        // help
+        HelpPage.addAction( TopicPage.class, site );
         return ui;
     }
 

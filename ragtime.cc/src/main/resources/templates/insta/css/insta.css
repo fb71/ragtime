@@ -1,5 +1,5 @@
 /***
- * Settings of the fb71 template.
+ * Styles of the insta template.
  */
 :root {
    --bs-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
@@ -61,7 +61,7 @@ a:hover {
     width: 100%;
     height: 100%;
     border-radius: 100px;
-    //border: 2px solid #cdcdcd;
+    /*border: 2px solid #cdcdcd;*/
 }
 
 .ITopics {
@@ -96,6 +96,17 @@ a:hover {
     /* for inset shadow */
     z-index: -1;
     position: relative;
+}
+
+.ITopicBio {
+    color: var(--common-accent-color);
+    line-height: 1.2;
+}
+.ITopicBio p, dl, ol, ul {
+    margin-bottom: 0px;
+}
+.ITopicBio h1, h2, h3, h4, h5 {
+    margin-bottom: 0.2em;
 }
 
 .IContent {

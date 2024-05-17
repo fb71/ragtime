@@ -6,7 +6,7 @@
 <#--
   The main page layout. 
 -->
-<#macro layout title pageclass>
+<#macro layout title pageClass="IHome" hideTopicBio=false>
 <html>
 <head>
     <title>${title} - ${config.page.title}</title>
@@ -16,7 +16,7 @@
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
-    <link href="css/insta.css" rel="stylesheet"/>
+    <link href="insta/css/insta.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
 
@@ -24,7 +24,7 @@
     <script src="common/js/common.js" type="text/javascript"></script>
 </head>
 
-<body class="${pageclass}">
+<body class="${pageClass}">
     <#-- Page header -->
     <header class="IHeader IBgImage" style="background-image: url(<@c.mediaUrl name="Raumfoto.jpg"/>)">
         <div class="IBgImage container" style="height:100%">
@@ -33,9 +33,9 @@
             </@c.editable>
             <#-- Face -->
                 <div class="IFace">
-            <@c.editable msg="page.title">
+                  <@c.editable msg="page.title">
                     <img class="IFaceBordered" src="media/RikeRingeisCoaching.jpg"></img>
-            </@c.editable>
+                  </@c.editable>
                 </div>
             </div>
         </div>
@@ -59,6 +59,14 @@
         </div>
         </div>
     </div>
+
+    <#if !hideTopicBio>
+        <@c.editable msg="topic.${topic.id}">
+          <div class="ITopicBio container">
+            ${topic.description}
+          </div>
+        </@c.editable>
+    </#if>
     
     <#-- Content -->
     <div class="IContent container">

@@ -4,7 +4,7 @@
 <#--
   Page/Body 
  -->
-<@page.layout title="Tiles" pageclass="CHome">
+<@page.layout title="Tiles">
     <div class="ITiles row row-cols-3">
         <#list articles?sequence?sort_by("modified")?reverse as article>
             <@c.editable msg="article.${article.id}">
