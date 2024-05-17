@@ -46,6 +46,7 @@ import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.AssociationModel;
 import ragtime.cc.EntityTransform;
+import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.media.MediasPage.MediaListItem;
 import ragtime.cc.model.Article;
@@ -99,7 +100,7 @@ public class ArticlePage {
                 .lc( RowConstraints.height( 35 ) )
                 .tooltip.set( "Das Topic dieses Textes" ) );
 
-        ui.body.add( form.newField().label( "Titel" )
+        ui.body.add( form.newField().label( "Name" )
                 .model( new PropertyModel<>( state.article.$().title ) )
                 .viewer( new TextFieldViewer() )
                 .create()
@@ -183,6 +184,8 @@ public class ArticlePage {
             form.subscribe( ev -> updateEnabled.run() );
             state.medias.subscribe( ev -> updateEnabled.run() );
         }});
+        // help
+        HelpPage.addAction( ArticlePage.class, site );
         return ui;
     }
 
