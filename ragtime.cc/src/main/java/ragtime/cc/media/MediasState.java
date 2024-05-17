@@ -18,7 +18,6 @@ import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
-import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -91,19 +90,11 @@ public class MediasState
 
     @State.Action
     public Promise<Submitted> createMediaAction( FileUpload.File f ) {
-        return uow.query( MediaEntity.class )
-                .where( Expressions.eq( MediaEntity.TYPE.name, f.name() ) ).executeCollect()
-                .map( rs -> {
-                    Assert.that( rs.size() <= 1 );
-                    var entity = !rs.isEmpty()
-                            ? rs.get( 0 )
-                            : uow.createEntity( MediaEntity.class, proto -> {
-                                MediaEntity.defaults().accept( proto );
-                                proto.name.set( f.name() );
-                                proto.mimetype.set( f.mimetype() );
-                            });
-                    f.copyInto( entity.out() );
-                    return entity;
+        return MediaEntity.getOrCreate( uow, f.name() )
+                .map( media -> {
+                    media.mimetype.set( f.mimetype() );
+                    f.copyInto( media.out() );
+                    return media;
                 })
                 .then( entity -> {
                     return uow.submit();

@@ -13,8 +13,6 @@
  */
 package ragtime.cc.article;
 
-import java.io.IOException;
-
 import org.polymap.model2.Entity;
 import org.polymap.model2.ManyAssociation;
 
@@ -77,27 +75,21 @@ public class ArticleEditState
 
     @State.Action
     public void createMediaAction( File uploaded ) {
-        uow.createEntity( MediaEntity.class, proto -> {
-            try {
-                MediaEntity.defaults().accept( proto );
-                proto.name.set( uploaded.name() );
-                proto.mimetype.set( uploaded.mimetype() );
-                uploaded.copyInto( proto.out() );
-
-                article.get().medias.add( proto );
-            }
-            catch (IOException e) {
-                // XXX
-                throw new RuntimeException( e );
-            }
+        MediaEntity.getOrCreate( uow, uploaded.name() ).onSuccess( media -> {
+            media.mimetype.set( uploaded.mimetype() );
+            uploaded.copyInto( media.out() );
+            article.get().medias.add( media );
         });
+
         modelChanged = true;
         medias.fireChangeEvent();
     }
 
 
     public void removeMediaAction( MediaEntity media ) {
-        uow.removeEntity( media );
+        //uow.removeEntity( media );
+        article.get().medias.remove( media );
+
         modelChanged = true;
         medias.fireChangeEvent();
     }

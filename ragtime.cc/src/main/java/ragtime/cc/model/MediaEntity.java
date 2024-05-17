@@ -40,6 +40,7 @@ import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
+import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.Assert;
 import areca.common.Promise;
@@ -75,10 +76,27 @@ public class MediaEntity
 
     public static MediaEntity TYPE;
 
+    /** */
     public static RConsumer<MediaEntity> defaults() {
         return proto -> {
             proto.permid.set( proto.cpermid.get() );
         };
+    }
+
+    /** */
+    public static Promise<MediaEntity> getOrCreate( UnitOfWork uow, String name ) {
+        return uow.query( MediaEntity.class )
+                .where( Expressions.eq( MediaEntity.TYPE.name, name ) ).executeCollect()
+                .map( rs -> {
+                    Assert.that( rs.size() <= 1 );
+                    var entity = !rs.isEmpty()
+                            ? rs.get( 0 )
+                            : uow.createEntity( MediaEntity.class, proto -> {
+                                MediaEntity.defaults().accept( proto );
+                                proto.name.set( name );
+                            });
+                    return entity;
+                });
     }
 
     // instance *******************************************
@@ -122,7 +140,6 @@ public class MediaEntity
         if (state == State.AFTER_SUBMIT) {
             thumbnails.clear();
         }
-
 //        // remove back association
 //        if (state == State.AFTER_REMOVED) {
 //            article().onSuccess( articles -> articles.forEach( article -> {
