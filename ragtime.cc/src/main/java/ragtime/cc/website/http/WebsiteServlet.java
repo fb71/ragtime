@@ -54,39 +54,15 @@ public class WebsiteServlet
 
     private static final String ATTR_SESSION = "ragtime.cc.website.session";
 
+    /** */
+    private static volatile String etag = "\"" + System.currentTimeMillis() + "\"";
 
-    protected void error( Throwable e, HttpServletResponse resp ) {
-        try (var out = resp.getWriter()) {
-            if (e instanceof TemplateNotFoundException) {
-                LOG.warn( "Template not found: %s", e.toString() );
-                //out.write( "Unter dieser Adresse gibt es nichts." );
-
-                // catch old atlas/polymap customers
-                out.write( "<!DOCTYPE HTML>\n"
-                        + "<html>\n"
-                        + "    <head>\n"
-                        + "        <meta charset=\"UTF-8\">\n"
-                        + "        <meta http-equiv=\"refresh\" content=\"5; url=https://fb71.org/\">\n"
-                        + "        <title>Page does not exist</title>\n"
-                        + "    </head>\n"
-                        + "    <body style=\"font-family: sans-serif;\">\n"
-                        + "        <h1>Page does not exist</h1>\n"
-                        + "        <h3>Your are redirected to: <a href='https://fb71.org/'>fb71.org</a></h3>\n"
-                        + "    </body>\n"
-                        + "</html>" );
-            }
-            else {
-                resp.setStatus( 500 );
-                out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden.\n\n" );
-                out.write( e.toString() );
-
-                LOG.warn( "Error while processing: %s", e.toString() );
-                Platform.rootCause( e ).printStackTrace( System.err );
-            }
-        }
-        catch (IOException ee) {
-            ee.printStackTrace( System.err );
-        }
+    /**
+     *
+     */
+    public static void clearCache() {
+        LOG.info( "FLUSHING CACHES" );
+        etag = "\"" + System.currentTimeMillis() + "\"";
     }
 
 
@@ -94,23 +70,34 @@ public class WebsiteServlet
     protected void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException {
         try {
             var t = Timer.start();
-            var session = new Session();
 
-            ThreadBoundSessionScoper.instance().bind( session, __ -> {
-                var eventloop = EventLoop.create();
-                Session.setInstance( eventloop );
-                eventloop.enqueue( "website request", () -> {
-                    try {
-                        process( req, resp );
-                    }
-                    catch (Exception e) {
-                        error( e, resp );
-                    }
-                }, 0 );
-                eventloop.execute( FULLY );
-            });
+            resp.setHeader( "Etag", etag );
 
-            session.dispose();
+            // check etag -> 304
+            var ifNoneMatch = req.getHeader(  "If-None-Match" );
+            if (etag.equals( ifNoneMatch )) {
+                LOG.debug( "304: %s", req.getPathInfo() );
+                resp.setStatus( HttpServletResponse.SC_NOT_MODIFIED );
+            }
+            // no cache
+            else {
+                var session = new Session();
+                ThreadBoundSessionScoper.instance().bind( session, __ -> {
+                    var eventloop = EventLoop.create();
+                    Session.setInstance( eventloop );
+                    eventloop.enqueue( "website request", () -> {
+                        try {
+                            process( req, resp );
+                        }
+                        catch (Exception e) {
+                            error( e, resp );
+                        }
+                    }, 0 );
+                    eventloop.execute( FULLY );
+                });
+
+                session.dispose();
+            }
             LOG.warn( "%s: %s - %s", resp.getStatus(), req.getPathInfo(), t.elapsedHumanReadable() );
         }
         catch (Exception e) {
@@ -130,8 +117,6 @@ public class WebsiteServlet
             this.path = parts;
         }};
         request.uow = ContentRepo.waitFor( permid ).newUnitOfWork();
-
-        //LOG.info( "Path: %s", Arrays.toString( parts ) );
 
         request.uow.query( TemplateConfigEntity.class ).singleResult()
                 .then( config -> {
@@ -169,6 +154,41 @@ public class WebsiteServlet
                 .waitForResult();
 
         request.uow.close();
+    }
+
+
+    protected void error( Throwable e, HttpServletResponse resp ) {
+        try (var out = resp.getWriter()) {
+            if (e instanceof TemplateNotFoundException) {
+                LOG.warn( "Template not found: %s", e.toString() );
+                //out.write( "Unter dieser Adresse gibt es nichts." );
+
+                // catch old atlas/polymap customers
+                out.write( "<!DOCTYPE HTML>\n"
+                        + "<html>\n"
+                        + "    <head>\n"
+                        + "        <meta charset=\"UTF-8\">\n"
+                        + "        <meta http-equiv=\"refresh\" content=\"5; url=https://fb71.org/\">\n"
+                        + "        <title>Page does not exist</title>\n"
+                        + "    </head>\n"
+                        + "    <body style=\"font-family: sans-serif;\">\n"
+                        + "        <h1>Page does not exist</h1>\n"
+                        + "        <h3>Your are redirected to: <a href='https://fb71.org/'>fb71.org</a></h3>\n"
+                        + "    </body>\n"
+                        + "</html>" );
+            }
+            else {
+                resp.setStatus( 500 );
+                out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden.\n\n" );
+                out.write( e.toString() );
+
+                LOG.warn( "Error while processing: %s", e.toString() );
+                Platform.rootCause( e ).printStackTrace( System.err );
+            }
+        }
+        catch (IOException ee) {
+            ee.printStackTrace( System.err );
+        }
     }
 
 }

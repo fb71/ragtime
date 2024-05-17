@@ -25,6 +25,7 @@ import areca.common.event.EventListener;
 import areca.common.event.EventManager;
 import areca.common.event.EventManager.EventHandlerInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.website.http.WebsiteServlet;
 
 /**
  *
@@ -51,6 +52,9 @@ public abstract class Common
         }
         if (state == State.BEFORE_SUBMIT && status() != EntityStatus.REMOVED ) {
             modified.set( new Date() );
+
+            // XXX brute force
+            WebsiteServlet.clearCache();
         }
         // XXX this send ALL lifecycle events - although we are just using AFTER_SUBMIT;
         // except for REMOVE, which we need because there is no other way to find out (after submit);
