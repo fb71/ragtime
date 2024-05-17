@@ -184,6 +184,7 @@ public class ArticlePage {
             form.subscribe( ev -> updateEnabled.run() );
             state.medias.subscribe( ev -> updateEnabled.run() );
         }});
+
         // help
         HelpPage.addAction( ArticlePage.class, site );
         return ui;
@@ -195,7 +196,7 @@ public class ArticlePage {
         Platform.schedule( 2000, () -> null )
                 .then( __ -> {
                     return state.uow.query( Article.class )
-                            .orderBy( Article.TYPE.title, Order.ASC )
+                            //.orderBy( Article.TYPE.title, Order.ASC ) // XXX newly created Article
                             .executeCollect();
                 })
                 .then( rs -> {

@@ -39,6 +39,7 @@ import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.model.ListModelBase;
 import areca.ui.viewer.transform.Number2StringTransform;
+import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.EntityCompositeListModel;
 import ragtime.cc.article.PropertyModel;
@@ -276,6 +277,9 @@ public class TemplateConfigPage {
                 site.createPage( new EditCssPage() ).open();
             });
         }});
+
+        // help
+        HelpPage.addAction( TemplateConfigPage.class, site );
         return ui;
     }
 

@@ -49,6 +49,15 @@ Im laufenden Text gehen folgende Formatierungen:
 2. ein weiterer Punkt
 </pre>
 
-### Externe Links
+### Links
 
-\[Hier geht es zu Google\](https:\\\\google.de)
+Links werden in der folgenden Form geschrieben: \[*Text*\](*Ziel des Links*)
+
+Für **interne** Ziele, also zum Beispiel Beiträge, kann beim Bearbeiten des Textes eine **Hilfe** aufgerufen werden. Dazu benutzt man die Tastenkombination:
+
+* Strg + Space
+
+#### Link Beispiele
+
+* \[Hier geht es zu Google\](https:\\\\google.de) -> [Hier geht es zu Google](https:\\\\google.de)
+* ...
