@@ -113,8 +113,8 @@ public class HelpPage {
             ui.body.add( new Button() {{
                 lc( RowConstraints.height( 40 ) );
                 type.set( Button.Type.SUBMIT );
-                label.set( "Hab ich verstanden!" );
-                tooltip.set( "Diesen Hilfetext nicht mehr automatisch einblenden" );
+                label.set( "Ok, kann losgehen!" );
+                tooltip.set( "Diesen Hilfetext beim Start nicht mehr automatisch einblenden" );
                 events.on( EventType.SELECT, ev -> {
                     account.helpSeen.set( true );
                     account.context.getUnitOfWork().submit().onSuccess( __ -> {

@@ -2,13 +2,13 @@
 
 Hier kannst du deine Web-Seite bearbeiten.
 
-Wenn du diese Seite schließt, dann erscheint deine Web-Seite im **Bearbeiten-Modus**.
+Wenn du unten auf den Knopf drückst oder dieses Fenster schließt, dann erscheint deine Web-Seite im **Bearbeiten-Modus**.
 
 ## Hilfe <span class="material-icons icon" style="vertical-align: top;">help</span>
 
 Dieses Hilfetext kannst du immer wieder aufrufen. **Oben rechts** findest du meist einen Knopf mit einem **Fragezeichen**. Dieser zeigt die Hilfe für die jeweilige Aktion.
 
-## Bearbeiten-Modus
+## Bearbeiten
 
 Du kannst alle Elemente der Web-Seite **bearbeiten**, indem du **etwas länger** drückst oder klicks. **Überschriften, Navigation, Texte, Bilder**... alles kann auf diese Weise bearbeitet werden.
 
