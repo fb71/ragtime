@@ -7,8 +7,8 @@
 <@page.layout title="Tiles">
     <div class="ITiles row row-cols-3">
         <#list articles?sequence?sort_by("modified")?reverse as article>
-            <@c.editable msg="article.${article.id}">
             <div class="ITile IClickable col" onclick="location.href='${topic.urlPart}?a=${article.id}';">
+            <@c.editable msg="article.${article.id}">
                 <#if article.medias?sequence?size == 0>
                     ${article.content}
                 <#else>
@@ -16,8 +16,8 @@
                         <img src="media/${media.name}?w=300&h=300" class="img-fluid" alt="${media.name}"/>
                     </#list>
                 </#if>
-            </div>
             </@c.editable>
+            </div>
         </#list>
     </div>
 </@page.layout>
