@@ -13,6 +13,9 @@
  */
 package ragtime.cc.article;
 
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
+
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -47,6 +50,12 @@ public class TopicEditState
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
+    }
+
+
+    public Promise<Submitted> deleteAction() {
+        uow.removeEntity( topic );
+        return uow.submit();
     };
 
 }

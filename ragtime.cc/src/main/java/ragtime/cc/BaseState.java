@@ -95,16 +95,4 @@ public abstract class BaseState<P> {
         return uow.submit(); //.onSuccess( __ -> disposeAction() );
     }
 
-//    @State.Action
-//    public StateAction<Void> submitAction = new StateAction<>() {
-//        @Override
-//        public boolean canRun() {
-//            return edited && valid;
-//        }
-//        @Override
-//        public void run( Void arg ) {
-//            uow.submit(); //.onSuccess( __ -> disposeAction() );
-//        }
-//    };
-
 }

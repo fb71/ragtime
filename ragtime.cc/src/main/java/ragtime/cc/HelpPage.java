@@ -35,7 +35,6 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.pageflow.Pageflow;
-import freemarker.template.TemplateModelException;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.website.template.Markdown;
 
@@ -100,7 +99,7 @@ public class HelpPage {
                     var html = Markdown.render( md );
                     content.set( html );
                 }
-                catch (TemplateModelException | IOException e) {
+                catch (IOException e) {
                     throw new RuntimeException( e );
                 }
             }});

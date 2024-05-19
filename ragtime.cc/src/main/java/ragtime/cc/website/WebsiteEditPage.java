@@ -143,9 +143,8 @@ public class WebsiteEditPage {
         }});
         // help
         HelpPage.addAction( WebsiteEditPage.class, site );
-        //
+        // accounts
         if (state.account.isAdmin.get()) {
-            // action: settings
             site.actions.add( new Action() {{
                 order.set( 20 );
                 icon.set( "manage_accounts" );

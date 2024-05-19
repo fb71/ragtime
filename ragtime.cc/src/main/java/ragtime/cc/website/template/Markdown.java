@@ -25,7 +25,6 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import freemarker.template.TemplateModelException;
 
 /**
  * Markdown parse and render functionality.
@@ -39,10 +38,13 @@ public class Markdown {
     /* Both are thread-safe */
     public static Parser         parser = Parser.builder().build();
 
-    public static HtmlRenderer   renderer = HtmlRenderer.builder().attributeProviderFactory( new AttributeFactory() ).build();
+    public static HtmlRenderer   renderer = HtmlRenderer.builder()
+            .attributeProviderFactory( new AttributeFactory() )
+            .escapeHtml( false )
+            .build();
 
 
-    public static String render( String markdown ) throws TemplateModelException {
+    public static String render( String markdown ) {
         Node doc = parser.parse( markdown );
         return renderer.render( doc );
     }

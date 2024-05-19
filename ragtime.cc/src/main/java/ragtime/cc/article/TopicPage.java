@@ -13,11 +13,14 @@
  */
 package ragtime.cc.article;
 
+import static java.lang.String.format;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
@@ -32,6 +35,7 @@ import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
+import ragtime.cc.ConfirmDialog;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.website.template.TopicTemplate;
@@ -135,6 +139,23 @@ public class TopicPage {
                 state.submitAction().onSuccess( __ -> {
                     submitBtn.enabled.set( false );
                 });
+            });
+        }});
+
+        // action: dialog
+        site.actions.add( new Action() {{
+            icon.set( UICommon.ICON_DELETE );
+            handler.set( ev -> {
+                ConfirmDialog.createAndOpen( "Topic",
+                        format( "<b>%s</b><br/><br/>Enthält %s Beiträgen. Diese werden nicht gelöscht.",
+                                state.topic.title.get(),
+                                state.topic.articles().waitForResult().get().size() ) )
+                        .size.set( Size.of( 360, 200 ) )
+                        .addDeleteAction( () -> {
+                            state.deleteAction().onSuccess( __ -> {
+                                site.close();
+                            });
+                        });
             });
         }});
 
