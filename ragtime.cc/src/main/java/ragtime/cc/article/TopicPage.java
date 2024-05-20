@@ -13,8 +13,6 @@
  */
 package ragtime.cc.article;
 
-import static java.lang.String.format;
-
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -76,7 +74,6 @@ public class TopicPage {
         form.subscribe( ev -> {
             LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
             boolean enabled = form.isChanged() && form.isValid();
-            submitBtn.icon.set( enabled ? UICommon.ICON_SAVE : "" );
             submitBtn.enabled.set( enabled );
         });
 
@@ -132,6 +129,7 @@ public class TopicPage {
         // action: submit
         site.actions.add( submitBtn = new Action() {{
             type.set( Button.Type.SUBMIT );
+            icon.set( UICommon.ICON_SAVE );
             description.set( "Speichern" );
             enabled.set( false );
             handler.set( ev -> {
@@ -142,20 +140,21 @@ public class TopicPage {
             });
         }});
 
-        // action: dialog
+        // action: delete
         site.actions.add( new Action() {{
             icon.set( UICommon.ICON_DELETE );
             handler.set( ev -> {
-                ConfirmDialog.createAndOpen( "Topic",
-                        format( "<b>%s</b><br/><br/>Enthält %s Beiträgen. Diese werden nicht gelöscht.",
-                                state.topic.title.get(),
-                                state.topic.articles().waitForResult().get().size() ) )
-                        .size.set( Size.of( 360, 200 ) )
-                        .addDeleteAction( () -> {
-                            state.deleteAction().onSuccess( __ -> {
-                                site.close();
-                            });
-                        });
+                state.topic.articles().onSuccess( articles -> {
+                    ConfirmDialog.createAndOpen( "Topic",
+                            "<b>" + state.topic.title.get() + "</b><br/><br/>" +
+                            "Enthält " + articles.size() + " Beiträge. Diese werden nicht gelöscht." )
+                            .size.set( Size.of( 360, 200 ) )
+                            .addDeleteAction( () -> {
+                                state.deleteAction().onSuccess( __ -> {
+                                    site.close();
+                                });
+                    });
+                });
             });
         }});
 

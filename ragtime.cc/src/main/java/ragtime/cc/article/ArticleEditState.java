@@ -15,6 +15,7 @@ package ragtime.cc.article;
 
 import org.polymap.model2.Entity;
 import org.polymap.model2.ManyAssociation;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Platform;
 import areca.common.Promise;
@@ -93,6 +94,12 @@ public class ArticleEditState
         modelChanged = true;
         medias.fireChangeEvent();
     }
+
+
+    public Promise<Submitted> deleteAction() {
+        uow.removeEntity( article.$() );
+        return uow.submit();
+    };
 
 
     /**

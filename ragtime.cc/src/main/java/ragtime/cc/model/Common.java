@@ -50,9 +50,10 @@ public abstract class Common
             created.set( now );
             modified.set( now );
         }
-        if (state == State.BEFORE_SUBMIT && status() != EntityStatus.REMOVED ) {
+        if (state == State.BEFORE_SUBMIT && status() != EntityStatus.REMOVED) {
             modified.set( new Date() );
-
+        }
+        if (state == State.AFTER_SUBMIT) {
             // XXX brute force
             WebsiteServlet.clearCache();
         }

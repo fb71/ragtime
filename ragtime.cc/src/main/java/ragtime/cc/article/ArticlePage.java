@@ -24,6 +24,7 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.FileUpload;
@@ -45,6 +46,7 @@ import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
 import ragtime.cc.AssociationModel;
+import ragtime.cc.ConfirmDialog;
 import ragtime.cc.EntityTransform;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
@@ -167,6 +169,7 @@ public class ArticlePage {
         // action: submit
         site.actions.add( new Action() {{
             description.set( "Speichern" );
+            icon.set( UICommon.ICON_SAVE );
             type.set( Button.Type.SUBMIT );
             enabled.set( false );
             handler.set( ev -> {
@@ -177,12 +180,26 @@ public class ArticlePage {
             });
             Runnable updateEnabled = () -> {
                 boolean _enabled = state.modelChanged || (form.isChanged() && form.isValid() );
-                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
                 this.enabled.set( _enabled );
             };
 
             form.subscribe( ev -> updateEnabled.run() );
             state.medias.subscribe( ev -> updateEnabled.run() );
+        }});
+
+        // action: delete
+        site.actions.add( new Action() {{
+            icon.set( UICommon.ICON_DELETE );
+            handler.set( ev -> {
+                ConfirmDialog.createAndOpen( "Beitrag",
+                        "<b><center>" + state.article.$().title.get() + "</center></b><br/><br/>" )
+                        .size.set( Size.of( 320, 200 ) )
+                        .addDeleteAction( () -> {
+                            state.deleteAction().onSuccess( __ -> {
+                                site.close();
+                            });
+                        });
+            });
         }});
 
         // help
