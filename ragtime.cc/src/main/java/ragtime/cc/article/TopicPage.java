@@ -20,22 +20,31 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Button;
+import areca.ui.component2.Events.EventType;
+import areca.ui.component2.FileUpload;
+import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowConstraints;
+import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
+import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
+import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.ConfirmDialog;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
+import ragtime.cc.media.MediasPage.MediaListItem;
+import ragtime.cc.model.MediaEntity;
 import ragtime.cc.website.template.TopicTemplate;
 
 /**
@@ -71,19 +80,62 @@ public class TopicPage {
         ui.init( parent ).title.set( "Topic" );
 
         form = new Form();
-        form.subscribe( ev -> {
-            LOG.info( "updateEnabled(): changed = %s, valid = %s", form.isChanged(), form.isValid() );
-            boolean enabled = form.isChanged() && form.isValid();
-            submitBtn.enabled.set( enabled );
-        });
 
         ui.body.layout.set( uic.verticalL().fillHeight( true ) );
 
-        ui.body.add( form.newField().label( "Titel" )
-                .viewer( new TextFieldViewer() )
-                .model( new PropertyModel<>( state.topic.title ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
+        // title / color
+        ui.body.add( new UIComposite() {{
+            lc( RowConstraints.height( 35 ) );
+            layout.set( RowLayout.filled().spacing( uic.space ) );
+
+            add( form.newField().label( "Titel" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new PropertyModel<>( state.topic.title ) )
+                    .create() );
+
+            add( form.newField() //.label( "Farbe" )
+                    .viewer( new ColorPickerViewer() )
+                    .model( new PropertyModel<>( state.topic.color ) )
+                    .create()
+                    .lc( RowConstraints.width( 50 ) ) );
+        }});
+
+        // media
+        ui.body.add( new UIComposite() {{
+            lc( RowConstraints.height( 110 ) );
+            layout.set( RowLayout.filled().vertical().spacing( 5 ) );
+
+            // upload
+            add( new UIComposite() {{
+                lc( RowConstraints.height( 35 ) );
+                layout.set( RowLayout.filled().spacing( uic.space ) );
+                add( new FileUpload() {{
+                    events.on( EventType.UPLOAD, ev -> {
+                        LOG.warn( "Uploaded: %s", data.get().name() );
+                        state.createMediaAction( data.get() );
+                    });
+                }});
+            }});
+
+            // medias
+            add( new ScrollableComposite() {{
+                layout.set( FillLayout.defaults() );
+
+                add( new ViewerContext<>()
+                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                            return new MediaListItem( media, () -> state.removeMediaAction( media ) );
+                        }) {{
+                            oddEven.set( true );
+                            spacing.set( 0 );
+                            lines.set( true );
+                            onSelect.set( media -> {
+                                LOG.info( "SELECT: %s", media );
+                            });
+                        }})
+                        .model( state.medias )
+                        .createAndLoad() );
+            }});
+        }});
 
         ui.body.add( form.newField() //.label( "Beschreibung" )
                 .model( new PropertyModel<>( state.topic.description ) )
@@ -104,12 +156,6 @@ public class TopicPage {
                 .viewer( new TextFieldViewer() )
                 .model( new Number2StringTransform(
                         new PropertyModel<>( state.topic.order ) ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
-        ui.body.add( form.newField().label( "Farbe" )
-                .viewer( new ColorPickerViewer() )
-                .model( new PropertyModel<>( state.topic.color ) )
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
@@ -138,6 +184,13 @@ public class TopicPage {
                     submitBtn.enabled.set( false );
                 });
             });
+            Runnable updateEnabled = () -> {
+                boolean _enabled = state.medias.modified() || (form.isChanged() && form.isValid() );
+                this.enabled.set( _enabled );
+            };
+
+            form.subscribe( ev -> updateEnabled.run() );
+            state.medias.subscribe( ev -> updateEnabled.run() );
         }});
 
         // action: delete

@@ -99,7 +99,7 @@ public class ErrorPage {
             lc( RowConstraints.height( 190 ) );
             multiline.set( true );
             content.set( "Lieber Falko, \n\n"
-                    + "alles ist ganz fürchterlich!\n"
+                    + "alles ist ganz fürchterlich! "
                     + "Bevor der Fehler kam, habe ich gerade folgendes gemacht:\n\n"
                     + "...\n\n" );
             events.on( EventType.TEXT, ev -> {/*just trigger client send*/} );

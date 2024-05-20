@@ -13,13 +13,9 @@
  */
 package ragtime.cc.article;
 
-import org.polymap.model2.Entity;
-import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
-import areca.common.Platform;
 import areca.common.Promise;
-import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -27,9 +23,7 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.component2.FileUpload.File;
 import areca.ui.pageflow.Page;
 import areca.ui.statenaction.State;
-import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.Model;
-import areca.ui.viewer.model.ModelBaseImpl;
 import ragtime.cc.BaseState;
 import ragtime.cc.UICommon;
 import ragtime.cc.model.Article;
@@ -56,7 +50,7 @@ public class ArticleEditState
     public Model<Article>   article = new EntityModel<>();
 
     @State.Model
-    public AssocListModel<MediaEntity> medias;
+    public EntityAssocListModel<MediaEntity> medias;
 
     public boolean          modelChanged;
 
@@ -65,7 +59,7 @@ public class ArticleEditState
     public void initAction() {
         super.initAction();
 
-        medias = new AssocListModel<>( article.get().medias );
+        medias = new EntityAssocListModel<>( article.get().medias );
 
         pageflow.create( page = new ArticlePage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
@@ -99,39 +93,6 @@ public class ArticleEditState
     public Promise<Submitted> deleteAction() {
         uow.removeEntity( article.$() );
         return uow.submit();
-    };
-
-
-    /**
-     *
-     */
-    public static class AssocListModel<V extends Entity>
-            extends ModelBaseImpl
-            implements LazyListModel<V> {
-
-        protected ManyAssociation<V> assoc;
-
-        public AssocListModel( ManyAssociation<V> assoc ) {
-            this.assoc = assoc;
-        }
-
-        @Override
-        public Promise<Integer> count() {
-            throw new RuntimeException( "not implemented." );
-        }
-
-        @Override
-        public Promise<Opt<V>> load( int first, int max ) {
-            LOG.info( "Load: %s", assoc.info().getName() );
-            return assoc.fetch()
-                    // XXX ManyAssociation.fetch() does not seem to return absent as last element
-                    .join( Platform.schedule( 1000, () -> Opt.absent() ) );
-        }
-
-        @Override
-        public void fireChangeEvent() {
-            super.fireChangeEvent();
-        }
     }
 
 }

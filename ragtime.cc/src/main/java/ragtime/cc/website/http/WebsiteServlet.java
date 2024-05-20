@@ -130,7 +130,7 @@ public class WebsiteServlet
                     }
                     // media
                     else if (parts.length >= 2 && parts[1].equals( MediaContentProvider.PATH )) {
-                        request.path = ArrayUtils.removeAll( parts, 0 , 1);
+                        request.path = ArrayUtils.removeAll( parts, 0 , 1 );
                         return new MediaContentProvider().process( request );
                     }
                     // template

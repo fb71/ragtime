@@ -46,12 +46,18 @@
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
             <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto">
+                <div class="ITopic col-auto"> <#-- style="background-color: ${topic.color};"-->
                 <@c.editable msg="topic.${topic.id}">
                   <div onclick="location.href='${topic.urlPart}';">
-                    <img src="media/bubble+R01_klein.png"></img>
-                    <br/>
-                    ${topic.title}
+
+                      <#if topic.medias?sequence?size gt 0>
+                        <#assign media = topic.medias?sequence?first>
+                        <img src="media/${media.id}?w=50&h=50" class="img-fluid" alt="${media.name}"/>
+                      </#if>
+                      <#-- img src="media/bubble+R01_klein.png"></img-->
+                      
+                      <br/>
+                      ${topic.title}
                   </div>
                 </@c.editable>
                 </div>

@@ -16,7 +16,7 @@ package ragtime.cc.website;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
-import areca.common.Platform;
+import areca.common.event.EventCollector;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -91,11 +91,12 @@ public class WebsiteEditPage {
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
+            var throttle = new EventCollector<>( 500 );
             EventManager.instance()
                     .subscribe( (EntityLifecycleEvent ev) -> {
                         LOG.info( "Submitted: %s", ev.getSource() );
-                        reload();
-                        Platform.schedule( 750, () -> {
+                        throttle.collect( ev, evs -> {
+                            reload();
                             if (disposableChildState != null && !disposableChildState.isDisposed()) {
                                 disposableChildState.disposeAction();
                             }
