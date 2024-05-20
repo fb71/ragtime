@@ -24,6 +24,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.FileUpload;
@@ -42,6 +43,7 @@ import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerBuilder;
 import areca.ui.viewer.ViewerContext;
+import ragtime.cc.ConfirmDialog;
 import ragtime.cc.UICommon;
 import ragtime.cc.model.MediaEntity;
 
@@ -119,7 +121,13 @@ public class MediasPage {
 
                 medias = new ViewerContext()
                         .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
-                            return new MediaListItem( media, () -> state.removeMediaAction( media ) );
+                            return new MediaListItem( media, () -> {
+                                ConfirmDialog.createAndOpen( "Media", "<b><center>" + media.name.get() + "</center></b>" )
+                                        .size.set( Size.of( 320, 200 ) )
+                                        .addDeleteAction( () -> {
+                                            state.deleteMediaAction( media );
+                                        });
+                            });
                         }) {{
                             oddEven.set( true );
                             spacing.set( 0 );
@@ -179,7 +187,8 @@ public class MediasPage {
             }
             add( new Button() {{
                 lc( RowConstraints.width( 40 ));
-                icon.set( "close" );
+                icon.set( "close" ); // XXX UICommon.ICON_DELETE );
+                tooltip.set( "Löschen" );
                 events.on( EventType.SELECT, ev -> {
                     removeAction.run();
                 });

@@ -103,7 +103,7 @@ public class MediasState
 
 
     @State.Action
-    public Promise<Submitted> removeMediaAction( MediaEntity entity ) {
+    public Promise<Submitted> deleteMediaAction( MediaEntity entity ) {
         uow.removeEntity( entity );
         return uow.submit();
     }
