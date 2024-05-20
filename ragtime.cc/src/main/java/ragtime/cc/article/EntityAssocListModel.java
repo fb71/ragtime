@@ -19,6 +19,8 @@ import org.polymap.model2.ManyAssociation;
 import areca.common.Platform;
 import areca.common.Promise;
 import areca.common.base.Opt;
+import areca.common.log.LogFactory;
+import areca.common.log.LogFactory.Log;
 import areca.ui.viewer.model.LazyListModel;
 import areca.ui.viewer.model.ModelBaseImpl;
 
@@ -30,6 +32,8 @@ import areca.ui.viewer.model.ModelBaseImpl;
 public class EntityAssocListModel<V extends Entity>
         extends ModelBaseImpl
         implements LazyListModel<V> {
+
+    private static final Log LOG = LogFactory.getLog( EntityAssocListModel.class );
 
     protected ManyAssociation<V> assoc;
 
@@ -50,7 +54,7 @@ public class EntityAssocListModel<V extends Entity>
 
     @Override
     public Promise<Opt<V>> load( int first, int max ) {
-        ArticleEditState.LOG.info( "Load: %s", assoc.info().getName() );
+        LOG.info( "Load: %s", assoc.info().getName() );
         return assoc.fetch()
                 // XXX ManyAssociation.fetch() does not seem to return absent as last element
                 .join( Platform.schedule( 1000, () -> Opt.absent() ) );
