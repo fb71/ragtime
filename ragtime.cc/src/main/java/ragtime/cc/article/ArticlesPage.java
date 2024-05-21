@@ -112,15 +112,6 @@ public class ArticlesPage {
         ui.body.add( new UIComposite() {{
             lc( RowConstraints.height( 30 ) );
             layout.set( RowLayout.filled().spacing( 20 ) );
-//            add( new Button() {{
-//                lc( RowConstraints.width( 180 ) );
-//                label.set( "Web-Seite bearbeiten..." );
-//                tooltip.set( "Web-Seite durch Click auf einzelne Elemente bearbeiten" );
-//                events.on( EventType.SELECT, ev -> {
-//                    // XXX
-//                    state.site.createState( new WebsiteEditState() ).activate();
-//                });
-//            }});
             add( new UIComposite() );
             add( new Link() {{
                 lc( RowConstraints.width( 150 ) );
@@ -172,15 +163,6 @@ public class ArticlesPage {
                 content.set( article.title.get() + "<br/>" +
                         "<span style=\"font-size:10px; color:#808080;\">" + df.format( article.modified.get() ) + "</span>" );
             }});
-//            Platform.schedule( 2000, () -> {
-//                var comments = RandomUtils.nextInt( 1, 8 );
-//                if (comments < 3) {
-//                    addDecorator( new Badge() {{
-//                        content.set( "" + comments );
-//                        tooltip.set( "Ungelesene Kommentare: " + comments );
-//                    }});
-//                }
-//            });
         }
     }
 

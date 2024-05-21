@@ -74,10 +74,10 @@ public class ArticleEditState
             media.mimetype.set( uploaded.mimetype() );
             uploaded.copyInto( media.out() );
             article.get().medias.add( media );
-        });
 
-        modelChanged = true;
-        medias.fireChangeEvent();
+            modelChanged = true;
+            medias.fireChangeEvent();
+        });
     }
 
 

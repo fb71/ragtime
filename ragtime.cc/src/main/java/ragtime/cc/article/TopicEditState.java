@@ -16,7 +16,6 @@ package ragtime.cc.article;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Assert;
-import areca.common.Platform;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -76,8 +75,9 @@ public class TopicEditState
             uploaded.copyInto( media.out() );
             topic.medias.add( media );
             Assert.that( topic.medias.fetchCollect().waitForResult().get().size() > 0 );
+
+            medias.fireChangeEvent();
         });
-        Platform.async( () -> medias.fireChangeEvent() );
     }
 
 

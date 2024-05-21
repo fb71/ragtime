@@ -28,7 +28,6 @@ import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.FileUpload;
-import areca.ui.component2.FileUpload.File;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
@@ -81,9 +80,6 @@ public class ArticlePage {
 
     private Form                form;
 
-    private Button              uploadBtn;
-
-    private File                uploaded;
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
@@ -125,21 +121,7 @@ public class ArticlePage {
             add( new FileUpload() {{
                 events.on( EventType.UPLOAD, ev -> {
                     LOG.warn( "Uploaded: %s", data.get().name() );
-                    uploaded = data.get();
-                    uploadBtn.enabled.set( true );
-                });
-            }});
-
-            uploadBtn = add( new Button() {{
-                layoutConstraints.set( RowConstraints.width( 80 ) );
-                //label.set( "Upload" );
-                icon.set( "add" );
-                tooltip.set( "Das ausgewählte File neu anlegen" );
-                type.set( Type.SUBMIT );
-                enabled.set( false );
-                events.on( EventType.SELECT, ev -> {
-                    state.createMediaAction( uploaded );
-                    enabled.set( false );
+                    state.createMediaAction( data.get() );
                 });
             }});
         }});
