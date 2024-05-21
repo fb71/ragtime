@@ -67,7 +67,6 @@ public class EntityAssocListModel<V extends Entity>
     @Override
     public void fireChangeEvent() {
         modified = true;
-
         super.fireChangeEvent();
     }
 
