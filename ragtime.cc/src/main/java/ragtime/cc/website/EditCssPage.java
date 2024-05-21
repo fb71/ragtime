@@ -13,6 +13,7 @@
  */
 package ragtime.cc.website;
 
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -96,6 +97,7 @@ public class EditCssPage {
                 form.submit();
                 state.submitAction().onSuccess( __ -> {
                     enabled.set( false );
+                    Platform.schedule( 100, () -> site.close() );
                 });
             });
             form.subscribe( ev -> {

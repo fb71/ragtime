@@ -38,6 +38,10 @@ window.addLongPressListener = function( elm, callback) {
     // onEnd
     let onEnd = (ev) => {
         log( "onEnd" );
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
         if (timer) {
             log( "dispatchEvent(click): " + ev.target );
             ev.target.dispatchEvent( new MouseEvent( "click", {
@@ -48,6 +52,7 @@ window.addLongPressListener = function( elm, callback) {
         }
         clearTimeout( timer );
         timer = null;
+        return false;
     };
     elm.addEventListener( 'touchend', onEnd );
     elm.addEventListener( 'mouseup', onEnd );
@@ -83,5 +88,5 @@ window.addLongPressListener = function( elm, callback) {
 
 
 function log( msg ) {
-    //window.console.log( "LongPress: " + msg );
+    window.console.log( "LongPress: " + msg );
 }

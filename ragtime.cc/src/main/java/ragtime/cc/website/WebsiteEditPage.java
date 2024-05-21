@@ -92,7 +92,7 @@ public class WebsiteEditPage {
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
-            var throttle = new EventCollector<>( 250 );
+            var throttle = new EventCollector<>( 100 );
             EventManager.instance()
                     .subscribe( (EntityLifecycleEvent ev) -> {
                         LOG.info( "Submitted: %s", ev.getSource() );
@@ -100,6 +100,7 @@ public class WebsiteEditPage {
                             reload();
 
                             Platform.schedule( 500, () -> {
+                                // FIXME check if this state/page is actually top (edit CSS!)
                                 if (disposableChildState != null && !disposableChildState.isDisposed()) {
                                     disposableChildState.disposeAction();
                                 }
@@ -145,6 +146,12 @@ public class WebsiteEditPage {
             icon.set( "topic" );
             description.set( "Topics" );
             handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
+        }});
+        // action: refresh
+        site.actions.add( new Action() {{
+            icon.set( "refresh" );
+            description.set( "Web-Seite neu laden" );
+            handler.set( ev -> iframe.reload() );
         }});
         // help
         HelpPage.addAction( WebsiteEditPage.class, site );

@@ -82,7 +82,7 @@ abstract class TemplateContentProviderBase
             try (
                 var in = res.openStream();
                 var out = request.httpResponse.getOutputStream();
-            ) {
+            ){
                 IOUtils.copy( in, out, BUFFER_SIZE );
             }
             return done( true );

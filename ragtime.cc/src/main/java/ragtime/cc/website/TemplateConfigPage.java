@@ -252,7 +252,7 @@ public class TemplateConfigPage {
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{
-            order.set( 10 );
+            //order.set( 10 );
             description.set( "Speichern" );
             type.set( Button.Type.SUBMIT );
             enabled.set( false );
