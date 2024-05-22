@@ -34,7 +34,6 @@ import areca.ui.component2.IFrame.IFrameMsgEvent;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.AbsoluteLayout;
-import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
@@ -132,7 +131,7 @@ public class WebsiteEditPage {
             }});
         }
         else {
-            ui.body.layout.set( FillLayout.defaults() );
+            ui.body.layout.set( new BrowserLayout() );
             ui.body.add( iframe );
         }
 
