@@ -1,5 +1,51 @@
 /**
  */
+window.addDoubleClickListener = function( elm, callback) {
+    // long tap / right click
+    elm.addEventListener( "contextmenu", ev => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        callback( ev );
+    });
+    
+    // double click (safari iOS)
+    let timer;
+    elm.addEventListener( "click", ev => {
+        log( "click: me=" + ev.me );
+        if (ev.me) {
+            return;
+        }
+        
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        // double
+        if (timer) {
+            clearTimeout( timer );
+            timer = null;
+            callback( ev );
+        }
+        // first
+        else {
+            timer = setTimeout( () => {
+                timer = null;
+                log( "dispatchEvent(click): " + ev.target );
+                let event = new MouseEvent( "click", {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                });
+                event.me = true; // prevent cycle
+                ev.target.dispatchEvent( event );
+            }, 300 );
+        }
+    }, true ); // capture event *before* children
+}
+
+/**
+ */
 window.addLongPressListener = function( elm, callback) {
     let timer;
     let lastTouch;
@@ -88,5 +134,5 @@ window.addLongPressListener = function( elm, callback) {
 
 
 function log( msg ) {
-    window.console.log( "LongPress: " + msg );
+    //window.console.log( "LongPress: " + msg );
 }

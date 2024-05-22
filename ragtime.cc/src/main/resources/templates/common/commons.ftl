@@ -41,7 +41,7 @@
         </div>
         <script type="text/javascript">            
             var editable = document.currentScript.previousElementSibling;
-            window.addLongPressListener( editable, ev => {
+            window.addDoubleClickListener( editable, ev => {
                 window.console.log( "long press" );
                 window.top.postMessage('${msg}', '*');
             });
