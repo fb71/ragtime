@@ -100,6 +100,15 @@ public class TopicPage {
                     .lc( RowConstraints.width( 50 ) ) );
         }});
 
+        ui.body.add( form.newField() //.label( "Beschreibung" )
+                .model( new PropertyModel<>( state.topic.description ) )
+                .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                    t.multiline.set( true );
+                    t.type.set( Type.MARKDOWN );
+                }))
+                .create()
+                .lc( RowConstraints.height( 200 ) ) );
+
         // media
         ui.body.add( new UIComposite() {{
             lc( RowConstraints.height( 110 ) );
@@ -136,15 +145,6 @@ public class TopicPage {
                         .createAndLoad() );
             }});
         }});
-
-        ui.body.add( form.newField() //.label( "Beschreibung" )
-                .model( new PropertyModel<>( state.topic.description ) )
-                .viewer( new TextFieldViewer().configure( (TextField t) -> {
-                    t.multiline.set( true );
-                    t.type.set( Type.MARKDOWN );
-                }))
-                .create()
-                .lc( RowConstraints.height( 200 ) ) );
 
         ui.body.add( form.newField().label( "Darstellung" )
                 .viewer( new SelectViewer( TopicTemplate.availableNames() ) )
