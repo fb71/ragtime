@@ -17,6 +17,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
 import areca.common.Platform;
+import areca.common.base.Sequence;
 import areca.common.event.EventCollector;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
@@ -24,12 +25,15 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.Position;
+import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.IFrame;
 import areca.ui.component2.IFrame.IFrameMsgEvent;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.AbsoluteLayout;
 import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
@@ -118,9 +122,12 @@ public class WebsiteEditPage {
                 label.set( "Load..." );
                 events.on( EventType.SELECT, ev -> {
                     ui.body.components.disposeAll();
-                    ui.body.layout.set( FillLayout.defaults() );
+                    ui.body.layout.set( new BrowserLayout() );
                     ui.body.add( iframe );
                     ui.body.layout();
+
+                    // XXX attempt to hide Page header and/or browser bar
+                    //iframe.scrollIntoView.set( Vertical.TOP );
                 });
             }});
         }
@@ -193,6 +200,29 @@ public class WebsiteEditPage {
         }
         else {
             LOG.warn( "Unhandled msg: %s", ev.msg );
+        }
+    }
+
+    /**
+     *
+     */
+    public static class BrowserLayout
+                extends AbsoluteLayout {
+
+        @Override
+        public void layout( UIComposite composite ) {
+            super.layout( composite );
+            composite.clientSize.opt().ifPresent( size -> {
+                var component = Sequence.of( composite.components.get() ).single();
+
+                // on phone oversize so that browser bar and Page header can be scrolled out view
+                var height = size.width() <= 450 && size.height() <= 750
+                        ? size.height() + 110
+                        : size.height();
+
+                component.size.set( Size.of( size.width(), height ) );
+                component.position.set( Position.of( 0, 0 ) );
+            });
         }
     }
 
