@@ -12,9 +12,8 @@
                 <#if article.medias?sequence?size == 0>
                     ${article.content}
                 <#else>
-                    <#list article.medias?sequence as media>
-                        <img src="media/${media.id}?w=300&h=300" class="img-fluid" alt="${media.name}"/>
-                    </#list>
+                    <#assign media = article.medias?first>
+                    <img src="media/${media.id}?w=300&h=300" class="img-fluid" alt="${media.name}"/>
                 </#if>
             </div>
             </@c.editable>

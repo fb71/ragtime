@@ -114,6 +114,15 @@ a:hover {
     margin-top: 40px;
 }
 
+.IContent .carousel {
+    margin-bottom: 40px;
+    max-width: 380px;
+}
+
+.IContent img {
+    border-radius: 4px;
+}
+
 @media (max-width: 768px) {
   .IHeader {
     height: 120px;
@@ -137,6 +146,9 @@ a:hover {
   }
   .IContent {
     margin-top: 25px;
+  }
+  .IContent .carousel {
+    margin-bottom: 25px;
   }
 }
 
