@@ -129,6 +129,7 @@ public class MediasPage {
                                         });
                             });
                         }) {{
+                            etag.set( media -> media.modified.get() );
                             oddEven.set( true );
                             spacing.set( 0 );
                             lines.set( true );
@@ -178,11 +179,9 @@ public class MediasPage {
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    if (media.mimetype.get().startsWith( "image" )) {
-                        media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
-                            setData( bytes );
-                        });
-                    }
+                    media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                        setData( bytes );
+                    });
                 }});
             }
             add( new Button() {{

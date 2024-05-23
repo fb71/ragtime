@@ -20,12 +20,14 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import areca.common.base.Sequence;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Size;
+import areca.ui.component2.Image;
 import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
@@ -39,6 +41,7 @@ import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerContext;
+import areca.ui.viewer.model.ListModelBase;
 import ragtime.cc.HelpPage;
 import ragtime.cc.model.Article;
 
@@ -135,7 +138,8 @@ public class ArticlesPage {
             layout.set( FillLayout.defaults() );
 
             add( new ViewerContext<>()
-                    .viewer( new CompositeListViewer<Article>( (article,model) -> new ListItem( article ) ) {{
+                    .viewer( new CompositeListViewer<Article>( ListItem::new ) {{
+                        etag.set( article -> article.modified.get() );
                         lines.set( true );
                         oddEven.set( true );
                         onSelect.set( article -> {
@@ -155,13 +159,41 @@ public class ArticlesPage {
      */
     protected class ListItem extends UIComposite {
 
-        protected ListItem( Article article ) {
+        protected ListItem( Article article, ListModelBase<Article> model ) {
             lc( RowConstraints.height( 54 ));
             layout.set( RowLayout.filled().margins( 10, 10 ) );
+            // title
             add( new Text() {{
                 format.set( Format.HTML );
                 content.set( article.title.get() + "<br/>" +
                         "<span style=\"font-size:10px; color:#808080;\">" + df.format( article.modified.get() ) + "</span>" );
+            }});
+            // Topic
+            add( new Text() {{
+                format.set( Format.HTML );
+                article.topic.fetch().onSuccess( topic -> {
+                    if (topic != null) {
+                        content.set( String.format( "<span style=\"color:%s;\">%s</span>",
+                                topic.color.get(), topic.title.get() ) );
+                    }
+                });
+            }});
+            // medias
+            add( new UIComposite() {{
+                lc( RowConstraints.width( 40 ));
+                layout.set( FillLayout.defaults() );
+                article.medias.fetchCollect().onSuccess( medias -> {
+                    Sequence.of( medias ).first().ifPresent( media -> {
+                        if (media.mimetype.opt().orElse( "null" ).startsWith( "image" )) {
+                            add( new Image() {{
+                                media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                                    setData( bytes );
+                                });
+                            }});
+                            layout();
+                        }
+                    });
+                });
             }});
         }
     }

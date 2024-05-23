@@ -95,7 +95,8 @@ public class TopicsPage {
             layout.set( FillLayout.defaults() );
 
             add( new ViewerContext<>()
-                    .viewer( new CompositeListViewer<TopicEntity>( (topic,model) -> new ListItem( topic ) ) {{
+                    .viewer( new CompositeListViewer<TopicEntity>( ListItem::new ) {{
+                        etag.set( topic -> topic.modified.get() );
                         lines.set( true );
                         oddEven.set( true );
                         onSelect.set( topic -> {
