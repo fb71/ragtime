@@ -146,7 +146,10 @@ public class CCApp
                 e.printStackTrace( System.out );
                 //throw rootCauseForTeaVM( e );
             }
-            ErrorPage.tryOpen( e );
+            // no ErrorPage if image scaling produced an OOM
+            if (!Error.class.isInstance( e )) {
+                ErrorPage.tryOpen( e );
+            }
         };
     }
 
