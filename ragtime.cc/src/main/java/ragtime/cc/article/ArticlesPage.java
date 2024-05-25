@@ -136,7 +136,6 @@ public class ArticlesPage {
         // list
         ui.body.add( new ScrollableComposite() {{
             layout.set( FillLayout.defaults() );
-
             add( new ViewerContext<>()
                     .viewer( new CompositeListViewer<Article>( ListItem::new ) {{
                         etag.set( article -> article.modified.get() );

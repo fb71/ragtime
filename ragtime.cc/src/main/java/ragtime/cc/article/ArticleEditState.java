@@ -13,6 +13,8 @@
  */
 package ragtime.cc.article;
 
+import java.util.List;
+
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Promise;
@@ -85,6 +87,13 @@ public class ArticleEditState
         //uow.removeEntity( media );
         article.get().medias.remove( media );
 
+        modelChanged = true;
+        medias.fireChangeEvent();
+    }
+
+
+    public void addMedias( List<MediaEntity> add ) {
+        add.forEach( media -> article.get().medias.add( media ) );
         modelChanged = true;
         medias.fireChangeEvent();
     }

@@ -17,6 +17,7 @@ import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Promise;
+import areca.common.base.Opt;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -57,6 +58,11 @@ public abstract class BaseState<P> {
 
     @NoRuntimeInfo
     protected P             page;
+
+
+    public Opt<P> page() {
+        return Opt.of( page );
+    }
 
 
     /**

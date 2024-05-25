@@ -27,7 +27,6 @@ import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
-import areca.ui.component2.FileUpload;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
@@ -50,6 +49,7 @@ import ragtime.cc.EntityTransform;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.media.MediasPage.MediaListItem;
+import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.model.TopicEntity;
@@ -85,68 +85,78 @@ public class ArticlePage {
     public UIComponent createUI( UIComposite parent ) {
         ui.init( parent ).title.set( state.article.$().title.get() );
 
-        ui.body.layout.set( uic.verticalL().fillHeight( true ) );
-
-        form = new Form();
-
-        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
-                new AssociationModel<>( state.article.$().topic ) );
-        ui.body.add( form.newField()
-                .viewer( new SelectViewer( topics.values() ) )
-                .model( topics )
-                .create()
-                .lc( RowConstraints.height( 35 ) )
-                .tooltip.set( "Das Topic dieses Textes" ) );
-
-        ui.body.add( form.newField().label( "Name" )
-                .model( new PropertyModel<>( state.article.$().title ) )
-                .viewer( new TextFieldViewer() )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
-        ui.body.add( form.newField()
-                .model( new PropertyModel<>( state.article.$().content ) )
-                .viewer( new TextFieldViewer().configure( (TextField t) -> {
-                    t.multiline.set( true );
-                    t.type.set( Type.MARKDOWN );
-                    autocompletes( t );
-                }))
-                .create()
-                .layoutConstraints.set( null ) ); //RowConstraints.height( 300 ) ) );
-
-        // media upload
-        ui.body.add( new UIComposite() {{
-            lc( RowConstraints.height( 35 ) );
-            layout.set( RowLayout.filled().spacing( uic.space ) );
-            add( new FileUpload() {{
-                events.on( EventType.UPLOAD, ev -> {
-                    LOG.warn( "Uploaded: %s", data.get().name() );
-                    state.createMediaAction( data.get() );
-                });
-            }});
-        }});
-
-        // medias
+        ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
-            lc( RowConstraints.height( 70 ) );
-            layout.set( FillLayout.defaults() );
+            layout.set( uic.verticalL().fillHeight( true ) );
 
-            var medias = new ViewerContext<>()
-                    .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
-                        return new MediaListItem( media, () -> state.removeMediaAction( media ) );
-                    }) {{
-                        oddEven.set( true );
-                        spacing.set( 0 );
-                        lines.set( true );
-                        onSelect.set( media -> {
-                            LOG.info( "SELECT: %s", media );
+            form = new Form();
+
+            var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
+                    new AssociationModel<>( state.article.$().topic ) );
+            add( form.newField()
+                    .viewer( new SelectViewer( topics.values() ) )
+                    .model( topics )
+                    .create()
+                    .lc( RowConstraints.height( 35 ) )
+                    .tooltip.set( "Das Topic dieses Textes" ) );
+
+            add( form.newField().label( "Name" )
+                    .model( new PropertyModel<>( state.article.$().title ) )
+                    .viewer( new TextFieldViewer() )
+                    .create()
+                    .lc( RowConstraints.height( 35 ) ) );
+
+            add( form.newField()
+                    .model( new PropertyModel<>( state.article.$().content ) )
+                    .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                        t.multiline.set( true );
+                        t.type.set( Type.MARKDOWN );
+                        autocompletes( t );
+                    }))
+                    .create()
+                    .lc( RowConstraints.height( 300 ) ) );
+
+            // medias
+            add( new UIComposite() {{
+                layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
+
+                // add button
+                add( new UIComposite() {{
+                    lc( RowConstraints.height( 38 ) );
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( new UIComposite() );
+                    add( new Button() {{
+                        lc( RowConstraints.width( 50 ) );
+                        tooltip.set( "Bilder/Medien hinzufügen" );
+                        icon.set( "add_photo_alternate" );
+                        events.on( EventType.SELECT, ev -> {
+                            state.site.createState( new MediasSelectState( sel -> state.addMedias( sel ) ) ).activate();
                         });
-                    }})
-                    .model( state.medias );
-            add( medias.createAndLoad() );
-        }});
+                    }});
+                }});
 
-        form.load();
+                // medias
+                add( new UIComposite() {{
+                    //lc( RowConstraints.height( 70 ) );
+                    layout.set( FillLayout.defaults() );
+                    var medias = new ViewerContext<>()
+                            .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                                return new MediaListItem( media, () -> state.removeMediaAction( media ) );
+                            }) {{
+                                oddEven.set( true );
+                                spacing.set( 0 );
+                                lines.set( true );
+                                onSelect.set( media -> {
+                                    LOG.info( "SELECT: %s", media );
+                                });
+                            }})
+                            .model( state.medias );
+                    add( medias.createAndLoad() );
+                }});
+            }});
+
+            form.load();
+        }});
 
         // action: submit
         site.actions.add( new Action() {{

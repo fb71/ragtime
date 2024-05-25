@@ -91,7 +91,7 @@ public class WebsiteEditPage {
             // IFrame msg
             EventManager.instance()
                     .subscribe( (IFrameMsgEvent ev) -> onEditableClick( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> Pageflow.current().pages().first().orNull() == WebsiteEditPage.this )
+                    .performIf( IFrameMsgEvent.class, ev -> Pageflow.current().topPage() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
@@ -103,8 +103,10 @@ public class WebsiteEditPage {
                             reload();
 
                             Platform.schedule( 500, () -> {
-                                // FIXME check if this state/page is actually top (edit CSS!)
-                                if (disposableChildState != null && !disposableChildState.isDisposed()) {
+                                LOG.info( "TOP page: %s", Pageflow.current().topPage() );
+                                if (disposableChildState != null
+                                        && !disposableChildState.isDisposed()
+                                        && disposableChildState.page().orNull() == Pageflow.current().topPage()) {
                                     disposableChildState.disposeAction();
                                 }
                             });
@@ -152,6 +154,13 @@ public class WebsiteEditPage {
             icon.set( "topic" );
             description.set( "Topics" );
             handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
+        }});
+        // action: settings
+        site.actions.add( new Action() {{
+            //order.set( 10 );
+            icon.set( "settings" );
+            description.set( "Einstellungen" );
+            handler.set( ev -> state.site.createState( new TemplateConfigState() ).activate() );
         }});
         // action: refresh
         site.actions.add( new Action() {{

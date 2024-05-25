@@ -89,7 +89,11 @@ public class MediasSelectState
     @State.Action
     public void applyAction() {
         onApply.accept( selection.sequence().toList() );
-        disposeAction();
+
+        if (page != null && pageflow.isOpen( page )) {
+            pageflow.close( page );
+        }
+        site.dispose();
     }
 
 
