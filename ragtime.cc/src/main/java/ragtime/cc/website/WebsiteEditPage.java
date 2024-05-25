@@ -82,7 +82,7 @@ public class WebsiteEditPage {
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
-        ui.init( parent ).title.set( "Bearbeiten" );
+        ui.init( parent ); //.title.set( "Bearbeiten" );
 
         // IFrame
         var iframe = new IFrame() {{
@@ -103,7 +103,6 @@ public class WebsiteEditPage {
                             reload();
 
                             Platform.schedule( 500, () -> {
-                                LOG.info( "TOP page: %s", Pageflow.current().topPage() );
                                 if (disposableChildState != null
                                         && !disposableChildState.isDisposed()
                                         && disposableChildState.page().orNull() == Pageflow.current().topPage()) {
