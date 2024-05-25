@@ -36,7 +36,7 @@ import ragtime.cc.website.model.TemplateConfigEntity;
  *
  * @author Falko Bräutigam
  */
-abstract class TemplateContentProviderBase
+public abstract class TemplateContentProviderBase
         implements ContentProvider {
 
     private static final Log LOG = LogFactory.getLog( TemplateContentProviderBase.class );
@@ -114,7 +114,7 @@ abstract class TemplateContentProviderBase
     /**
      * {@link Configuration} factory and template loader that...
      */
-    protected static class TemplateLoader
+    public static class TemplateLoader
             extends ClassTemplateLoader {
 
         private static Map<String,Configuration> cfg = new ConcurrentHashMap<>();

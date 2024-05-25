@@ -41,6 +41,7 @@ import areca.ui.viewer.model.ListModelBase;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
+import ragtime.cc.article.EntityAssocModel;
 import ragtime.cc.article.EntityCompositeListModel;
 import ragtime.cc.article.PropertyModel;
 import ragtime.cc.website.model.NavItem;
@@ -109,9 +110,7 @@ public class TemplateConfigPage {
 
                 // PageConfig
                 add( new UIComposite() {{
-                    //layoutConstraints.set( RowConstraints.height( 200 ) );
                     layout.set( uic.verticalL().fillHeight( false ) );
-                    //bordered.set( true );
                     cssClasses.add( "MessageCard" );
                     addDecorator( new Label().content.set( "Seite" ) );
 
@@ -127,6 +126,26 @@ public class TemplateConfigPage {
                             .viewer( new TextFieldViewer() )
                             .model( new PropertyModel<>( config.page.get().footer ) )
                             .create() );
+                }});
+
+                // Fotos
+                add( new UIComposite() {{
+                    lc( RowConstraints.height( 100 ) );
+                    layout.set( uic.verticalL().margins( uic.spaceL, 10 ).spacing( uic.space ) );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Bilder" ) );
+
+                    add( new UIComposite() {{
+                        layout.set( RowLayout.filled().spacing( uic.spaceL ) );
+                        add( form.newField()/*.label( "Lead" )*/
+                                .viewer( new MediaPickerViewer( state.site ) )
+                                .model( new EntityAssocModel<>( config.leadImage ) )
+                                .create() );
+                        add( form.newField()/*.label( "Banner" )*/
+                                .viewer( new MediaPickerViewer( state.site ) )
+                                .model( new EntityAssocModel<>( config.bannerImage ) )
+                                .create() );
+                    }});
                 }});
 
                 // Colors

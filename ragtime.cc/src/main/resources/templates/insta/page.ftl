@@ -26,17 +26,22 @@
 
 <body class="${pageClass}">
     <#-- Page header -->
-    <header class="IHeader IBgImage" style="background-image: url(<@c.mediaUrl name="Raumfoto.jpg"/>)">
-        <div class="IBgImage container" style="height:100%">
+    <header class="IHeader" <#-- style="background-image: url(<@c.mediaUrl name="Raumfoto.jpg"/>)" -->>
+        <div class="IBgImage container" style="height:100%;
+            <#if config.bannerImage??>
+                background-image: url(media/${config.bannerImage.id});
+            </#if>
+            ">
             <@c.editable msg="page.title">
                 <h1>${config.page.title}</h1>
             </@c.editable>
             <#-- Face -->
-                <div class="IFace">
-                  <@c.editable msg="page.title">
-                    <img class="IFaceBordered" src="media/RikeRingeisCoaching.jpg"></img>
-                  </@c.editable>
-                </div>
+            <div class="IFace">
+                <@c.editable msg="page.title">
+                    <#if config.leadImage??>
+                        <img class="IFaceBordered" src="media/${config.leadImage.id}?w=134&h=134"></img>
+                    </#if>
+                </@c.editable>
             </div>
         </div>
     </header>

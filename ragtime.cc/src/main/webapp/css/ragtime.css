@@ -1,8 +1,23 @@
 .RootWindow {
     background-color: #2e2e2e;
+    overflow: visible;
 }
+
 .btn:hover {
     margin-top: -1px;
+}
+
+.Badged:before, .Tagged:after {
+    z-index: 1;
+}
+.Badged:before {
+    background: #cf6305;
+}
+.Tagged:after {
+    color: var(--basic-progress-color);
+}
+.Labeled:before {
+    /*background: #2e2e2e;*/
 }
 
 .HelpPage h1, h2, h3, h4, h5 {

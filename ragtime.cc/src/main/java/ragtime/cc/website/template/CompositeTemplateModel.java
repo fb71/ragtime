@@ -17,6 +17,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.polymap.model2.Association;
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Composite;
 import org.polymap.model2.Entity;
@@ -70,31 +71,40 @@ public class CompositeTemplateModel
         if (key.equals( "id" )) {
             return new SimpleScalar( ((Entity)composite).id().toString() );
         }
-        var prop = composite.info().getProperty( key );
+
         // single
+        var prop = composite.info().getProperty( key );
         if (prop.getMaxOccurs() == 1) {
-            var p = (Property<?>)prop.get( composite );
-            // String
-            if (String.class.isAssignableFrom( prop.getType() )) {
-                var a = prop.getAnnotation( Format.class );
-                var format = a != null ? a.value() : FormatType.PLAIN;
-                switch (format) {
-                    case MARKDOWN: return new SimpleScalar( Markdown.render( (String)p.get() ) );
-                    case PLAIN: return new SimpleScalar( convert( p.get(), convert ) );
-                    default: throw new RuntimeException( "Not yet: " + format );
+            // Association
+            if (prop.get( composite ) instanceof Association<?> assoc) {
+                return assoc.fetch().waitForResult()
+                        .map( e -> new CompositeTemplateModel( e ) )
+                        .orNull();
+            }
+            // Property
+            else if (prop.get( composite ) instanceof Property p) {
+                // String
+                if (String.class.isAssignableFrom( prop.getType() )) {
+                    var a = prop.getAnnotation( Format.class );
+                    var format = a != null ? a.value() : FormatType.PLAIN;
+                    switch (format) {
+                        case MARKDOWN: return new SimpleScalar( Markdown.render( (String)p.get() ) );
+                        case PLAIN: return new SimpleScalar( convert( p.get(), convert ) );
+                        default: throw new RuntimeException( "Not yet: " + format );
+                    }
                 }
-            }
-            // Number
-            else if (Number.class.isAssignableFrom( prop.getType() )) {
-                return new SimpleNumber( (Number)p.get() );
-            }
-            // Date
-            else if (Date.class.isAssignableFrom( prop.getType() )) {
-                return new SimpleDate( (Date)p.get(), TemplateDateModel.DATETIME );
-            }
-            // Composite
-            else if (Composite.class.isAssignableFrom( prop.getType() )) {
-                return new CompositeTemplateModel( (Composite)p.get() );
+                // Number
+                else if (Number.class.isAssignableFrom( prop.getType() )) {
+                    return new SimpleNumber( (Number)p.get() );
+                }
+                // Date
+                else if (Date.class.isAssignableFrom( prop.getType() )) {
+                    return new SimpleDate( (Date)p.get(), TemplateDateModel.DATETIME );
+                }
+                // Composite
+                else if (Composite.class.isAssignableFrom( prop.getType() )) {
+                    return new CompositeTemplateModel( (Composite)p.get() );
+                }
             }
         }
         // list

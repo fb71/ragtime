@@ -27,11 +27,14 @@ a:hover {
 
 .IHeader {
     height: 180px;
-    box-shadow: 0 0px 6px rgb(0 0 0 / 40%);
-    
+    /*
+    box-shadow: 0 0px 6px rgb(0 0 0 / 40%);    
     max-width: 1280;
+    */
     margin-left: auto;
     margin-right: auto;
+    background-color: var(--common-header-bg);
+    color: var(--common-header-color);
 }
 
 .IBgImage {

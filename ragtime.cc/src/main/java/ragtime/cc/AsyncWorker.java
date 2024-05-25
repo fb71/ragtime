@@ -66,6 +66,7 @@ public class AsyncWorker<R>
      * global thread pool.
      */
     public static <RR> Promise<RR> pool( Callable<RR> work ) {
+        LOG.debug( "Pool: threads=%s, tasks=%s", pool.getPoolSize(), pool.getQueue().size() );
         var promise = new Completable<RR>();
         var eventloop = Session.instanceOf( EventLoop.class );
         eventloop.requestPolling();

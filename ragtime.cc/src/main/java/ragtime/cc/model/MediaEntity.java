@@ -154,12 +154,19 @@ public class MediaEntity
         return new ThumbnailBuilder();
     }
 
+    /**
+     *
+     */
     public class ThumbnailBuilder {
         private Size    size;
         private String  outputFormat;
 
         public ThumbnailBuilder size( int w, int h ) {
-            this.size = Size.of( w, h );
+            return size( Size.of( w, h ) );
+        }
+
+        public ThumbnailBuilder size( Size s ) {
+            this.size = s;
             return this;
         }
 

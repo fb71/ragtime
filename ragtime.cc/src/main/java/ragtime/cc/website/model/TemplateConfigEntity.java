@@ -13,6 +13,7 @@
  */
 package ragtime.cc.website.model;
 
+import org.polymap.model2.Association;
 import org.polymap.model2.CollectionProperty;
 import org.polymap.model2.Concerns;
 import org.polymap.model2.DefaultValue;
@@ -26,6 +27,7 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import ragtime.cc.model.Common;
 import ragtime.cc.model.DefaultsCompositeConcern;
+import ragtime.cc.model.MediaEntity;
 import ragtime.cc.website.template.TemplateContentProvider;
 
 /**
@@ -57,6 +59,12 @@ public class TemplateConfigEntity
     @Nullable
     @Concerns( DefaultsCompositeConcern.class )
     public Property<Colors>             colors;
+
+    @Nullable
+    public Association<MediaEntity>     bannerImage;
+
+    @Nullable
+    public Association<MediaEntity>     leadImage;
 
     /**
      * Project specific CSS.
