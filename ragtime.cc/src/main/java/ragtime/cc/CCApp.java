@@ -147,7 +147,7 @@ public class CCApp
                 //throw rootCauseForTeaVM( e );
             }
             // no ErrorPage if image scaling produced an OOM
-            if (!Error.class.isInstance( e )) {
+            if (!Error.class.isInstance( Platform.rootCause( e ) )) {
                 ErrorPage.tryOpen( e );
             }
         };
