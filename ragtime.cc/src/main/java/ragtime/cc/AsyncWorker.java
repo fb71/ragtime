@@ -78,7 +78,9 @@ public class AsyncWorker<R>
                 }, 0 );
             }
             catch (Throwable e) {
-                promise.completeWithError( e );
+                eventloop.releasePolling( "AsyncWorker", () -> {
+                    promise.completeWithError( e );
+                }, 0 );
             }
         });
         return promise;
