@@ -13,7 +13,7 @@
                     ${article.content}
                 <#else>
                     <#assign media = article.medias?first>
-                    <img src="media/${media.id}?w=300&h=300" class="img-fluid" alt="${media.name}"/>
+                    <img src="media/${media.id}?w=310&h=310" class="img-fluid" alt="${media.name}"/>
                 </#if>
             </div>
             </@c.editable>
