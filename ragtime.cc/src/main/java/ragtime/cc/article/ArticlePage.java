@@ -126,7 +126,7 @@ public class ArticlePage {
                     layout.set( RowLayout.filled().spacing( uic.space ) );
                     add( new UIComposite() );
                     add( new Button() {{
-                        lc( RowConstraints.width( 50 ) );
+                        lc( RowConstraints.width( 60 ) );
                         tooltip.set( "Bilder/Medien hinzufügen" );
                         icon.set( "add_photo_alternate" );
                         events.on( EventType.SELECT, ev -> {
@@ -135,7 +135,7 @@ public class ArticlePage {
                     }});
                 }});
 
-                // medias
+                // list
                 add( new UIComposite() {{
                     //lc( RowConstraints.height( 70 ) );
                     layout.set( FillLayout.defaults() );

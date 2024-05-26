@@ -13,15 +13,15 @@
  */
 package ragtime.cc.article;
 
+import java.util.List;
+
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
-import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
-import areca.ui.component2.FileUpload.File;
 import areca.ui.pageflow.Page;
 import areca.ui.statenaction.State;
 import ragtime.cc.BaseState;
@@ -69,21 +69,16 @@ public class TopicEditState
 
 
     @State.Action
-    public void createMediaAction( File uploaded ) {
-        MediaEntity.getOrCreate( uow, uploaded.name() ).onSuccess( media -> {
-            media.mimetype.set( uploaded.mimetype() );
-            uploaded.copyInto( media.out() );
-            topic.medias.add( media );
-            Assert.that( topic.medias.fetchCollect().waitForResult().get().size() > 0 );
-
-            medias.fireChangeEvent();
-        });
+    public void removeMediaAction( MediaEntity media ) {
+        topic.medias.remove( media );
+        medias.fireChangeEvent();
     }
 
 
     @State.Action
-    public void removeMediaAction( MediaEntity media ) {
-        topic.medias.remove( media );
+    public void addMedias( List<MediaEntity> add ) {
+        add.forEach( media -> topic.medias.add( media ) );
+        //modelChanged = true;
         medias.fireChangeEvent();
     }
 
