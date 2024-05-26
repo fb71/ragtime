@@ -14,13 +14,11 @@
 package ragtime.cc.model;
 
 import static org.apache.commons.lang3.ArrayUtils.EMPTY_BYTE_ARRAY;
+import static ragtime.cc.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +56,7 @@ import areca.ui.Size;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import ragtime.cc.AsyncWorker;
+import ragtime.cc.ConcurrentReferenceHashMap;
 import ragtime.cc.Workspace;
 
 /**
@@ -99,6 +98,11 @@ public class MediaEntity
                 });
     }
 
+    /** Cache */
+    private static Map<String,Promise<byte[]>> thumbnails = new ConcurrentReferenceHashMap<>(
+            128, 0.75f, AsyncWorker.MAX_THREADS, SOFT, SOFT, null );
+
+
     // instance *******************************************
 
     @Queryable
@@ -114,7 +118,6 @@ public class MediaEntity
     protected RLazy<Integer>            cpermid = new RLazy<>( () ->
             context.getUnitOfWork().query( AccountEntity.class ).singleResult().waitForResult().get().permid.get() );
 
-    protected Map<ThumbnailBuilder,Promise<byte[]>> thumbnails = new ConcurrentHashMap<>();
 
     /**
      * Computed back association of {@link Article#medias}
@@ -135,10 +138,6 @@ public class MediaEntity
                 f.delete();
             }
             LOG.info( "Removed: %s", f );
-        }
-        // clean thumbnails
-        if (state == State.AFTER_SUBMIT) {
-            thumbnails.clear();
         }
 //        // remove back association
 //        if (state == State.AFTER_REMOVED) {
@@ -176,25 +175,15 @@ public class MediaEntity
             return this;
         }
 
-        @Override
-        public int hashCode() {
-            int result = 7;
-            result = 31 * result + ((outputFormat == null) ? 0 : outputFormat.hashCode());
-            return 31 * result + ((size == null) ? 0 : size.hashCode());
-        }
-
-        @Override
-        public boolean equals( Object obj ) {
-            return (obj instanceof ThumbnailBuilder rhs)
-                    ? Objects.equals( rhs.outputFormat, outputFormat ) && Objects.equals( rhs.size, size )
-                    : false;
+        private String cacheKey() {
+            return String.format( "%s|%s|%s", id(), size, outputFormat );
         }
 
         public Promise<byte[]> create() {
             Assert.notNull( size, "No 'size' specified for thumbnail" );
             Assert.notNull( outputFormat, "No 'imageType' specified for thumbnail" );
 
-            return thumbnails.computeIfAbsent( this, __ -> {
+            return thumbnails.computeIfAbsent( cacheKey(), cacheKey -> {
                 return AsyncWorker.pool( () -> {
                     var t = Timer.start();
                     try (var in = IOUtils.buffer( in() )) {
@@ -224,8 +213,12 @@ public class MediaEntity
      */
     public OutputStream out() {
         try {
-            thumbnails.clear();
-            return /*new BufferedOutputStream(*/ new FileOutputStream( f() );
+            var f = f();
+            if (f.exists()) {
+                LOG.warn( "Overwrite: " + name.get() + ". -> FLUSHING CACHE!" );
+                thumbnails.clear();
+            }
+            return /*new BufferedOutputStream(*/ new FileOutputStream( f );
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException( e );

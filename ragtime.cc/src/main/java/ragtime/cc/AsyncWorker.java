@@ -36,7 +36,9 @@ public class AsyncWorker<R>
 
     private static final Log LOG = LogFactory.getLog( AsyncWorker.class );
 
-    private static ThreadPoolExecutor pool = new ThreadPoolExecutor( 4, 4,
+    public static final int MAX_THREADS = 4;
+
+    private static ThreadPoolExecutor pool = new ThreadPoolExecutor( MAX_THREADS, MAX_THREADS,
             30, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>( ) ) {{
                 //allowCoreThreadTimeOut( true );

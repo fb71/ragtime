@@ -15,18 +15,12 @@ package ragtime.cc.website.http;
 
 import static org.polymap.model2.query.Expressions.eq;
 
-import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.geometry.Positions;
 import ragtime.cc.model.MediaEntity;
 
 /**
@@ -63,14 +57,10 @@ public class MediaContentProvider
                 else {
                     var w = Integer.parseInt( request.httpRequest.getParameter( "w" ) );
                     var h = Integer.parseInt( request.httpRequest.getParameter( "h" ) );
-
-                    var bi = Thumbnails.fromInputStreams( Arrays.asList( in ) )
-                            .size( w, h )
-                            .crop( Positions.CENTER )
-                            .asBufferedImages();
-
                     var encoder = StringUtils.substringAfterLast( media.mimetype.get(), "/" );
-                    ImageIO.write( bi.get( 0 ), encoder, out );
+
+                    var bytes = media.thumbnail().size( w, h ).outputFormat( encoder ).create().waitForResult().get();
+                    out.write( bytes );
                 }
             }
             return true;
