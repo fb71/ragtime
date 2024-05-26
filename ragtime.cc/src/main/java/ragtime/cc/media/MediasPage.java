@@ -14,12 +14,14 @@
 package ragtime.cc.media;
 
 import static java.text.DateFormat.MEDIUM;
+import static org.apache.commons.lang3.StringUtils.abbreviate;
 
 import java.util.Locale;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -27,7 +29,6 @@ import areca.common.reflect.RuntimeInfo;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
-import areca.ui.component2.FileUpload;
 import areca.ui.component2.FileUpload.File;
 import areca.ui.component2.Image;
 import areca.ui.component2.ScrollableComposite;
@@ -88,32 +89,32 @@ public class MediasPage {
         ui.body.add( new UIComposite() {{
             layout.set( RowLayout.filled().vertical().spacing( uic.space ) );
 
-            // upload row
-            add( new UIComposite() {{
-                layoutConstraints.set( RowConstraints.height( 35 ) );
-                layout.set( RowLayout.filled().spacing( uic.space ) );
-                add( new FileUpload() {{
-                    events.on( EventType.UPLOAD, ev -> {
-                        LOG.warn( "Uploaded: %s", data.get().name() );
-                        uploaded = data.get();
-                        uploadBtn.enabled.set( true );
-                    });
-                }});
-
-                uploadBtn = add( new Button() {{
-                    layoutConstraints.set( RowConstraints.width( 80 ) );
-                    //label.set( "Upload" );
-                    icon.set( "add" );
-                    tooltip.set( "Das ausgewählte File neu anlegen" );
-                    type.set( Type.SUBMIT );
-                    enabled.set( false );
-                    events.on( EventType.SELECT, ev -> {
-                        state.createMediaAction( uploaded ).onSuccess( __ -> {
-                            enabled.set( false );
-                        });
-                    });
-                }});
-            }});
+//            // upload row
+//            add( new UIComposite() {{
+//                layoutConstraints.set( RowConstraints.height( 35 ) );
+//                layout.set( RowLayout.filled().spacing( uic.space ) );
+//                add( new FileUpload() {{
+//                    events.on( EventType.UPLOAD, ev -> {
+//                        LOG.warn( "Uploaded: %s", data.get().name() );
+//                        uploaded = data.get();
+//                        uploadBtn.enabled.set( true );
+//                    });
+//                }});
+//
+//                uploadBtn = add( new Button() {{
+//                    layoutConstraints.set( RowConstraints.width( 80 ) );
+//                    //label.set( "Upload" );
+//                    icon.set( "add" );
+//                    tooltip.set( "Das ausgewählte File neu anlegen" );
+//                    type.set( Type.SUBMIT );
+//                    enabled.set( false );
+//                    events.on( EventType.SELECT, ev -> {
+//                        state.createMediaAction( uploaded ).onSuccess( __ -> {
+//                            enabled.set( false );
+//                        });
+//                    });
+//                }});
+//            }});
 
             // list
             add( new ScrollableComposite() {{
@@ -141,28 +142,13 @@ public class MediasPage {
                 add( medias.createAndLoad() );
             }});
         }});
-
-//        // Submit
-//        site.actions.add( new Action() {{
-//            description.set( "Speichern" );
-//            type.set( Button.Type.SUBMIT );
-//            //enabled.set( false );
-//            icon.set( UICommon.ICON_SAVE );
-//            handler.set( ev -> {
-//                state.submitAction().onSuccess( __ -> {
-//                    enabled.set( false );
-//                });
-//            });
-//            medias.subscribe( ev -> {
-//                var _enabled = true; //medias.isChanged() && medias.isValid();
-//                enabled.set( _enabled );
-//                icon.set( _enabled ? UICommon.ICON_SAVE : "" );
-//            });
-//        }});
         return ui;
     }
 
 
+    /**
+     *
+     */
     public static class MediaListItem
             extends UIComposite {
 
@@ -172,15 +158,32 @@ public class MediasPage {
             layout.set( RowLayout.filled().spacing( 10 ).margins( 10, 10 ) );
             var mime = media.mimetype.opt().orElse( "null" );
             add( new Text() {{
+                tooltip.set( media.name.get() );
                 format.set( Format.HTML );
-                content.set( media.name.get() + "<br/>" +
-                            "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
+//                content.set( StringUtils.abbreviate( media.name.get(), 35 ) + "<br/>" +
+//                        "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
+
+                var s =  "%s<br/><span style=\"font-size:10px; color:#808080;\">%s - Beiträge: %s</span>";
+                var name = abbreviate( media.name.get(), 35 );
+                content.set( String.format( s, name, mime, "?" ) );
+
+                Platform.schedule( 1000, () -> {
+                    media.articles().onSuccess( articles -> {
+                        if (!isDisposed()) {
+                            content.set( String.format( s, name, mime, articles.size() ) );
+                        }
+                    });
+                });
             }});
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
-                        setData( bytes );
+                    Platform.schedule( 1000, () -> {
+                        media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                            if (!isDisposed()) {
+                                setData( bytes );
+                            }
+                        });
                     });
                 }});
             }

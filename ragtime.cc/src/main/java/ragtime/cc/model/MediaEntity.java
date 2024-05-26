@@ -119,7 +119,7 @@ public class MediaEntity
     /**
      * Computed back association of {@link Article#medias}
      */
-    public Promise<List<Article>> article() {
+    public Promise<List<Article>> articles() {
         return context.getUnitOfWork().query( Article.class )
                 .where( Expressions.anyOf( Article.TYPE.medias, Expressions.id( id() ) ) )
                 .executeCollect();
