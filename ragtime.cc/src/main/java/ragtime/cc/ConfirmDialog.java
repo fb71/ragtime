@@ -85,6 +85,32 @@ public class ConfirmDialog
     }
 
 
+    public ConfirmDialog addOkAction( Runnable task ) {
+        actions.add( new Button() {{
+            label.set( "Ok" );
+            //type.set( Button.Type.SUBMIT );
+            events.on( EventType.SELECT, ev -> {
+                pageSite.close();
+                task.run();
+            });
+        }});
+        return this;
+    }
+
+
+    public ConfirmDialog addCancelAction( Runnable task ) {
+        actions.add( new Button() {{
+            label.set( "Abbrechen" );
+            type.set( Button.Type.NAVIGATE );
+            events.on( EventType.SELECT, ev -> {
+                pageSite.close();
+                task.run();
+            });
+        }});
+        return this;
+    }
+
+
     public ConfirmDialog open() {
         Pageflow.current().create( this ).open();
         return this;

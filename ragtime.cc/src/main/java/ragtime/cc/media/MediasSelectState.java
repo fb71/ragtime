@@ -15,9 +15,15 @@ package ragtime.cc.media;
 
 import java.util.HashSet;
 import java.util.List;
+
+import java.io.IOException;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
+import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
 import areca.common.Promise;
@@ -26,11 +32,13 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.Size;
 import areca.ui.component2.FileUpload;
 import areca.ui.pageflow.Page;
 import areca.ui.statenaction.State;
 import areca.ui.viewer.model.Pojos;
 import ragtime.cc.BaseState;
+import ragtime.cc.ConfirmDialog;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.MediaEntity;
@@ -98,17 +106,41 @@ public class MediasSelectState
 
 
     @State.Action
-    public Promise<Submitted> createMediaAction( FileUpload.File f ) {
-        return MediaEntity.getOrCreate( uow, f.name() )
-                .map( media -> {
-                    media.mimetype.set( f.mimetype() );
-                    f.copyInto( media.out() );
-                    return media;
-                })
-                .then( entity -> {
-                    // XXX this also submits chnages from calling state
-                    return uow.submit();
-                });
+    public void createMediaAction( FileUpload.File f ) {
+        MediaEntity.getOrCreate( uow, f.name() ).onSuccess( media -> {
+            // mime check
+            if (StringUtils.isBlank( f.mimetype() )) {
+                ConfirmDialog.create( "MimeType",
+                        "Der Type der Datei kann nicht ermittelt werden.<br/>Ist die Endung des Dateinamens korrekt?" )
+                        .addOkAction( () -> LOG.info( "" ) )
+                        .open();
+            }
+            // status/name check
+            else if (!media.status().equals( EntityStatus.CREATED )) {
+                ConfirmDialog.create( "Name",
+                        "<center><b>" + media.name.get() + "</b><br/><br/>Existiert bereits und wird überschrieben!</center>" )
+                        .size.set( Size.of( 320, 200 ) )
+                        .addCancelAction( () -> LOG.info( "cancelled" ) )
+                        .addOkAction( () -> createMedia( f, media ) )
+                        .open();
+            }
+            //
+            else {
+                createMedia( f, media );
+            }
+        });
+    }
+
+
+    protected void createMedia( FileUpload.File f, MediaEntity media ) {
+        try {
+            media.mimetype.set( f.mimetype() );
+            f.copyInto( media.out() );
+            uow.submit();
+        }
+        catch (IOException e) {
+            throw new RuntimeException( e );
+        }
     }
 
 

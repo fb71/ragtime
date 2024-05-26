@@ -143,28 +143,11 @@ public class MediasSelectPage {
     /**
      *
      */
-    public static class MediaGridItem2
-            extends Image {
-
-        public MediaGridItem2( MediaEntity media ) {
-            var mime = media.mimetype.opt().orElse( "null" );
-            if (mime.startsWith( "image" )) {
-                styles.add( CssStyle.of( "border-radius", "3px" ) );
-                media.thumbnail().size( 100, 100 ).outputFormat( "png" ).create().onSuccess( bytes -> {
-                    setData( bytes );
-                });
-            }
-        }
-    }
-
-
-    /**
-     *
-     */
     public static class MediaGridItem
             extends UIComposite {
 
         public MediaGridItem( MediaEntity media ) {
+            tooltip.set( media.name.get() );
             layout.set( new AbsoluteLayout() {
                 @Override
                 public void layout( UIComposite composite ) {
@@ -189,6 +172,24 @@ public class MediasSelectPage {
                 add( new Image() {{
                     styles.add( CssStyle.of( "border-radius", "3px" ) );
                 }});
+            }
+        }
+    }
+
+
+    /**
+     *
+     */
+    public static class MediaGridItem2
+            extends Image {
+
+        public MediaGridItem2( MediaEntity media ) {
+            var mime = media.mimetype.opt().orElse( "null" );
+            if (mime.startsWith( "image" )) {
+                styles.add( CssStyle.of( "border-radius", "3px" ) );
+                media.thumbnail().size( 100, 100 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                    setData( bytes );
+                });
             }
         }
     }
