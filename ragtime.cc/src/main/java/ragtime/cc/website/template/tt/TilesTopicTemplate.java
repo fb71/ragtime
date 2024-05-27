@@ -26,6 +26,7 @@ import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.Article;
 import ragtime.cc.website.template.CompositeTemplateModel;
 import ragtime.cc.website.template.IterableAdapterTemplateModel;
+import ragtime.cc.website.template.TopicTemplate;
 
 /**
  *
@@ -51,6 +52,7 @@ public class TilesTopicTemplate
         if (articleIdParam != null) {
             return site.r.uow.entity( Article.class, articleIdParam ).map( article -> {
                 site.data.put( "article", new CompositeTemplateModel( article ) );
+                //processArticleContent( article, site );
                 return "article.ftl";
             });
         }
