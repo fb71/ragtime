@@ -198,7 +198,7 @@ public class TopicPage {
         site.actions.add( new Action() {{
             icon.set( UICommon.ICON_DELETE );
             handler.set( ev -> {
-                state.topic.articles().onSuccess( articles -> {
+                state.topic.articles().executeCollect().onSuccess( articles -> {
                     ConfirmDialog.createAndOpen( "Topic",
                             "<b>" + state.topic.title.get() + "</b><br/><br/>" +
                             "Enthält " + articles.size() + " Beiträge. Diese werden nicht gelöscht." )

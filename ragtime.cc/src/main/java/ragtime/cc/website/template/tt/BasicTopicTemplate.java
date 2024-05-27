@@ -40,7 +40,7 @@ public class BasicTopicTemplate
     public Promise<String> process( Site site ) throws TemplateNotFoundException {
         // topic home
         if (site.r.path.length == 1) {
-            return site.topic.articles().map( articles -> {
+            return site.topic.articles().executeCollect().map( articles -> {
                 site.data.put( "articles", new IterableAdapterTemplateModel<>( articles, a -> new CompositeTemplateModel( a ) ) );
 
                 //var rike = Sequence.of( articles ).first( a -> a.title.get().equalsIgnoreCase( "rike" ) ).orElseError();

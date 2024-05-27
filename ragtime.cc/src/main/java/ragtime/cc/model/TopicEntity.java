@@ -15,8 +15,6 @@ package ragtime.cc.model;
 
 import static org.polymap.model2.query.Expressions.anyOf;
 
-import java.util.List;
-
 import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Defaults;
 import org.polymap.model2.ManyAssociation;
@@ -24,6 +22,7 @@ import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query;
 
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
@@ -108,10 +107,9 @@ public class TopicEntity
     /**
      * Computed bidi association of {@link Article#topic}.
      */
-    public Promise<List<Article>> articles() {
+    public Query<Article> articles() {
         return context.getUnitOfWork().query( Article.class )
-                .where( Expressions.is( Article.TYPE.topic, this ) )
-                .executeCollect();
+                .where( Expressions.is( Article.TYPE.topic, this ) );
     }
 
 }

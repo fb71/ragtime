@@ -6,7 +6,7 @@
  -->
 <@page.layout title="Tiles">
     <div class="ITiles row row-cols-3">
-        <#list articles?sequence?sort_by("modified")?reverse as article>
+        <#list articles?sequence as article>
             <@c.editable msg="article.${article.id}">
             <div class="ITile IClickable col" onclick="location.href='${topic.urlPart}?a=${article.id}';">
                 <#if article.medias?sequence?size == 0>

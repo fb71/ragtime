@@ -43,6 +43,7 @@ import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
+import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.AssociationModel;
 import ragtime.cc.ConfirmDialog;
 import ragtime.cc.EntityTransform;
@@ -91,14 +92,26 @@ public class ArticlePage {
 
             form = new Form();
 
-            var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
-                    new AssociationModel<>( state.article.$().topic ) );
-            add( form.newField()
-                    .viewer( new SelectViewer( topics.values() ) )
-                    .model( topics )
-                    .create()
-                    .lc( RowConstraints.height( 35 ) )
-                    .tooltip.set( "Das Topic dieses Textes" ) );
+            add( new UIComposite() {{
+                lc( RowConstraints.height( 35 ) );
+                layout.set( RowLayout.filled().spacing( uic.spaceL ) );
+
+                var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
+                        new AssociationModel<>( state.article.$().topic ) );
+                add( form.newField()
+                        .viewer( new SelectViewer( topics.values() ) )
+                        .model( topics )
+                        .create()
+                        .tooltip.set( "Das Topic dieses Textes" ) );
+
+                add( form.newField().label( "Position" )
+                        .description( "Die Position dieses Beitrags im Topic\nBeiträge ohne Angabe werden darunter nach Modifikationsdatum sortiert" )
+                        .viewer( new TextFieldViewer() )
+                        .model( new Number2StringTransform(
+                                new PropertyModel<>( state.article.$().order ) ) )
+                        .create()
+                        .lc( RowConstraints.width( 80 ) ) );
+            }});
 
             add( form.newField().label( "Name" )
                     .model( new PropertyModel<>( state.article.$().title ) )

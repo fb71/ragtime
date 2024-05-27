@@ -50,6 +50,14 @@ public class Article
     @Queryable
     public ManyAssociation<TagEntity>   tags;
 
+    /**
+     * The position (ascending order) of this {@link Article} in the list
+     * of articles of the associated {@link TopicEntity}.
+     */
+    @Queryable
+    @Nullable
+    public Property<Integer>            order;
+
     @Nullable
     @Queryable
     public Association<TopicEntity>     topic;

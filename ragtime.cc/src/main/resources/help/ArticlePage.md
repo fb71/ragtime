@@ -6,6 +6,10 @@
 
 Jeder Beitrag ist einem Topic zugeordnet. Das Topic entscheidet darüber wo (und auch wie) der Beitrag in der Website angezeigt wird. Topics können zusätzlich mit anderen Kanälen verbunden sein, z.B. Instagram. Beiträge in diesem Topic werden dann automatisch auf Instagram gepostet.
 
+### Reihenfolge
+
+Bestimmt die Position dieses Beitrags im Topic. Der Beitrag mit "1" wird an erster Stelle angezeigt. Beiträge ohne Angabe werden danach nach Modifikationsdatum sortiert und angezeigt.
+
 ### Name
 
 Der Name eines Beitrags wird verwendet, um den Beitrag zu identifizieren, wird aber nicht als Überschrift verwendet. Wenn der Beitrag eine Überschrift haben soll, dann wird diese in den Text geschrieben (siehe unten).

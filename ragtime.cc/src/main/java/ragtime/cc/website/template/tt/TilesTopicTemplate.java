@@ -13,6 +13,11 @@
  */
 package ragtime.cc.website.template.tt;
 
+import java.util.ArrayList;
+
+import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query.Order;
+
 import areca.common.Assert;
 import areca.common.Promise;
 import areca.common.log.LogFactory;
@@ -21,7 +26,6 @@ import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.Article;
 import ragtime.cc.website.template.CompositeTemplateModel;
 import ragtime.cc.website.template.IterableAdapterTemplateModel;
-import ragtime.cc.website.template.TopicTemplate;
 
 /**
  *
@@ -52,11 +56,25 @@ public class TilesTopicTemplate
         }
         // topic
         else {
-            //Assert.isEqual( 0, site.r.httpRequest.getParameterMap().size() ); edit=true
-            return site.topic.articles().map( articles -> {
-                site.data.put( "articles", new IterableAdapterTemplateModel<>( articles, a -> new CompositeTemplateModel( a ) ) );
-                return "tiles.ftl";
-            });
+            var result = new ArrayList<Article>( 32 );
+            return site.topic.articles()
+                    // with order field
+                    .andWhere( Expressions.notNull( Article.TYPE.order ) )
+                    .orderBy( Article.TYPE.order, Order.ASC )
+                    .executeCollect()
+                    .then( rs -> {
+                        result.addAll( rs );
+                        // without order field
+                        return site.topic.articles()
+                                .andWhere( Expressions.isNull( Article.TYPE.order ) )
+                                .orderBy( Article.TYPE.modified, Order.DESC )
+                                .executeCollect();
+                    })
+                    .map( rs -> {
+                        result.addAll( rs );
+                        site.data.put( "articles", new IterableAdapterTemplateModel<>( result, a -> new CompositeTemplateModel( a ) ) );
+                        return "tiles.ftl";
+                    });
         }
     }
 
