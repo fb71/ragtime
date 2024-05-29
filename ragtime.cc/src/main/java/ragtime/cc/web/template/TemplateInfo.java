@@ -33,6 +33,7 @@ import com.google.gson.annotations.SerializedName;
 import areca.common.base.Sequence;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import ragtime.cc.web.template.topic.TopicTemplateContentProvider;
 
 /**
  * Represents a template (folder) in the classpath.

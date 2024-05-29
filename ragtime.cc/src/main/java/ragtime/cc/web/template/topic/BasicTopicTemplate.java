@@ -31,7 +31,6 @@ import freemarker.template.SimpleScalar;
 import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.Article;
 import ragtime.cc.web.template.CompositeTemplateModel;
-import ragtime.cc.web.template.TopicTemplate;
 import ragtime.cc.web.template.widgets.Excerpt;
 import ragtime.cc.web.template.widgets.Markdown;
 import ragtime.cc.web.template.widgets.Swiper;

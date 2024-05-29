@@ -31,7 +31,7 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
-import ragtime.cc.web.template.TopicTemplate;
+import ragtime.cc.web.template.topic.TopicTemplate;
 
 /**
  *

@@ -39,7 +39,7 @@ import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.web.model.TemplateConfigEntity;
 import ragtime.cc.web.template.TemplateContentProvider;
-import ragtime.cc.web.template.TopicTemplateContentProvider;
+import ragtime.cc.web.template.topic.TopicTemplateContentProvider;
 
 /**
  * Frontend servlet, does {@link Session} management and exception handling and

@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.web.template;
+package ragtime.cc.web.template.topic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +25,6 @@ import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.TopicEntity;
 import ragtime.cc.web.http.ContentProvider.Request;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
-import ragtime.cc.web.template.topic.BasicTopicTemplate;
-import ragtime.cc.web.template.topic.TilesTopicTemplate;
 
 /**
  *

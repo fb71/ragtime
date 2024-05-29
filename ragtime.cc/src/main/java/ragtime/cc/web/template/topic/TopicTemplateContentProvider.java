@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.web.template;
+package ragtime.cc.web.template.topic;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +26,11 @@ import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.TopicEntity;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
+import ragtime.cc.web.template.CompositeTemplateModel;
+import ragtime.cc.web.template.HttpRequestParamsTemplateModel;
+import ragtime.cc.web.template.IterableAdapterTemplateModel;
+import ragtime.cc.web.template.TemplateContentProviderBase;
+import ragtime.cc.web.template.TemplateContentProviderBase.TemplateLoader;
 
 /**
  * Delegates to the {@link TopicTemplate} specified in the URL.

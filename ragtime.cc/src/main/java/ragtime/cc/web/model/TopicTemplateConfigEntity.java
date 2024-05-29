@@ -23,7 +23,7 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import ragtime.cc.model.Common;
 import ragtime.cc.model.TopicEntity;
-import ragtime.cc.web.template.TopicTemplate;
+import ragtime.cc.web.template.topic.TopicTemplate;
 
 /**
  * The connection from a {@link TopicEntity} to its representation in the website.
