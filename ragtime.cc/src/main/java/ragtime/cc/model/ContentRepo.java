@@ -32,11 +32,11 @@ import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.Workspace;
-import ragtime.cc.website.http.WebsiteServlet;
-import ragtime.cc.website.model.TemplateConfigEntity;
-import ragtime.cc.website.model.TopicTemplateConfigEntity;
-import ragtime.cc.website.model.WebsiteConfigEntity;
-import ragtime.cc.website.template.ArticleTemplateModel;
+import ragtime.cc.web.http.WebsiteServlet;
+import ragtime.cc.web.model.TemplateConfigEntity;
+import ragtime.cc.web.model.TopicTemplateConfigEntity;
+import ragtime.cc.web.model.WebsiteConfigEntity;
+import ragtime.cc.web.template.ArticleTemplateModel;
 
 /**
  *

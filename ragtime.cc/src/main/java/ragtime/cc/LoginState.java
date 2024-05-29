@@ -48,8 +48,8 @@ import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
 import ragtime.cc.model.PasswordEncryption;
-import ragtime.cc.website.WebsiteEditPage;
-import ragtime.cc.website.WebsiteEditState;
+import ragtime.cc.web.WebsiteEditPage;
+import ragtime.cc.web.WebsiteEditState;
 
 /**
  * The start {@link State} of the application.

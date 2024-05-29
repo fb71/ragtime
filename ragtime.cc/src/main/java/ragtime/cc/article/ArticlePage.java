@@ -55,7 +55,7 @@ import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.model.TopicEntity;
-import ragtime.cc.website.http.MediaContentProvider;
+import ragtime.cc.web.http.MediaContentProvider;
 
 /**
  *

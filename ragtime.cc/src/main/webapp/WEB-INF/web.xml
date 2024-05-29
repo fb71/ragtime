@@ -40,7 +40,7 @@
       <!-- Website/Template Servlet -->
       <servlet>
         <servlet-name>WebsiteServlet</servlet-name>
-        <servlet-class>ragtime.cc.website.http.WebsiteServlet</servlet-class>
+        <servlet-class>ragtime.cc.web.http.WebsiteServlet</servlet-class>
       </servlet>
 
       <servlet-mapping>

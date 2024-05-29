@@ -35,7 +35,7 @@ import ragtime.cc.article.EntityListModel;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
-import ragtime.cc.website.WebsiteEditState;
+import ragtime.cc.web.WebsiteEditState;
 
 /**
  *

@@ -36,7 +36,7 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
-import ragtime.cc.website.template.TemplateInfo;
+import ragtime.cc.web.template.TemplateInfo;
 
 /**
  *

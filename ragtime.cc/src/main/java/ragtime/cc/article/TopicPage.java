@@ -44,7 +44,7 @@ import ragtime.cc.UICommon;
 import ragtime.cc.media.MediasPage.MediaListItem;
 import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.model.MediaEntity;
-import ragtime.cc.website.template.TopicTemplate;
+import ragtime.cc.web.template.TopicTemplate;
 
 /**
  *

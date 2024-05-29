@@ -32,7 +32,7 @@ import ragtime.cc.BaseState;
 import ragtime.cc.admin.AccountsState;
 import ragtime.cc.media.MediasState;
 import ragtime.cc.model.Article;
-import ragtime.cc.website.TemplateConfigState;
+import ragtime.cc.web.TemplateConfigState;
 
 /**
  *

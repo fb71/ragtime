@@ -25,7 +25,7 @@ import areca.common.event.EventListener;
 import areca.common.event.EventManager;
 import areca.common.event.EventManager.EventHandlerInfo;
 import areca.common.reflect.RuntimeInfo;
-import ragtime.cc.website.http.WebsiteServlet;
+import ragtime.cc.web.http.WebsiteServlet;
 
 /**
  *
