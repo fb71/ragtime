@@ -100,7 +100,7 @@ public class ArticlePage {
                 var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
                         new AssociationModel<>( state.article.$().topic ) );
                 add( form.newField()
-                        .viewer( new SelectViewer( topics.values() ) )
+                        .viewer( new SelectViewer( topics.values(), "Wählen..." ) )
                         .model( topics )
                         .create()
                         .tooltip.set( "Das Topic dieses Textes" ) );

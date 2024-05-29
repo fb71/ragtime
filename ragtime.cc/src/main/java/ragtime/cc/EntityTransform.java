@@ -71,6 +71,9 @@ public class EntityTransform<M extends Entity,V>
 
             delegate.set( entity );
         }
+        else {
+            delegate.set( null );
+        }
     }
 
     public List<V> values() {
