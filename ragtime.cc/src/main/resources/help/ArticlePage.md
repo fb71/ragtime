@@ -6,9 +6,9 @@
 
 Jeder Beitrag ist einem Topic zugeordnet. Das Topic entscheidet darüber wo (und auch wie) der Beitrag in der Website angezeigt wird. Topics können zusätzlich mit anderen Kanälen verbunden sein, z.B. Instagram. Beiträge in diesem Topic werden dann automatisch auf Instagram gepostet.
 
-### Reihenfolge
+### Position / Reihenfolge
 
-Bestimmt die Position dieses Beitrags im Topic. Der Beitrag mit "1" wird an erster Stelle angezeigt. Beiträge ohne Angabe werden danach nach Modifikationsdatum sortiert und angezeigt.
+Bestimmt die Position dieses Beitrags im Topic. Der Beitrag mit "1" wird an erster Stelle angezeigt. Beiträge ohne Angabe werden darunter nach Modifikationsdatum sortiert und angezeigt.
 
 ### Name
 
@@ -16,7 +16,7 @@ Der Name eines Beitrags wird verwendet, um den Beitrag zu identifizieren, wird a
 
 ### Bilder
 
-Zu einem Beitrag können Bilder oder andere Medien gehören. Alle Bilder werden dabei in einer zentralen Bobliothek gespeichert, so dass ein Bild in mehreren Beiträgen verwendet werden kann.
+Zu einem Beitrag können Bilder oder andere Medien gehören. Alle Bilder werden in einer zentralen Bobliothek gespeichert, so dass ein Bild in mehreren Beiträgen verwendet werden kann.
 
 ## Formatierung
 
@@ -34,7 +34,7 @@ Um den Text zu formatieren kann man einfach spezielle Zeichen im Text verwenden.
 
 Ein **Absatz** wird einfach mit einer Leerzeile erzeugt.
 
-Ein **Zeilenumbruch** im laufenden Text (ohne Absatz) wird durch ein '\\' am Ende der Zeile erzeugt.
+Ein **Zeilenumbruch** im laufenden Text (ohne Absatz) wird durch ein Backslash ('\\') am Ende der Zeile erzeugt.
 
 Im laufenden Text gehen folgende Formatierungen:
 
@@ -61,7 +61,24 @@ Für **interne** Ziele, also zum Beispiel Beiträge, kann beim Bearbeiten des Te
 
 * Strg + Space
 
-#### Link Beispiele
+**Link Beispiele:**
 
 * \[Hier geht es zu Google\](https:\\\\google.de) -> [Hier geht es zu Google](https:\\\\google.de)
 * ...
+
+## Objekte
+
+Durch spezielle Zeichefolgen können verschiedene Objekte im Text erzeugt werden.
+
+### ::swiper::
+
+Erzeugt eine **Gallerie** aller Bilder, die an dem Beitrag hängen.
+
+```::swiper[?w=<Breite>,h=<Höhe>]::```
+
+  * *w=* : Breite in Pixeln; Standard=380
+  * *h=* : Höhe in Pixeln; Standard=380 
+
+### ::excerpt::
+
+...

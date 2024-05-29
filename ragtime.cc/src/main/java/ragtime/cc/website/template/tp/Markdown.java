@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.website.template;
+package ragtime.cc.website.template.tp;
 
 import java.util.Map;
 
@@ -23,6 +23,8 @@ import org.commonmark.renderer.html.AttributeProviderContext;
 import org.commonmark.renderer.html.AttributeProviderFactory;
 import org.commonmark.renderer.html.HtmlRenderer;
 
+import org.apache.commons.io.input.CharSequenceReader;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 
@@ -31,7 +33,8 @@ import areca.common.log.LogFactory.Log;
  *
  * @author Falko Bräutigam
  */
-public class Markdown {
+public class Markdown
+        implements TextProcessor {
 
     private static final Log LOG = LogFactory.getLog( Markdown.class );
 
@@ -43,7 +46,9 @@ public class Markdown {
             .escapeHtml( false )
             .build();
 
-
+    /**
+     * Renders the given markdown to HTML.
+     */
     public static String render( String markdown ) {
         Node doc = parser.parse( markdown );
         return renderer.render( doc );
@@ -69,5 +74,14 @@ public class Markdown {
                 }
             };
         }
+    }
+
+    // instance *******************************************
+
+    @Override
+    public void process( StringBuilder content, Context ctx ) throws Exception {
+        Node doc = parser.parseReader( new CharSequenceReader( content ) );
+        content.setLength( 0 );
+        renderer.render( doc, content );
     }
 }

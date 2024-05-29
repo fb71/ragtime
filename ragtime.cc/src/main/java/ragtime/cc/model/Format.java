@@ -22,9 +22,12 @@ import java.lang.annotation.Target;
 
 import org.polymap.model2.Property;
 
+import ragtime.cc.website.template.tp.Markdown;
+
 /**
  * Denotes the format of the {@link Property} value.
  *
+ * @see {@link Markdown}
  * @author Falko Bräutigam
  */
 @Retention( RetentionPolicy.RUNTIME )

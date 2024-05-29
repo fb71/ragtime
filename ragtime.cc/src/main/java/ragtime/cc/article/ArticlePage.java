@@ -19,6 +19,7 @@ import java.util.Arrays;
 import org.polymap.model2.query.Query.Order;
 
 import areca.common.Platform;
+import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -213,31 +214,43 @@ public class ArticlePage {
     }
 
 
-    protected void autocompletes( TextField t ) {
+    protected void autocompletes( TextField tf ) {
+        var t = Timer.start();
         var result = new ArrayList<String>();
         Platform.schedule( 2000, () -> null )
                 .then( __ -> {
+                    result.add( "::swiper::" );
+                    result.add( "::swiper?w=<Breite>,h=<Höhe>::" );
+                    result.add( "::excerpt::" );
+                    result.add( "----" );
+
                     return state.uow.query( Article.class )
-                            //.orderBy( Article.TYPE.title, Order.ASC ) // XXX newly created Article
+                            //.orderBy( Article.TYPE.title, Order.ASC ) // XXX does not work for newly created Article
+                            .maxResults( 7 )
                             .executeCollect();
                 })
                 .then( rs -> {
                     rs.forEach( article -> result.add( article.title.get() ) );
                     result.add( "----" );
-                    return state.uow.query( MediaEntity.class ).orderBy( MediaEntity.TYPE.name, Order.ASC ).executeCollect();
+
+                    return state.uow.query( MediaEntity.class )
+                            .orderBy( MediaEntity.TYPE.modified, Order.DESC )
+                            .maxResults( 7 )
+                            .executeCollect();
                 })
                 .onSuccess( rs -> {
-                    if (t.isDisposed()) {
-                        LOG.warn( "autocomplete: TextField already disposed" );
-                        return;
-                    }
                     rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
                     result.add( "----" );
 
-                    result.addAll( Arrays.asList( "article", "home", "frontpage?n=", "frontpage?t=") );
+                    result.addAll( Arrays.asList( "frontpage?n=", "frontpage?t=", "home" ) );
 
-                    LOG.info( "autocomplete: %s", result );
-                    t.autocomplete.set( result );
+                    LOG.info( "autocomplete: %s [%s]", result.size(), t );
+                    if (!tf.isDisposed()) {
+                        tf.autocomplete.set( result );
+                    }
+                    else {
+                        LOG.warn( "autocomplete: TextField already disposed" );
+                    }
                 });
     }
 

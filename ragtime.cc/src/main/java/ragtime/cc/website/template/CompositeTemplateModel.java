@@ -36,6 +36,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import ragtime.cc.model.Format;
 import ragtime.cc.model.Format.FormatType;
+import ragtime.cc.website.template.tp.Markdown;
 
 /**
  * A {@link TemplateModel} of a {@link Composite}.
@@ -114,13 +115,13 @@ public class CompositeTemplateModel
                 @SuppressWarnings( "unchecked" )
                 var p = (ManyAssociation<Entity>)prop.get( composite );
                 var associated = p.fetchCollect().waitForResult().get();
-                return new IterableAdapterTemplateModel<>( associated, e -> new CompositeTemplateModel( e ) );
+                return new IterableAdapterTemplateModel<>( associated, CompositeTemplateModel::new );
             }
             // Composite
             else if (Composite.class.isAssignableFrom( prop.getType() )) {
                 @SuppressWarnings( "unchecked" )
                 var p = (CollectionProperty<Composite>)prop.get( composite );
-                return new IterableAdapterTemplateModel<>( p, c -> new CompositeTemplateModel( c ) );
+                return new IterableAdapterTemplateModel<>( p, CompositeTemplateModel::new );
             }
         }
         throw new RuntimeException( "Not yet: " + prop);

@@ -36,15 +36,21 @@ public abstract class TopicTemplate {
 
     private static final Log LOG = LogFactory.getLog( TopicTemplate.class );
 
-    public static final Map<String,Class<? extends TopicTemplate>> available = new HashMap<>() {{
+    private static final Map<String,Class<? extends TopicTemplate>> available = new HashMap<>() {{
         put( "Basic", BasicTopicTemplate.class );
         put( "Tiles", TilesTopicTemplate.class );
     }};
 
+    /**
+     * All available topic template names.
+     */
     public static Set<String> availableNames() {
         return available.keySet();
     }
 
+    /**
+     * Creates a new instance of the {@link TopicTemplate} with the given name.
+     */
     public static Opt<TopicTemplate> forName( String name ) {
         try {
             return Opt.of( available.get( name ) ).map( cl -> cl.getDeclaredConstructor().newInstance() );
@@ -54,6 +60,9 @@ public abstract class TopicTemplate {
         }
     }
 
+    /**
+     *
+     */
     public static class Site {
         public Request r;
         public TopicEntity topic;
@@ -65,6 +74,14 @@ public abstract class TopicTemplate {
 
     public abstract String label();
 
+    /**
+     *
+     *
+     * @param site
+     * @return The *.ftl template to load and process.
+     * @throws TemplateNotFoundException
+     * @throws Exception
+     */
     public abstract Promise<String> process( Site site ) throws TemplateNotFoundException, Exception;
 
 }

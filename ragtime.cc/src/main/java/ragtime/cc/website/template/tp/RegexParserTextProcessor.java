@@ -11,29 +11,33 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  */
-package ragtime.cc.website.template.tt;
+package ragtime.cc.website.template.tp;
 
-import areca.common.Promise;
+import org.apache.commons.io.output.StringBuilderWriter;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import ragtime.cc.website.template.TemplateContentProviderBase.TemplateLoader;
 
 /**
  *
  * @author Falko Bräutigam
  */
-public class TilesTopicTemplate
-        extends BasicTopicTemplate {
+public abstract class RegexParserTextProcessor
+        implements TextProcessor {
 
-    private static final Log LOG = LogFactory.getLog( TilesTopicTemplate.class );
+    private static final Log LOG = LogFactory.getLog( RegexParserTextProcessor.class );
 
-    @Override
-    public String label() {
-        return "Tiles";
-    }
+    /**
+     *
+     */
+    protected String processFtl( String ftl, Context ctx ) throws Exception {
+        var cfg = TemplateLoader.configuration( ctx.config );
+        var template = cfg.getTemplate( ftl );
 
-    @Override
-    protected Promise<String> processTopic() {
-        return super.processTopic().map( __ -> "tiles.ftl" );
+        var out = new StringBuilderWriter();
+        template.process( ctx.data, out );
+        return out.getBuilder().toString();
     }
 
 }

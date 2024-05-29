@@ -28,7 +28,7 @@ import ragtime.cc.model.TopicEntity;
 import ragtime.cc.website.model.TopicTemplateConfigEntity;
 
 /**
- * Processes... {@link TopicTemplate}.
+ * Delegates to the {@link TopicTemplate} specified in the URL.
  *
  * @author Falko Bräutigam
  */
