@@ -196,7 +196,7 @@ public class MediaEntity
                                 .outputFormat( outputFormat )
                                 .toOutputStream( out );
 
-                        LOG.warn( "%s: %s (%s)", name.get(), out.size(), t );
+                        LOG.debug( "%s: %s (%s)", name.get(), out.size(), t );
                         return out.toByteArray();
                     }
                     catch (IOException e) {
@@ -299,7 +299,7 @@ public class MediaEntity
                     eventloop.enqueue( "FileReader", () -> promise.consumeResult( result ), 0 );
                 }
                 eventloop.enqueue( "FileReader", () -> promise.complete( null ), 0 );
-                LOG.info( "FileReader: %s - %s (%s)", f.getName(), size, t );
+                LOG.debug( "FileReader: %s - %s (%s)", f.getName(), size, t );
             }
             catch (Throwable e) {
                 promise.completeWithError( e );

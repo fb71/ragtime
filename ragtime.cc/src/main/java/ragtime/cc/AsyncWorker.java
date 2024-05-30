@@ -36,7 +36,7 @@ public class AsyncWorker<R>
 
     private static final Log LOG = LogFactory.getLog( AsyncWorker.class );
 
-    public static final int MAX_THREADS = 4;
+    public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
     private static ThreadPoolExecutor pool = new ThreadPoolExecutor( MAX_THREADS, MAX_THREADS,
             30, TimeUnit.SECONDS,
