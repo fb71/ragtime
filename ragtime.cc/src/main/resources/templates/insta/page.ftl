@@ -40,7 +40,7 @@
             <div class="IFace">
                 <@c.editable msg="page.title">
                     <#if config.leadImage??>
-                        <img class="IFaceBordered" src="media/${config.leadImage.id}?w=134&h=134"></img>
+                        <img class="IFaceBordered" src="media/${config.leadImage.id}?w=180&h=180"></img>
                     </#if>
                 </@c.editable>
             </div>
@@ -52,19 +52,17 @@
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
             <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto"> <#-- style="background-color: ${topic.color};"-->
+                <div class="ITopic col-auto"> <#--  style="background-color: ${topic.color};">  -->
                 <@c.editable msg="topic.${topic.id}">
-                  <div onclick="location.href='${topic.urlPart}';">
+                  <a href="${topic.urlPart}" style="display:block;">
 
                       <#if topic.medias?sequence?size gt 0>
                         <#assign media = topic.medias?sequence?first>
-                        <img src="media/${media.id}?w=50&h=50" class="img-fluid" alt="${media.name}"/>
-                      </#if>
-                      <#-- img src="media/bubble+R01_klein.png"></img-->
-                      
+                        <img src="media/${media.id}?w=75&h=75" class="img-fluid" alt="${media.name}"/>
+                      </#if>                      
                       <br/>
                       ${topic.title}
-                  </div>
+                  </a>
                 </@c.editable>
                 </div>
             </#list>
