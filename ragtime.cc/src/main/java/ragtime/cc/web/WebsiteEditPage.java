@@ -223,9 +223,10 @@ public class WebsiteEditPage {
                 var component = Sequence.of( composite.components.get() ).single();
 
                 // on phone oversize so that browser bar and Page header can be scrolled out view
-                var height = size.width() <= 450 && size.height() <= 750
-                        ? size.height() + 110
-                        : size.height();
+//                var height = size.width() <= 450 && size.height() <= 750
+//                        ? size.height() + 110
+//                        : size.height();
+                var height = size.height();
 
                 component.size.set( Size.of( size.width(), height ) );
                 component.position.set( Position.of( 0, 0 ) );
