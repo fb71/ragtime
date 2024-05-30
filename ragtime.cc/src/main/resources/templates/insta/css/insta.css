@@ -83,6 +83,7 @@ p {
 
 .ITopics {
     padding-left: calc(var(--common-header-height) * 1.25);
+    margin-bottom: 0.5em;
 }
 
 .ITopicsScroller {
