@@ -1,6 +1,12 @@
 @font-face {
   font-family: 'RobotoC';
-  font-weight: normal;
+  font-weight: 100;
+  font-style: normal;
+  src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Light.ttf');
+}
+@font-face {
+  font-family: 'RobotoC';
+  font-weight: 400; /* normal */
   font-style: normal;
   src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Regular.ttf');
 }
@@ -12,7 +18,7 @@
 }
 @font-face {
   font-family: 'RobotoC';
-  font-weight: bold;
+  font-weight: 700; /* bold */
   font-style: normal;
   src: url('../common/fonts/RobotoCondensed/RobotoCondensed-Bold.ttf');
 }

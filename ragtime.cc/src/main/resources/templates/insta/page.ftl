@@ -34,6 +34,7 @@
             ">
             <@c.editable msg="page.title">
                 <h1>${config.page.title}</h1>
+                <h4>${config.page.title2}</h4>
             </@c.editable>
             <#-- Face -->
             <div class="IFace">
