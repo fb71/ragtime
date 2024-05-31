@@ -228,7 +228,8 @@ public class LoginState {
                 })
                 .map( account -> {
                     Email.send( account.email.get(), "Neues Passwort",
-                            "Ihr neues Passwort für *fb71.org* lautet: " + newPwd +
+                            "Dein neues Passwort für *fb71.org* lautet: " + newPwd +
+                            "\n\n    Login: https://fb71.org/cc/" +
                             "\n\nWenn Sie kein neues Passwort angefordert haben, dann" +
                             "\nantworten Sie bitte auf diese EMail mit einem kurzen Hinweis." +
                             "\nVielen Dank!" );
@@ -243,7 +244,7 @@ public class LoginState {
                 .executeCollect()
                 .then( rs -> {
                     if (!rs.isEmpty()) {
-                        throw new LoginException( "EMail existiert bereits: '" + email + "'" );
+                        throw new LoginException( "EMail existiert bereits: <em>" + email + "</em>" );
                     }
                     uow.createEntity( AccountEntity.class, AccountEntity.defaults( email ) );
                     return sendNewPasswordAction( email );

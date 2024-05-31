@@ -62,7 +62,6 @@ public class ContentRepo {
 
     public static EntityRepository waitFor( AccountEntity account ) {
         return instanceOf( account ).waitForResult().get();
-
     }
 
 

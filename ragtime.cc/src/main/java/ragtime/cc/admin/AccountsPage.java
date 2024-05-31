@@ -32,11 +32,16 @@ import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
+import areca.ui.layout.FillLayout;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
+import areca.ui.viewer.CompositeListViewer;
+import areca.ui.viewer.ViewerContext;
+import ragtime.cc.ConfirmDialog;
+import ragtime.cc.LoginState;
 import ragtime.cc.model.AccountEntity;
 
 /**
@@ -71,67 +76,70 @@ public class AccountsPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Accounts" );
 
-        // actions
-        site.actions.add( new Action() {{
-            icon.set( "add" );
-            description.set( "Neuen Account anlegen" );
-            //handler.set( ev -> state.createAccountAction() );
-        }});
-
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
+        ui.body.layout.set( RowLayout.filled().vertical().margins( 15, 15 ).spacing( 15 ) );
 
         // list
         ui.body.add( new ScrollableComposite() {{
-            list = this;
-            layout.set( RowLayout.filled().vertical().spacing( 10 ) );
-            add( new Text() {{
-               content.set( "..." );
-            }});
-            state.accounts.subscribe( ev -> refreshArticlesList() )
-                    .unsubscribeIf( () -> site.isClosed() );
-            refreshArticlesList();
+            layout.set( FillLayout.defaults() );
+            add( new ViewerContext<>()
+                    .viewer( new CompositeListViewer<AccountEntity>( AccountListItem::new ) {{
+                        etag.set( account -> account.modified.get() );
+                        lines.set( true );
+                        oddEven.set( true );
+                        onSelect.set( account -> {
+                            state.selected.set( account );
+                            state.becomeAccountAction( account );
+                        });
+                    }})
+                    .model( state.accounts )
+                    .createAndLoad() );
+        }});
+
+        // action: logout
+        site.actions.add( new Action() {{
+            order.set( 0 );
+            icon.set( "logout" );
+            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
+            handler.set( ev -> {
+                LoginState.logout( state.account ).onSuccess( __ -> {
+                    ui.body.components.disposeAll();
+                    ui.body.add( new Text() {{
+                        content.set( "Logout complete. Reload browser!" );
+                    }});
+                    ui.body.layout();
+                });
+            });
         }});
         return ui;
-    }
-
-
-    protected void refreshArticlesList() {
-        list.components.disposeAll();  // XXX race cond.
-        state.accounts.load( 0, 100 ).onSuccess( opt -> {
-            opt.ifPresent( article -> {
-                list.add( new AccountListItem( article ) );
-            } );
-            opt.ifAbsent( __ -> {
-                list.layout();
-            });
-        });
     }
 
 
     /**
      *
      */
-    protected class AccountListItem extends Button {
+    protected class AccountListItem extends UIComposite {
 
         public AccountListItem( AccountEntity account ) {
-            layoutConstraints.set( RowConstraints.height( 50 ) );
-            layout.set( RowLayout.filled().vertical().margins( 10, 10 ).spacing( 8 ) );
-            bordered.set( false );
+            lc( RowConstraints.height( 54 ));
+            layout.set( RowLayout.filled().margins( 10, 10 ) );
+            // title
             add( new Text() {{
-                //format.set( Format.HTML );
-                content.set( account.email.get() +
-                        (account.isAdmin.get() ? " (" + account.login.get() + ")" : "") );
+                format.set( Format.HTML );
+                content.set( account.email.get() + (account.isAdmin.get() ? " (" + account.login.get() + ")" : "") + "<br/>" +
+                        "<span style=\"font-size:10px; color:#808080;\">Last login: " + df.format( account.lastLogin.get() ) + "</span>" );
             }});
-            add( new Text() {{
-                content.set( "Login: " + df.format( account.lastLogin.get() ) );
-                styles.add( CssStyle.of( "font-size", "10px") );
-                styles.add( CssStyle.of( "color", "#707070") );
-                enabled.set( false );
+            add( new Button() {{
+                lc( RowConstraints.width( 40 ));
+                icon.set( "close" );
+                tooltip.set( "Löschen" );
+                events.on( EventType.SELECT, ev -> {
+                    ConfirmDialog.createAndOpen( "Account", "<b><center>" + account.email.get() + "</center></b>" )
+                            .size.set( Size.of( 320, 200 ) )
+                            .addDeleteAction( () -> {
+                                state.deleteAccountAction( account );
+                            });
+                });
             }});
-            events.on( EventType.SELECT, ev -> {
-                state.selected.set( account );
-                state.becomeAccountAction( account );
-            });
         }
     }
 }

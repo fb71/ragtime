@@ -125,7 +125,7 @@ public class LoginPage {
                 layoutConstraints.set( RowConstraints.height( 40 ) );
                 //type.set( Button.Type.SUBMIT );
                 label.set( "Registrieren" );
-                tooltip.set( "Registriert einen neuen Nutzer\nmit der oben eingetragenen EMail-Adresse.\nDas Passwort wird an diese Adresse verschickt." );
+                tooltip.set( "Registriert einen neuen Nutzer für\ndie oben angegebene EMail-Adresse.\nDas Passwort wird an diese Adresse verschickt." );
                 enabled.set( false );
                 form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
                 events.on( EventType.SELECT, ev -> {

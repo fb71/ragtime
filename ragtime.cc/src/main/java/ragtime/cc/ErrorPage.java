@@ -88,7 +88,7 @@ public class ErrorPage {
         ui.body.add( new Text() {{
             lc( RowConstraints.height( 120 ) );
             format.set( Text.Format.HTML );
-            content.set( "<h2>Etwas hat nicht funktioniert :(</h2>"
+            content.set( "<h2>Leider ging etwas schief :(</h2>"
                     + "<p>"
                     + "Du kannst Bescheid sagen, indem du hier unten eine kleine Nachricht "
                     + "schreibst."

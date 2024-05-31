@@ -93,21 +93,6 @@ public class ArticlesPage {
 //            description.set( "Einstellungen" );
 //            handler.set( ev -> state.openSettingsAction() );
 //        }});
-//        // action: logout
-//        site.actions.add( new Action() {{
-//            order.set( 0 );
-//            icon.set( "logout" );
-//            description.set( state.account.login.get() + "\nAnmeldedaten löschen\nBeim nächsten Start neu anmelden" );
-//            handler.set( ev -> {
-//                LoginState.logout( state.account ).onSuccess( __ -> {
-//                    ui.body.components.disposeAll();
-//                    ui.body.add( new Text() {{
-//                        content.set( "Logout complete. Reload browser!" );
-//                    }});
-//                    ui.body.layout();
-//                });
-//            });
-//        }});
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 22, 22 ) ).spacing( 15 ) );
 

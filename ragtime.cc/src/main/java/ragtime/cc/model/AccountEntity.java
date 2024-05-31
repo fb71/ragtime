@@ -15,11 +15,14 @@ package ragtime.cc.model;
 
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
+
 import org.polymap.model2.Defaults;
 import org.polymap.model2.Immutable;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
 
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
@@ -51,6 +54,21 @@ public class AccountEntity
             proto.permid.set( permid );
             Workspace.create( proto );
         };
+    }
+
+    @Override
+    public void onLifecycleChange( State state ) {
+        super.onLifecycleChange( state );
+
+        if (state == State.AFTER_SUBMIT && status() == EntityStatus.REMOVED) {
+            ContentRepo.instanceOf( this ).onSuccess( repo -> {
+                repo.close();
+
+                var ws = Workspace.of( this );
+                FileUtils.deleteDirectory( ws );
+                LOG.info( "Deleted: %s", ws );
+            });
+        }
     }
 
     // instance *******************************************

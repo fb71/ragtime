@@ -20,7 +20,9 @@ import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
 import org.polymap.model2.runtime.UnitOfWork;
+import org.polymap.model2.runtime.UnitOfWork.Submitted;
 
+import areca.common.Promise;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -105,6 +107,12 @@ public class AccountsState
                 .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
                 .putContext( contentUow, State.Context.DEFAULT_SCOPE )
                 .activate();
+    }
+
+
+    public Promise<Submitted> deleteAccountAction( AccountEntity delete ) {
+        mainUow.removeEntity( delete );
+        return mainUow.submit();
     }
 
 }
