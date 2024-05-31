@@ -3,14 +3,25 @@
  */
 :root {
     --bs-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
-    --common-header-height: calc(15vh + 5vw);
+
+    /** The base/standard height of the header. */
+    --common-header-height-base: calc(15vh + 5vw);
+
+    /** Customizable factor */
+    --common-header-height-factor: 1;
+    /** The height that is actually applied. */
+    --common-header-height: calc(var(--common-header-height-base) * var(--common-header-height-factor));
+    
+    /** Customizable factor */
+    --common-face-height-factor: 0.9;
+    /** The height that is actually applied. */
+    --common-face-height: calc(var(--common-header-height-base) * var(--common-face-height-factor));
 }
 
 a {
     text-decoration: none;
 }
 a:hover {
-/*    filter: brightness(0.9) saturate(1.5);  */
     text-decoration: underline;
 }
 
@@ -66,10 +77,10 @@ p {
     
 .IHeader .IFace {
     position: absolute;
-    top: calc(var(--common-header-height) * 0.55);
-    width: calc(var(--common-header-height) * 0.9);
-    height: calc(var(--common-header-height) * 0.9);
-    border-radius: 100px;
+    top: calc(var(--common-header-height) - calc(var(--common-face-height) / 2));
+    width: var(--common-face-height);
+    height: var(--common-face-height);
+    border-radius: 100%;
     margin-left: calc(var(--bs-gutter-x) * .5);
     border: 3px solid var(--common-page-bg);
 }
@@ -82,7 +93,7 @@ p {
 }
 
 .ITopics {
-    padding-left: calc(var(--common-header-height) * 1.25);
+    padding-left: calc(var(--common-face-height) * 1.35);
     margin-bottom: 1em;
 }
 
@@ -96,17 +107,15 @@ p {
 }
 
 .ITopic {
-    width: calc(var(--common-header-height) * 0.5);
-    height: calc(var(--common-header-height) * 0.5);
-    --bs-gutter-x: calc(var(--common-header-height) * 0.18);
+    --bs-gutter-x: calc(var(--common-face-height) * 0.20);
+    width: calc(var(--common-face-height) * 0.6);
+    height: calc(var(--common-face-height) * 0.6);
+    min-width: 75px;
+    min-height: 75px;
     margin-top: 8px;
     font-size: smaller;
     text-align: center;
     color: var(--common-link-color);
-}
-.ITopic:hover {
-    filter: brightness(1.1);
-    cursor: pointer;
 }
 .ITopic img {
     height: auto;
@@ -117,6 +126,10 @@ p {
     /* for inset shadow */
     z-index: -1;
     position: relative;
+}
+.ITopic img:hover {
+    box-shadow: 0 1px 4px rgb(0 0 0 / 60%);
+    border: 1px solid var(--common-link-color);
 }
 
 .ITopicBio {
