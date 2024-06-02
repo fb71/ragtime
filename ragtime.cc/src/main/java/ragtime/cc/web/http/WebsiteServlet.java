@@ -116,9 +116,11 @@ public class WebsiteServlet
             this.httpResponse = resp;
             this.path = parts;
         }};
-        request.uow = ContentRepo.waitFor( permid ).newUnitOfWork();
-
-        request.uow.query( TemplateConfigEntity.class ).singleResult()
+        ContentRepo.of( permid )
+                .then( repo -> {
+                    request.uow = repo.newUnitOfWork();
+                    return request.uow.query( TemplateConfigEntity.class ).singleResult();
+                })
                 .then( config -> {
                     request.config = config;
 

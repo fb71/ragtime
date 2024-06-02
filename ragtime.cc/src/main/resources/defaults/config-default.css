@@ -1,6 +1,11 @@
 /**
  * Default styling of common website elements.
  */
+@media (min-width: 768px) {
+   .container {
+     max-width: 760px !important;
+   }
+}
   
 .CHeader {
     /* text-align: center; */

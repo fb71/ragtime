@@ -61,7 +61,7 @@ public class AccountEntity
         super.onLifecycleChange( state );
 
         if (state == State.AFTER_SUBMIT && status() == EntityStatus.REMOVED) {
-            ContentRepo.instanceOf( this ).onSuccess( repo -> {
+            ContentRepo.of( this ).onSuccess( repo -> {
                 repo.close();
 
                 var ws = Workspace.of( this );

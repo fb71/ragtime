@@ -20,15 +20,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.polymap.model2.runtime.EntityRepository;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
 import org.polymap.model2.store.no2.No2Store;
 
 import areca.common.Promise;
+import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.Workspace;
@@ -37,6 +40,7 @@ import ragtime.cc.web.model.TemplateConfigEntity;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
 import ragtime.cc.web.model.WebsiteConfigEntity;
 import ragtime.cc.web.template.ArticleTemplateModel;
+import ragtime.cc.web.template.topic.TopicTemplateContentProvider;
 
 /**
  *
@@ -60,18 +64,19 @@ public class ContentRepo {
     }
 
 
-    public static EntityRepository waitFor( AccountEntity account ) {
-        return instanceOf( account ).waitForResult().get();
-    }
-
-
-    public static Promise<EntityRepository> instanceOf( AccountEntity account ) {
+    public static Promise<EntityRepository> of( AccountEntity account ) {
         var permid = account.permid.get();
         return repos.computeIfAbsent( permid, __ -> {
-            return create( account.permid.get() ).then( newRepo -> {
-                // XXX fix old repos
-                return checkAccount( newRepo, account ).map( ___ -> newRepo );
-            });
+
+            // XXX testing
+//            if (account.email.get().equals( "f.braeutigam@polymap.de" )) {
+//                FileUtils.deleteQuietly( Workspace.of( permid ) );
+//                Workspace.of( permid ).mkdir();
+//            }
+
+            return initRepo( permid )
+                    .then( repo -> checkInitAccount( repo, account ).map( ___ -> repo ) )
+                    .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) );
         });
     }
 
@@ -79,15 +84,15 @@ public class ContentRepo {
     /**
      * Called from {@link WebsiteServlet} without {@link AccountEntity}.
      */
-    public static EntityRepository waitFor( int permid ) {
+    public static Promise<EntityRepository> of( int permid ) {
         return repos.computeIfAbsent( permid, __ -> {
-            return create( permid );
-        }).waitForResult().get();
+            return initRepo( permid );
+        });
     }
 
 
-    protected static Promise<EntityRepository> create( int permid ) {
-        File workspace = Workspace.of( permid );
+    protected static Promise<EntityRepository> initRepo( int permid ) {
+        var workspace = Workspace.of( permid );
         if (!workspace.exists()) {
             throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
         }
@@ -102,15 +107,11 @@ public class ContentRepo {
                         WebsiteConfigEntity.info, TemplateConfigEntity.info, TopicTemplateConfigEntity.info,
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )
-                .create()
-                .then( newRepo -> {
-                    LOG.debug( "Repo: initialized" );
-                    return populateContentRepo( newRepo ).map( ___ -> newRepo );
-                });
+                .create();
     }
 
 
-    protected static Promise<Submitted> checkAccount( EntityRepository repo, AccountEntity account ) {
+    protected static Promise<Submitted> checkInitAccount( EntityRepository repo, AccountEntity account ) {
         var uow2 = repo.newUnitOfWork();
         return uow2.query( AccountEntity.class )
                 .executeCollect()
@@ -127,67 +128,79 @@ public class ContentRepo {
     }
 
 
-    protected static Promise<Submitted> populateContentRepo( EntityRepository repo ) {
+    protected static Promise<Submitted> checkInitContent( EntityRepository repo, AccountEntity account ) {
         var uow2 = repo.newUnitOfWork();
-        return uow2.query( Article.class )
-                .executeCollect()
+        return uow2.query( Article.class ).executeCollect()
                 .then( rs -> {
                     if (rs.size() == 0) {
                         // model version
                         uow2.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_CONTENT ) );
-                        // Tags
-                        var homeTag = uow2.createEntity( TagEntity.class, proto -> {
-                            proto.category.set( TagEntity.WEBSITE_NAVI );
-                            proto.name.set( "Home" );
+                        // Medias
+                        //var sanddorn = uow2.createEntity( MediaEntity.class, defaultMedia( "sanddorn.jpeg" ));
+                        var wohnung = uow2.createEntity( MediaEntity.class, defaultMedia( "wohnung.jpeg" ));
+                        var areca = uow2.createEntity( MediaEntity.class, defaultMedia( "areca.jpeg" ));
+                        // Topics
+                        var main = uow2.createEntity( TopicEntity.class, proto -> {
+                            proto.title.set( "Willkommen" );
+                            proto.description.set( defaults( "mainTopic.md" ) );
+                            proto.order.set( 1 );
+                            proto.medias.add( wohnung );
+                            proto.urlPart.set( "home" );
                         });
-                        var asideTag = uow2.createEntity( TagEntity.class, proto -> {
-                            proto.category.set( TagEntity.WEBSITE_NAVI );
-                            proto.name.set( "aside" );
+                        var legal = uow2.createEntity( TopicEntity.class, proto -> {
+                            proto.title.set( "Rechtliches" );
+                            proto.description.set( defaults( "legalTopic.md" ) );
+                            proto.order.set( 2 );
+                            proto.medias.add( wohnung );
+                            proto.urlPart.set( "legal" );
                         });
                         // Article
                         uow2.createEntity( Article.class, proto -> {
-                            proto.title.set( "Willkommen" );
-                            proto.content.set( "## Willkommen\n\n..." );
-                            proto.tags.add( homeTag );
+                            proto.title.set( "Bedienung" );
+                            proto.content.set( defaults( "bedienung.md" ) );
+                            proto.topic.set( main );
                         });
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Impressum" );
-                            proto.content.set( "## Impressum\n\n..." );
+                            proto.content.set( defaults( "impressum.md" ) );
+                            proto.topic.set( legal );
+                            proto.order.set( 1 );
                         });
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Datenschutz" );
-                            proto.content.set( "## Datenschutz\n\n..." );
-                        });
-                        uow2.createEntity( Article.class, proto -> {
-                            proto.title.set( "Kasten mit Bild" );
-                            proto.content.set( "Kontakt..." );
-                            proto.tags.add( asideTag );
+                            proto.content.set( defaults( "datenschutz.md" ) );
+                            proto.topic.set( legal );
+                            proto.order.set( 2 );
                         });
                         // TemplateConfig
-                        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                        var css = IOUtils.toString( cl.getResource( "config-default.css" ), "UTF-8" );
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
+                            proto.templateName.set( TopicTemplateContentProvider.templates.get( 0 ) );
+                            proto.bannerImage.set( areca );
+                            proto.leadImage.set( wohnung );
+                            proto.colors.get().headerBackground.set( "#e0ddd2");
+                            proto.colors.get().headerForeground.set( "#ffffff");
+                            proto.colors.get().pageBackground.set( "#f0f0f0");
+                            proto.colors.get().pageForeground.set( "#3d3e3d");
+                            proto.colors.get().footerBackground.set( "#d5d1c3");
+                            proto.colors.get().footerForeground.set( "#3d3e3d");
+                            proto.colors.get().accent.set( "#52784f");
+                            proto.colors.get().link.set( "#db7e00" );
                             proto.page.createValue( page -> {
-                                page.title.set( "Titel" );
-                                page.title2.set( "Untertitel" );
+                                page.title.set( "Meine Website" );
+                                page.title2.set( "Hier sollte etwas anderes stehen" );
                                 page.footer.set( "&copy; ..." );
                             });
-                            proto.navItems.createElement( navItem -> {
-                                navItem.title.set( "Willkommen" );
-                                navItem.href.set( "home" );
-                                navItem.order.set( 1 );
-                            });
-                            proto.navItems.createElement( navItem -> {
+                            proto.footerNavItems.createElement( navItem -> {
                                 navItem.title.set( "Datenschutz" );
                                 navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
                                 navItem.order.set( 2 );
                             });
-                            proto.navItems.createElement( navItem -> {
+                            proto.footerNavItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );
                                 navItem.href.set( String.format( "frontpage?%s=Impressum", ArticleTemplateModel.PARAM_TITLE ) );
                                 navItem.order.set( 3 );
                             });
-                            proto.css.set( css );
+                            proto.css.set( defaults( "config-default.css" ) );
                         });
                     }
                     LOG.debug( "Repo: content created" );
@@ -196,6 +209,37 @@ public class ContentRepo {
                 .onSuccess( submitted -> {
                     LOG.debug( "Repo: submitted." );
                 });
+    }
+
+
+    protected static String defaults( String res ) {
+        try {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            return IOUtils.toString( cl.getResource( "defaults/" + res ), "UTF-8" );
+        }
+        catch (IOException e) {
+            throw new RuntimeException( e );
+        }
+    }
+
+
+    protected static RConsumer<MediaEntity> defaultMedia( String res ) {
+        return proto -> {
+            MediaEntity.defaults().accept( proto );
+            proto.mimetype.set( "image/" + StringUtils.substringAfterLast( res, "." ) );
+            proto.name.set( res );
+
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            try (
+                var out = proto.out();
+                var in = cl.getResourceAsStream( "defaults/" + res )
+            ){
+                IOUtils.copy( in, out );
+            }
+            catch (IOException e) {
+                throw new RuntimeException( e );
+            }
+        };
     }
 
 

@@ -100,13 +100,14 @@ public class AccountsState
 
     @State.Action
     public void becomeAccountAction( @SuppressWarnings( "hiding" ) AccountEntity account ) {
-        var contentRepo = ContentRepo.waitFor( account );
-        var contentUow = contentRepo.newUnitOfWork();
-        site.createState( new WebsiteEditState() )
-                .putContext( account, MainRepo.SCOPE )
-                .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
-                .putContext( contentUow, State.Context.DEFAULT_SCOPE )
-                .activate();
+        ContentRepo.of( account ).onSuccess( contentRepo -> {
+            var contentUow = contentRepo.newUnitOfWork();
+            site.createState( new WebsiteEditState() )
+                    .putContext( account, MainRepo.SCOPE )
+                    .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
+                    .putContext( contentUow, State.Context.DEFAULT_SCOPE )
+                    .activate();
+        });
     }
 
 

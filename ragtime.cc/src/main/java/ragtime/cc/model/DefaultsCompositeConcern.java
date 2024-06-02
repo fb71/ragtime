@@ -28,7 +28,7 @@ import areca.common.reflect.RuntimeInfo;
  * Creates an empty {@link Composite} value for an un-initializes/null
  * {@link Property}. Helps with model schema evolution.
  * <p>
- * Beware that this calls {@link Property#createValue(areca.common.base.Consumer)}
+ * Beware: this calls {@link Property#createValue(areca.common.base.Consumer)}
  * which modifies the Entity!
  * <p>
  * The {@link Property} needs to be {@link Nullable} (although it will never return

@@ -27,18 +27,23 @@ a:hover {
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 300;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.4em;
 }
 h5, h6 {
     font-weight: 400;    
 }
 p {
     margin-bottom: 0.9em;
+    line-height: 1.4;
 }
 
 .ITiles {
     --bs-gutter-x: 0.3rem;
     --bs-gutter-y: 0.3rem;
+}
+.ITile {
+    font-size: calc(0.6vh + 0.6vw);
+    text-align: center;
 }
 
 .IClickable {
@@ -83,6 +88,7 @@ p {
     border-radius: 100%;
     margin-left: calc(var(--bs-gutter-x) * .5);
     border: 3px solid var(--common-page-bg);
+    background-color: var(--common-header-bg)
 }
 
 .IHeader .IFaceBordered {
@@ -140,14 +146,14 @@ p {
 .ITopicBio dl,
 .ITopicBio ol,
 .ITopicBio ul {
-    margin-bottom: 0.2em;
+    margin-bottom: 0.9em;
 }
 .ITopicBio h1,
 .ITopicBio h2,
 .ITopicBio h3,
 .ITopicBio h4,
 .ITopicBio h5 {
-    margin-bottom: 0.2em;
+    margin-bottom: 0.4em;
 }
 
 .IContent {

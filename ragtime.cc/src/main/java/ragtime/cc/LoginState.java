@@ -138,24 +138,25 @@ public class LoginState {
 
 
     protected void advanceState( AccountEntity account ) {
-        var contentRepo = ContentRepo.waitFor( account );
-        var contentUow = contentRepo.newUnitOfWork();
-        site.createState( new WebsiteEditState() )
-                .putContext( account, MainRepo.SCOPE )
-                .putContext( repo, MainRepo.SCOPE )
-                .putContext( uow, MainRepo.SCOPE )
-                .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
-                .putContext( contentUow, State.Context.DEFAULT_SCOPE )
-                .activate();
+        ContentRepo.of( account ).onSuccess( contentRepo -> {
+            var contentUow = contentRepo.newUnitOfWork();
+            site.createState( new WebsiteEditState() )
+                    .putContext( account, MainRepo.SCOPE )
+                    .putContext( repo, MainRepo.SCOPE )
+                    .putContext( uow, MainRepo.SCOPE )
+                    .putContext( contentRepo, State.Context.DEFAULT_SCOPE )
+                    .putContext( contentUow, State.Context.DEFAULT_SCOPE )
+                    .activate();
 
-        if (!account.helpSeen.get()) {
-            Platform.schedule( 2000, () -> {
-                Pageflow.current().create( new HelpPage() )
-                        .putContext( account, Page.Context.DEFAULT_SCOPE )
-                        .putContext( WebsiteEditPage.class.getSimpleName(), Page.Context.DEFAULT_SCOPE )
-                        .open();
-            });
-        }
+            if (!account.helpSeen.get()) {
+                Platform.schedule( 2000, () -> {
+                    Pageflow.current().create( new HelpPage() )
+                            .putContext( account, Page.Context.DEFAULT_SCOPE )
+                            .putContext( WebsiteEditPage.class.getSimpleName(), Page.Context.DEFAULT_SCOPE )
+                            .open();
+                } );
+            }
+        });
     }
 
 
