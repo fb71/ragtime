@@ -123,24 +123,31 @@ public class LoginPage {
             // Register
             add( new Button() {{
                 layoutConstraints.set( RowConstraints.height( 40 ) );
-                //type.set( Button.Type.SUBMIT );
                 label.set( "Registrieren" );
-                tooltip.set( "Registriert einen neuen Nutzer für\ndie oben angegebene EMail-Adresse.\nDas Passwort wird an diese Adresse verschickt." );
-                enabled.set( false );
-                form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
+                tooltip.set( "Registriert einen neuen Nutzer für\ndie oben eingegebene EMail-Adresse.\nDas Passwort wird an diese Adresse verschickt." );
+                //enabled.set( false );
+                //form.subscribe( ev -> enabled.set( form.isChanged() && form.isValid() ) );
                 events.on( EventType.SELECT, ev -> {
-                    responseTxt.content.set( "Neuer Nutzer wird erstellt..." );
-                    Platform.schedule( 500, () -> {
-                        var email = loginField.content.$();
-                        state.registerAction( email )
-                                .onSuccess( __ -> {
-                                    responseTxt.content.set( "EMail wurde versendet an:<br/><b>" + email + "</b>" );
-                                })
-                                .onError( e -> {
-                                    responseTxt.content.set( "<b>Nutzer konnte nicht angelegt werden.</b><br/>" + e.getMessage() );
-                                    e.printStackTrace();
-                                });
-                    });
+                    if (!form.isChanged() || !form.isValid()) {
+                        ConfirmDialog.create( "EMail", "Bitte gib eine gültige Adresse im Feld <b>EMail</b> ein.<br/>Das Passwort wird an diese Adresse geschickt." )
+                                .size.set( Size.of(  330, 190 ) )
+                                .addOkAction( () -> LOG.info( "ok" ) )
+                                .open();
+                    }
+                    else {
+                        responseTxt.content.set( "Neuer Nutzer wird erstellt..." );
+                        Platform.schedule( 500, () -> {
+                            var email = loginField.content.$();
+                            state.registerAction( email )
+                                    .onSuccess( __ -> {
+                                        responseTxt.content.set( "EMail wurde versendet an:<br/><b>" + email + "</b>" );
+                                    })
+                                    .onError( e -> {
+                                        responseTxt.content.set( "<b>Nutzer konnte nicht angelegt werden.</b><br/>" + e.getMessage() );
+                                        e.printStackTrace();
+                                    });
+                        });
+                    }
                 });
             }});
             //
