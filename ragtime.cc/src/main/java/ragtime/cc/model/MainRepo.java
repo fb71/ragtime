@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import java.io.File;
 
+import org.polymap.model2.query.Expressions;
 import org.polymap.model2.runtime.EntityRepository;
 import org.polymap.model2.runtime.UnitOfWork;
 import org.polymap.model2.runtime.UnitOfWork.Submitted;
@@ -57,10 +58,6 @@ public class MainRepo {
         });
     }
 
-    public static EntityRepository waitFor() {
-        return instance().waitForResult().get();
-    }
-
 
     /**
      * The global main {@link EntityRepository}.
@@ -76,21 +73,38 @@ public class MainRepo {
                     .store.set( new No2Store( dbfile ) )
                     .create()
                     .then( newRepo -> {
-                        LOG.debug( "Repo: created." );
-                        return populateMainRepo( newRepo ).map( __ -> newRepo );
+                        LOG.debug( "Repo: opened" );
+                        return checkInitMainRepo( newRepo ).map( __ -> newRepo );
+                    })
+                    .onSuccess( submitted -> {
+                        LOG.debug( "Repo: initialized" );
                     });
         });
     }
 
 
-    protected static Promise<Submitted> populateMainRepo( EntityRepository repo ) {
+    protected static Promise<Submitted> checkInitMainRepo( EntityRepository repo ) {
         var uow = repo.newUnitOfWork();  // must not be closed as we are giving back promise
-        return uow.query( AccountEntity.class ).executeCollect()
+        return uow.query( ModelVersionEntity.class ).executeCollect()
                 .then( rs -> {
+                    // model version
                     if (rs.size() == 0) {
-                        // model version
                         uow.createEntity( ModelVersionEntity.class, ModelVersionEntity.defaults( SCHEMA_VERSION_MAIN ) );
-                        // admin
+                    }
+
+                    return uow.query( AccountEntity.class )
+                            .where( Expressions.eq( AccountEntity.TYPE.login, CCApp.config.adminLogin ) )
+                            .executeCollect();
+                })
+                .then( rs -> {
+                    // fix wrong admins
+                    for (var admin : rs) {
+                        if (admin.permid.get() != 0) {
+                            LOG.warn( "FIX: admin: %s" + admin.permid.get() );
+                            uow.removeEntity( admin );
+                        }
+                    }
+                    if (rs.isEmpty()) {
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
                             proto.login.set( CCApp.config.adminLogin );
@@ -99,13 +113,8 @@ public class MainRepo {
                             proto.permid.set( 0 );
                             Workspace.create( proto );
                         });
-                        // gienke
-                        uow.createEntity( AccountEntity.class, AccountEntity.defaults( "praxis@psychotherapie-gienke.de" ) );
                     }
                     return uow.submit();
-                })
-                .onSuccess( submitted -> {
-                    LOG.debug( "Repo: submitted." );
                 });
     }
 

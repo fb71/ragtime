@@ -89,24 +89,26 @@ public class LoginState {
 
     @State.Init
     public void init() {
-        repo = MainRepo.waitFor();
-        uow = repo.newUnitOfWork(); // .setPriority( priority );
+        MainRepo.instance().onSuccess( _repo -> {
+            repo = _repo;
+            uow = repo.newUnitOfWork(); // .setPriority( priority );
 
-        Platform.async( () -> {
-            var remembered = remembered();
-            if (remembered != null) {
-                LOG.warn( "Remembered: %s", remembered );
-                remembered.lastLogin.set( new Date() );
-                uow.submit().onSuccess( __ -> {
-                    advanceState( remembered );
-                });
-            }
-            else {
-                pageflow.create( new LoginPage() )
-                        .putContext( this, Page.Context.DEFAULT_SCOPE )
-                        .putContext( uic, Page.Context.DEFAULT_SCOPE )
-                        .open();
-            }
+            Platform.async( () -> {
+                var remembered = remembered();
+                if (remembered != null) {
+                    LOG.warn( "Remembered: %s", remembered );
+                    remembered.lastLogin.set( new Date() );
+                    uow.submit().onSuccess( __ -> {
+                        advanceState( remembered );
+                    });
+                }
+                else {
+                    pageflow.create( new LoginPage() )
+                            .putContext( this, Page.Context.DEFAULT_SCOPE )
+                            .putContext( uic, Page.Context.DEFAULT_SCOPE )
+                            .open();
+                }
+            });
         });
     }
 
@@ -117,7 +119,7 @@ public class LoginState {
                 .where( Expressions.eq( AccountEntity.TYPE.login, login.get() ) )
                 .executeCollect()
                 .map( rs -> {
-                    Assert.that( rs.size() <= 1 );
+                    Assert.that( rs.size() <= 1, "Multiple: " + login.get() + " (" + rs.size() + ")" );
                     if (rs.isEmpty()) {
                         throw new LoginException( "No such login: '" + login.get() + "'" );
                     }
@@ -240,6 +242,7 @@ public class LoginState {
 
 
     public Promise<AccountEntity> registerAction( String email ) {
+        Assert.that( !email.equals( CCApp.config.adminLogin ), "Admin überschreiben!?" );
         return uow.query( AccountEntity.class )
                 .where( /*XXX or( eq( AccountEntity.TYPE.login, login ),*/ eq( AccountEntity.TYPE.email, email ) )
                 .executeCollect()
