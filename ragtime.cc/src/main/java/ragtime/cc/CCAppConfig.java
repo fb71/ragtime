@@ -82,4 +82,7 @@ public class CCAppConfig {
     public String igUser;
     public String igPassword;
 
+    public String adminLogin;
+    public String adminEMail;
+    public String adminPassword;
 }

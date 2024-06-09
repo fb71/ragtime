@@ -28,6 +28,7 @@ import areca.common.Promise;
 import areca.common.base.Lazy.RLazy;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import ragtime.cc.CCApp;
 import ragtime.cc.Workspace;
 
 /**
@@ -92,9 +93,9 @@ public class MainRepo {
                         // admin
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
-                            proto.login.set( "admin" );
-                            proto.email.set( "falko@fb71.org" );
-                            proto.setPassword( "admin" );
+                            proto.login.set( CCApp.config.adminLogin );
+                            proto.email.set( CCApp.config.adminEMail );
+                            proto.setPassword( CCApp.config.adminPassword );
                             proto.permid.set( 0 );
                             Workspace.create( proto );
                         });

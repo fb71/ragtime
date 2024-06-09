@@ -13,6 +13,7 @@
  */
 package ragtime.cc;
 
+import areca.common.AssertionException;
 import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -115,6 +116,9 @@ public class LoginPage {
                     form.submit();
                     state.loginAction().onError( e -> {
                         LOG.info( "Login failed: %s", e.getMessage() );
+                        if (e instanceof AssertionException) {
+                            e.printStackTrace();
+                        }
                         responseTxt.content.set( "EMail oder Passwort sind nicht korrekt" );
                     });
                 });
