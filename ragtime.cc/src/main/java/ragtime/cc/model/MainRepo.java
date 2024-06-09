@@ -97,14 +97,17 @@ public class MainRepo {
                             .executeCollect();
                 })
                 .then( rs -> {
-                    // fix wrong admins
-                    for (var admin : rs) {
-                        if (admin.permid.get() != 0) {
-                            LOG.warn( "FIX: admin: %s" + admin.permid.get() );
-                            uow.removeEntity( admin );
-                        }
+//                    // fix wrong admins
+//                    for (var admin : rs) {
+//                        if (admin.permid.get() != 0) {
+//                            LOG.warn( "FIX: admin: %s", admin.permid.get() );
+//                            uow.removeEntity( admin );
+//                        }
+//                    }
+                    if (rs.size() == 1) {
+                        rs.get( 0 ).setPassword( CCApp.config.adminPassword );
                     }
-                    if (rs.isEmpty()) {
+                    else if (rs.isEmpty()) {
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
                             proto.login.set( CCApp.config.adminLogin );
