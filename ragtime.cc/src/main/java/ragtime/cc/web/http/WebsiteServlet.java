@@ -185,6 +185,7 @@ public class WebsiteServlet
                 out.write( e.toString() );
 
                 LOG.warn( "Error while processing: %s", e.toString() );
+                e.printStackTrace();
                 Platform.rootCause( e ).printStackTrace( System.err );
             }
         }

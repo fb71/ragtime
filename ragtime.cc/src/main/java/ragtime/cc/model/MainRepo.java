@@ -104,9 +104,12 @@ public class MainRepo {
 //                            uow.removeEntity( admin );
 //                        }
 //                    }
+
+                    // reset/update admin password to config value
                     if (rs.size() == 1) {
                         rs.get( 0 ).setPassword( CCApp.config.adminPassword );
                     }
+                    // create admin
                     else if (rs.isEmpty()) {
                         uow.createEntity( AccountEntity.class, proto -> {
                             proto.isAdmin.set( true );
