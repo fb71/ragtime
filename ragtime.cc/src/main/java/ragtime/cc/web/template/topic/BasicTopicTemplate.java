@@ -28,6 +28,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.SimpleCollection;
 import freemarker.template.SimpleScalar;
+import freemarker.template.TemplateModel;
 import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.Article;
 import ragtime.cc.web.template.CompositeTemplateModel;
@@ -49,7 +50,7 @@ public class BasicTopicTemplate
 
     private static final Log LOG = LogFactory.getLog( BasicTopicTemplate.class );
 
-    private TopicTemplate.Site site;
+    protected TopicTemplate.Site site;
 
 
     @Override
@@ -97,8 +98,8 @@ public class BasicTopicTemplate
     }
 
 
-    protected Map<Object,Object> processTopicArticle( Article article ) throws Exception {
-        var result = new HashMap<>();
+    protected Map<String,TemplateModel> processTopicArticle( Article article ) throws Exception {
+        var result = new HashMap<String,TemplateModel>();
         result.put( "entity", new CompositeTemplateModel( article ) );
         result.put( "article", new CompositeTemplateModel( article ) );
 

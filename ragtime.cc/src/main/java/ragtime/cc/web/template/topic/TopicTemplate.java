@@ -37,6 +37,7 @@ public abstract class TopicTemplate {
     private static final Map<String,Class<? extends TopicTemplate>> available = new HashMap<>() {{
         put( "Basic", BasicTopicTemplate.class );
         put( "Tiles", TilesTopicTemplate.class );
+        put( "Flex", FlexTopicTemplate.class );
     }};
 
     /**

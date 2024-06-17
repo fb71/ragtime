@@ -115,13 +115,13 @@ public class CompositeTemplateModel
                 @SuppressWarnings( "unchecked" )
                 var p = (ManyAssociation<Entity>)prop.get( composite );
                 var associated = p.fetchCollect().waitForResult().get();
-                return new IterableAdapterTemplateModel<>( associated, CompositeTemplateModel::new );
+                return new IterableTemplateModel<>( associated, CompositeTemplateModel::new );
             }
             // Composite
             else if (Composite.class.isAssignableFrom( prop.getType() )) {
                 @SuppressWarnings( "unchecked" )
                 var p = (CollectionProperty<Composite>)prop.get( composite );
-                return new IterableAdapterTemplateModel<>( p, CompositeTemplateModel::new );
+                return new IterableTemplateModel<>( p, CompositeTemplateModel::new );
             }
         }
         throw new RuntimeException( "Not yet: " + prop);

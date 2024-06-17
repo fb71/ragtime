@@ -2,7 +2,7 @@
 <#import "/commons.ftl" as c>
 
 <#--
-  Page/Body 
+  Basic
 -->
 <@page.layout title="Basic">
     <#list articles?sequence as article>

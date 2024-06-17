@@ -27,23 +27,24 @@ import freemarker.template.TemplateModelIterator;
  *
  * @author Falko Bräutigam
  */
-public class IterableAdapterTemplateModel<T extends TemplateModel>
+public class IterableTemplateModel<T extends TemplateModel, C extends Iterable<T>>
         implements TemplateCollectionModel {
 
-    private final Iterable<T> p;
+    public final C delegate;
 
-    public IterableAdapterTemplateModel( Iterable<T> p ) {
-        this.p = p;
+    public IterableTemplateModel( C p ) {
+        this.delegate = p;
     }
 
-    public <S> IterableAdapterTemplateModel( Iterable<S> p, RFunction<S,T> transform ) {
-        this( Sequence.of( p ).map( c -> transform.apply( c ) ).asIterable() );
+    @SuppressWarnings( "unchecked" )
+    public <S> IterableTemplateModel( Iterable<S> p, RFunction<S,T> transform ) {
+        this( (C)Sequence.of( p ).map( transform ).asIterable() );
     }
 
     @Override
     public TemplateModelIterator iterator() throws TemplateModelException {
         return new TemplateModelIterator() {
-            Iterator<T> it = p.iterator();
+            Iterator<T> it = delegate.iterator();
             @Override
             public TemplateModel next() throws TemplateModelException {
                 return it.next();

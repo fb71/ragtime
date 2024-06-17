@@ -28,7 +28,7 @@ import ragtime.cc.model.TopicEntity;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
 import ragtime.cc.web.template.CompositeTemplateModel;
 import ragtime.cc.web.template.HttpRequestParamsTemplateModel;
-import ragtime.cc.web.template.IterableAdapterTemplateModel;
+import ragtime.cc.web.template.IterableTemplateModel;
 import ragtime.cc.web.template.TemplateContentProviderBase;
 import ragtime.cc.web.template.TemplateContentProviderBase.TemplateLoader;
 
@@ -64,7 +64,7 @@ public class TopicTemplateContentProvider
 
         // topics
         var loadTopics = request.uow.query( TopicEntity.class ).executeCollect().onSuccess( rs -> {
-            data.put( "topics", new IterableAdapterTemplateModel<>( rs, t -> new CompositeTemplateModel( t ) ) );
+            data.put( "topics", new IterableTemplateModel<>( rs, t -> new CompositeTemplateModel( t ) ) );
         });
 
         // XXX hack a config

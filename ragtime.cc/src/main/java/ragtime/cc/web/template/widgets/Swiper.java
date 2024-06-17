@@ -27,7 +27,7 @@ import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateModel;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.web.template.CompositeTemplateModel;
-import ragtime.cc.web.template.IterableAdapterTemplateModel;
+import ragtime.cc.web.template.IterableTemplateModel;
 
 /**
  *
@@ -64,7 +64,7 @@ public class Swiper
                 size.put( "height", new SimpleNumber( Integer.valueOf( substringAfter( g, "h=" ) ) ) );
             });
             ctx.data.put( "size", size );
-            ctx.data.put( "medias", new IterableAdapterTemplateModel<>( medias.get(), CompositeTemplateModel::new ) );
+            ctx.data.put( "medias", new IterableTemplateModel<>( medias.get(), CompositeTemplateModel::new ) );
 
             content.delete( match.start(), match.end() );
             content.insert( match.start(), processFtl( "carousel.ftl", ctx ) );
