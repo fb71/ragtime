@@ -13,7 +13,7 @@
     --common-header-height: calc(var(--common-header-height-base) * var(--common-header-height-factor));
     
     /** Customizable factor */
-    --common-face-height-factor: 0.8;
+    --common-face-height-factor: 0.9;
     /** The height that is actually applied. */
     --common-face-height: calc(var(--common-header-height-base) * var(--common-face-height-factor));
 }
@@ -31,12 +31,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 h5, h6 {
     font-weight: 400;    
-}
-h5 {
-    font-size: 1.2rem;
-}
-h6 {
-    font-size: 1rem;
 }
 p {
     margin-bottom: 0.9em;
@@ -58,7 +52,6 @@ p {
 
 .IHeader {
     height: var(--common-header-height);
-    margin-bottom: calc(var(--common-face-height) * 0.5);
     
     margin-left: auto;
     margin-right: auto;
@@ -105,30 +98,15 @@ p {
     /*border: 2px solid #cdcdcd;*/
 }
 
-.container {
-    padding-right: calc(var(--bs-gutter-x) * 1);
-    padding-left: calc(var(--bs-gutter-x) * 1);
-}
-
-.ISection {
-    padding-top: 1rem;     
-}
-
-.ITitle {
-    color: var(--common-accent-color);
-}
-.ITitle h5, .ITitle h6 {
-    margin-bottom: 0;
-}
-
 .ITopics {
+    padding-left: calc(var(--common-face-height) * 1.35);
+    margin-bottom: 1em;
 }
 
 .ITopicsScroller {
     overflow-x: scroll;
     scrollbar-width: none;
     /*box-shadow: 0px 0 15px inset rgba(${config.colors.pageBackground@rgb},100%);*/
-    padding-left: 5px; /* space for shadow */
 }
 .ITopicsScroller::-webkit-scrollbar {
   display: none;
@@ -149,12 +127,11 @@ p {
     height: auto;
     width: 100%;
     border-radius: 50px;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 50%);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
     border: 1px solid white;
     /* for inset shadow */
     z-index: -1;
     position: relative;
-    margin-bottom: 0.3em;
 }
 .ITopic img:hover {
     box-shadow: 0 1px 4px rgb(0 0 0 / 60%);
@@ -180,6 +157,8 @@ p {
 }
 
 .IContent {
+    margin-top: 2em;
+    margin-bottom: 2em;
 }
 
 .IContent .carousel {
@@ -192,6 +171,9 @@ p {
 }
 
 @media (max-width: 768px) {
+  .IContent {
+    margin-top: 25px;
+  }
   .IContent .carousel {
     margin-bottom: 25px;
   }

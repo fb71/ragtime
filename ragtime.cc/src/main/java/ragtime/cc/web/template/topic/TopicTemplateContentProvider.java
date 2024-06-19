@@ -30,7 +30,6 @@ import ragtime.cc.web.template.CompositeTemplateModel;
 import ragtime.cc.web.template.HttpRequestParamsTemplateModel;
 import ragtime.cc.web.template.IterableTemplateModel;
 import ragtime.cc.web.template.TemplateContentProviderBase;
-import ragtime.cc.web.template.TemplateContentProviderBase.TemplateLoader;
 
 /**
  * Delegates to the {@link TopicTemplate} specified in the URL.
@@ -42,8 +41,8 @@ public class TopicTemplateContentProvider
 
     private static final Log LOG = LogFactory.getLog( TopicTemplateContentProvider.class );
 
-    /** XXX The templates that are compatible with {@link TopicTemplateContentProvider} */
-    public static final List<String> templates = Arrays.asList( "insta" );
+    /** XXX The templates compatible with {@link TopicTemplateContentProvider} */
+    public static final List<String> templates = Arrays.asList( "topic", "insta", "insta-compact" );
 
 
     @Override
@@ -64,7 +63,7 @@ public class TopicTemplateContentProvider
 
         // topics
         var loadTopics = request.uow.query( TopicEntity.class ).executeCollect().onSuccess( rs -> {
-            data.put( "topics", new IterableTemplateModel<>( rs, t -> new CompositeTemplateModel( t ) ) );
+            data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
         });
 
         // XXX hack a config

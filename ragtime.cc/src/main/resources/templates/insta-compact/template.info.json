@@ -1,0 +1,5 @@
+{
+  "title": "Insta Compact",
+  "description": "Insta mit Titel im Header",
+  "extends": "insta"
+}

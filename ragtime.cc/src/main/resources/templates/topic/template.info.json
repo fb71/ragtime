@@ -1,0 +1,5 @@
+{
+  "title": "",
+  "description": "Common base for all topic templates",
+  "extends": "common"
+}

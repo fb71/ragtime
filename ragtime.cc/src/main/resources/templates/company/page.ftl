@@ -1,5 +1,5 @@
 <#--
-  insta
+  company
 -->
 <#import "/commons.ftl" as c>
 
@@ -12,12 +12,15 @@
     <title>${title} - ${config.page.title}</title>
     <meta charset="iso-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
     <link href="insta/css/insta.css" rel="stylesheet"/>
+    <link href="company/css/company.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
+
     <script src="common/bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
     <script src="common/js/common.js" type="text/javascript"></script>
 </head>
@@ -30,6 +33,10 @@
                 background-image: url(media/${config.bannerImage.id});
             </#if>
             ">
+            <@c.editable msg="page.title">
+                <h1>${config.page.title}</h1>
+                <h4>${config.page.title2}</h4>
+            </@c.editable>
             <#-- Face -->
             <div class="IFace">
                 <@c.editable msg="page.title">
@@ -41,16 +48,8 @@
         </div>
     </header>
 
-    <#-- Title -->
-    <div class="ITitle ISection container">
-        <@c.editable msg="page.title">
-            <h5><strong>${config.page.title}</strong></h5>
-            <h6>${config.page.title2}</h6>
-        </@c.editable>
-    </div>
-
     <#-- Topics -->
-    <div class="ITopics ISection container">
+    <div class="ITopics container">
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
             <#list topics?sequence?sort_by("order") as topic>
@@ -74,20 +73,20 @@
 
     <#if !hideTopicBio>
         <@c.editable msg="topic.${topic.id}">
-          <div class="ITopicBio ISection container">
+          <div class="ITopicBio container">
             ${topic.description}
           </div>
         </@c.editable>
     </#if>
     
     <#-- Content -->
-    <div class="IContent ISection container">
+    <div class="IContent container">
     <#nested>
     </div>
 
     <#-- Footer -->
     <#-- 
-    <footer class="IFooter ISection">
+    <footer class="CFooter">
         <div class="container">
             <p class="m-0 small">
             <@c.editable msg="page.footer">

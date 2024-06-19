@@ -1,5 +1,5 @@
 {
   "title": "Insta",
-  "description": "Für Rike. ...und die Welt. :)",
-  "extends": "common"
+  "description": "Für Rike ...und die Welt :)",
+  "extends": "topic"
 }
