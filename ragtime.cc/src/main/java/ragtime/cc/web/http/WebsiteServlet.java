@@ -52,6 +52,8 @@ public class WebsiteServlet
 
     private static final Log LOG = LogFactory.getLog( WebsiteServlet.class );
 
+    public static final String PATH_HOME = "home";
+
     private static final String ATTR_SESSION = "ragtime.cc.website.session";
 
     /** */
@@ -90,7 +92,7 @@ public class WebsiteServlet
                             process( req, resp );
                         }
                         catch (Exception e) {
-                            error( e, resp );
+                            error( e, req, resp );
                         }
                     }, 0 );
                     eventloop.execute( FULLY );
@@ -101,7 +103,7 @@ public class WebsiteServlet
             LOG.warn( "%s: %s - %s", resp.getStatus(), req.getPathInfo(), t.elapsedHumanReadable() );
         }
         catch (Exception e) {
-            error( e, resp );
+            error( e, req, resp );
         }
     }
 
@@ -127,7 +129,7 @@ public class WebsiteServlet
                     // redirect: home
                     if (parts.length == 1) {
                         Assert.that( req.getPathInfo().endsWith( "/" ), "Home URL does not end with a '/'" );
-                        resp.sendRedirect( "home" );
+                        resp.sendRedirect( PATH_HOME );
                         return Promise.completed( null, Priority.MAIN_EVENT_LOOP );
                     }
                     // media
@@ -151,7 +153,7 @@ public class WebsiteServlet
                     }
                 })
                 .onError( e -> {
-                    error( e, resp );
+                    error( e, req, resp );
                 })
                 .waitForResult();
 
@@ -159,26 +161,28 @@ public class WebsiteServlet
     }
 
 
-    protected void error( Throwable e, HttpServletResponse resp ) {
+    protected void error( Throwable e, HttpServletRequest req, HttpServletResponse resp ) {
         try (var out = resp.getWriter()) {
+            // 404
             if (e instanceof TemplateNotFoundException) {
                 LOG.warn( "Template not found: %s", e.toString() );
                 //out.write( "Unter dieser Adresse gibt es nichts." );
 
-                // catch old atlas/polymap customers
+                // XXX /home only works behind reverse proxy
                 out.write( "<!DOCTYPE HTML>\n"
                         + "<html>\n"
                         + "    <head>\n"
                         + "        <meta charset=\"UTF-8\">\n"
-                        + "        <meta http-equiv=\"refresh\" content=\"5; url=https://fb71.org/\">\n"
-                        + "        <title>Page does not exist</title>\n"
+                        + "        <meta http-equiv=\"refresh\" content=\"5; url=/" + PATH_HOME + "\">\n"
+                        + "        <title>Seite existiert nicht</title>\n"
                         + "    </head>\n"
                         + "    <body style=\"font-family: sans-serif;\">\n"
-                        + "        <h1>Page does not exist</h1>\n"
-                        + "        <h3>Your are redirected to: <a href='https://fb71.org/'>fb71.org</a></h3>\n"
+                        + "        <h1>Diese Seite existiert nicht (mehr)</h1>\n"
+                        + "        <h3>Sie werden weitergeleitet zur: <a href='/" + PATH_HOME + "'>Home Page</a></h3>\n"
                         + "    </body>\n"
                         + "</html>" );
             }
+            // internal
             else {
                 resp.setStatus( 500 );
                 out.write( "Leider ging etwas schief. Die Seite kann nicht angezeigt werden.\n\n" );
