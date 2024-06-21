@@ -32,11 +32,12 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateNotFoundException;
 import ragtime.cc.model.Article;
 import ragtime.cc.web.template.CompositeTemplateModel;
-import ragtime.cc.web.template.widgets.Excerpt;
+import ragtime.cc.web.template.widgets.Abstract;
 import ragtime.cc.web.template.widgets.Markdown;
 import ragtime.cc.web.template.widgets.Swiper;
 import ragtime.cc.web.template.widgets.TextProcessor;
 import ragtime.cc.web.template.widgets.TextProcessor.Context;
+import ragtime.cc.web.template.widgets.fb71;
 
 /**
  * A basic topic template that renders  two different kind of pages: one for
@@ -112,7 +113,8 @@ public class BasicTopicTemplate
 
 
     protected void processTopicArticle( Article article, StringBuilder content, Context ctx ) throws Exception {
-        new Excerpt( processArticleLink( article ) ).process( content, ctx );
+        new fb71().process( content, ctx );
+        new Abstract( processArticleLink( article ) ).process( content, ctx );
         new Markdown().process( content, ctx );
         new Swiper( () -> article.medias.fetchCollect().waitForResult().get() ).process( content, ctx );
     }
@@ -131,7 +133,8 @@ public class BasicTopicTemplate
         site.data.put( "article", new CompositeTemplateModel( article ) );
         content.append( article.content.get() );
 
-        new Excerpt( null ).process( content, ctx );
+        new fb71().process( content, ctx );
+        new Abstract( null ).process( content, ctx );
         new Markdown().process( content, ctx );
         new Swiper( () -> article.medias.fetchCollect().waitForResult().get() ).process( content, ctx );
 
