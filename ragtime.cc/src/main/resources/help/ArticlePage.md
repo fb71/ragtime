@@ -72,13 +72,13 @@ Durch spezielle Zeichefolgen können verschiedene Objekte im Text erzeugt werden
 
 ### ::swiper::
 
-Erzeugt eine **Gallerie** aller Bilder, die an dem Beitrag hängen.
+Erzeugt eine **Gallerie** aller Bilder, die an diesem Beitrag hängen.
 
 ```::swiper[?w=<Breite>,h=<Höhe>]::```
 
   * *w=* : Breite in Pixeln; Standard=380
   * *h=* : Höhe in Pixeln; Standard=380 
 
-### ::excerpt::
+### ::abstract::
 
-...
+Markiert die **Kurz-** oder **Zusammenfassung** des Textes. Oberhalb dieser Markierung ist die Zusammenfassung. Unterhalb der Markierung folgt der "Rest" des Textes. Wenn nicht viel Platz zur Verfügung steht, dann wird nur die Zusammenfassung angezeigt. Ansonsten wird Zusammenfassung **und** der Rest des Textes angezeigt.
