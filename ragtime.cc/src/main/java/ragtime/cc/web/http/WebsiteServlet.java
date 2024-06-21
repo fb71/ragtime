@@ -97,7 +97,6 @@ public class WebsiteServlet
                     }, 0 );
                     eventloop.execute( FULLY );
                 });
-
                 session.dispose();
             }
             LOG.warn( "%s: %s - %s", resp.getStatus(), req.getPathInfo(), t.elapsedHumanReadable() );
@@ -167,6 +166,8 @@ public class WebsiteServlet
             if (e instanceof TemplateNotFoundException) {
                 LOG.warn( "Template not found: %s", e.toString() );
                 //out.write( "Unter dieser Adresse gibt es nichts." );
+
+                resp.setStatus( 404 );
 
                 // XXX /home only works behind reverse proxy
                 out.write( "<!DOCTYPE HTML>\n"
