@@ -13,6 +13,8 @@
  */
 package ragtime.cc.web.template.widgets;
 
+import java.util.regex.Pattern;
+
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 
@@ -20,32 +22,19 @@ import areca.common.log.LogFactory.Log;
  *
  * @author Falko Bräutigam
  */
-public class Excerpt
-        extends RegexParserTextProcessor {
+public class fb71
+        implements TextProcessor {
 
-    private static final Log LOG = LogFactory.getLog( Excerpt.class );
+    private static final Log LOG = LogFactory.getLog( fb71.class );
 
-    public static final String EXCERPT = "::excerpt::";
-
-    protected String replacement;
-
-
-    public Excerpt( String replacement ) {
-        this.replacement = replacement;
-    }
-
+    public static final Pattern FB71 = Pattern.compile( ":+fb71:+" );
 
     @Override
     public void process( StringBuilder content, Context ctx ) throws Exception {
-        var index = content.indexOf( EXCERPT );
-        if (index >= 0) {
-            if (replacement != null) {
-                content.delete( index, content.length() );
-                content.insert( index, replacement );
-            }
-            else {
-                content.delete( index, index + EXCERPT.length() );
-            }
+        var match = FB71.matcher( content );
+        for (var pos = 0; match.find( pos ); pos = match.start()) {
+            content.delete( match.start(), match.end() );
+            content.insert( match.start(), "fb71.net" );
         }
     }
 
