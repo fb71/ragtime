@@ -78,8 +78,7 @@ public class ContentRepo {
 
             return initRepo( permid )
                     .then( repo -> checkInitAccount( repo, account ).map( ___ -> repo ) )
-                    .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) )
-                    .then( repo -> checkManyAssocDuplicates( repo ).map( ___ -> repo ) );
+                    .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) );
         });
     }
 
