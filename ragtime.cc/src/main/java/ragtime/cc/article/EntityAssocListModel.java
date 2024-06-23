@@ -56,9 +56,18 @@ public class EntityAssocListModel<V extends Entity>
     public Promise<Opt<V>> load( int first, int max ) {
         LOG.info( "Load: %s", assoc.info().getName() );
         return assoc.fetch()
-                .onSuccess( opt -> LOG.info( "sending: %s", opt ) )
+                .<Opt<V>>map( (opt,next) -> {
+                    // XXX filter out deleted Entities (that are still in the assoc)
+                    if (opt.isPresent()) {
+                        LOG.info( "sending: %s", opt );
+                        next.consumeResult( opt );
+                    }
+                    else {
+                        LOG.info( "NOT sending: %s", opt );
+                    }
+                })
                 // XXX ManyAssociation.fetch() does not seem to return absent as last element
-                .join( Platform.schedule( 200, () -> {
+                .join( Platform.schedule( 1000, () -> {
                     LOG.info( "sending: complete/absent" );
                     return Opt.absent();
                 }));
