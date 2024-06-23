@@ -16,6 +16,7 @@ package ragtime.cc.model;
 import static ragtime.cc.model.ModelVersionEntity.SCHEMA_VERSION_CONTENT;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -50,7 +52,7 @@ public class ContentRepo {
 
     private static final Log LOG = LogFactory.getLog( ContentRepo.class );
 
-    private static final boolean CLEAN_ON_STARTUP = false;
+    private static final String CLEAN_ON_STARTUP = ""; //"f.braeutigam@polymap.de";
 
     private static Map<Integer,Promise<EntityRepository>> repos = new ConcurrentHashMap<>();
 
@@ -69,14 +71,15 @@ public class ContentRepo {
         return repos.computeIfAbsent( permid, __ -> {
 
             // XXX testing
-//            if (account.email.get().equals( "f.braeutigam@polymap.de" )) {
-//                FileUtils.deleteQuietly( Workspace.of( permid ) );
-//                Workspace.of( permid ).mkdir();
-//            }
+            if (account.email.get().equals( CLEAN_ON_STARTUP )) {
+                FileUtils.deleteQuietly( Workspace.of( permid ) );
+                Workspace.of( permid ).mkdir();
+            }
 
             return initRepo( permid )
                     .then( repo -> checkInitAccount( repo, account ).map( ___ -> repo ) )
-                    .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) );
+                    .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) )
+                    .then( repo -> checkManyAssocDuplicates( repo ).map( ___ -> repo ) );
         });
     }
 
@@ -97,9 +100,6 @@ public class ContentRepo {
             throw new IllegalArgumentException( "Workspace does not exist for permid: " + permid );
         }
         var dbfile = new File( workspace, "content.db" );
-        if (CLEAN_ON_STARTUP) {
-            dbfile.delete();
-        }
         return EntityRepository.newConfiguration()
                 .entities.set( Arrays.asList(
                         AccountEntity.info,
@@ -108,6 +108,36 @@ public class ContentRepo {
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )
                 .create();
+    }
+
+
+    /**
+     * HACK: earlier versions of ManyAssociationImpl.add() did not check duplicates
+     * Rike: Streitsackgasse und Trennungsbegleitung
+     */
+    protected static Promise<Submitted> checkManyAssocDuplicates( EntityRepository repo ) {
+        var uow2 = repo.newUnitOfWork();
+        return uow2.query( Article.class ).executeCollect()
+                .then( rs -> {
+                    return Promise.serial( rs.size(), i -> {
+                        var article = rs.get( i );
+                        return article.medias.fetchCollect().map( medias -> {
+                            var unique = new HashSet<Object>();
+                            medias.forEach( media -> {
+                                if (!unique.add( media.id() )) {
+                                    LOG.warn( "DUPLICATE media removed: %s / %s", article.title.get(), media.name.get() );
+                                    article.medias.remove( media );
+                                }
+                            });
+                            return medias.size() - unique.size();
+                        });
+                    });
+                })
+                .reduce2( 0, (r,removed) -> r + removed )
+                .then( removed -> {
+                    LOG.warn( "Repo: ManyAssociation dupplicates removed: " + removed + " - submitting..." );
+                    return uow2.submit();
+                });
     }
 
 
