@@ -121,7 +121,7 @@ public class ArticlesState
             Assert.that( canRun(), "StateAction: !canRun() " );
             site.createState( new ArticleEditState() )
                     .putContext( Assert.notNull( selected.$() ), State.Context.DEFAULT_SCOPE )
-                    .onChange( ev -> LOG.info( "STATE CHANGE: %s", ev ) )
+                    //.onChange( ev -> LOG.info( "STATE CHANGE: %s", ev ) )
                     .activate();
         }
     };
