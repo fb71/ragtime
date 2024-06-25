@@ -14,6 +14,7 @@
 package ragtime.cc.model;
 
 import static org.apache.commons.lang3.ArrayUtils.EMPTY_BYTE_ARRAY;
+import static org.polymap.model2.query.Expressions.anyOf;
 import static ragtime.cc.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 import java.util.Arrays;
@@ -124,7 +125,16 @@ public class MediaEntity
      */
     public Promise<List<Article>> articles() {
         return context.getUnitOfWork().query( Article.class )
-                .where( Expressions.anyOf( Article.TYPE.medias, Expressions.id( id() ) ) )
+                .where( anyOf( Article.TYPE.medias, Expressions.id( id() ) ) )
+                .executeCollect();
+    }
+
+    /**
+     * Computed back association of {@link TopicEntity#medias}
+     */
+    public Promise<List<TopicEntity>> topics() {
+        return context.getUnitOfWork().query( TopicEntity.class )
+                .where( anyOf( TopicEntity.TYPE.medias, Expressions.id( id() ) ) )
                 .executeCollect();
     }
 
@@ -134,20 +144,28 @@ public class MediaEntity
         // delete file
         if (state == State.AFTER_SUBMIT && status() == EntityStatus.REMOVED) {
             var f = f();
+            LOG.info( "Removing: %s", f );
             if (f.exists()) {
-                f.delete();
+                if (!f.delete()) {
+                    LOG.warn( "Error removing: %s", f );
+                }
             }
-            LOG.info( "Removed: %s", f );
         }
-//        // remove back association
-//        if (state == State.AFTER_REMOVED) {
-//            article().onSuccess( articles -> articles.forEach( article -> {
-//                LOG.info( "Removing back link: %s", article.title.get() );
-//                article.medias.remove( MediaEntity.this );
-//            }));
-//        }
+        // remove back association
+        if (state == State.AFTER_REMOVED) {
+            // article
+            // XXX without wait/block we are to late for (possible) subsequent submit()
+            articles().waitForResult().get().forEach( article -> {
+                LOG.info( "Removing back link: %s", article.title.get() );
+                Assert.that( article.medias.remove( MediaEntity.this ) );
+            });
+            // topic
+            topics().waitForResult().get().forEach( topic -> {
+                LOG.info( "Removing back link: %s", topic.title.get() );
+                Assert.that( topic.medias.remove( MediaEntity.this ) );
+            });
+        }
     }
-
 
     public ThumbnailBuilder thumbnail() {
         return new ThumbnailBuilder();

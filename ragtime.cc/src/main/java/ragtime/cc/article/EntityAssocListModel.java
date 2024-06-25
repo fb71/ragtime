@@ -67,8 +67,8 @@ public class EntityAssocListModel<V extends Entity>
                     }
                 })
                 // XXX ManyAssociation.fetch() does not seem to return absent as last element
-                .join( Platform.schedule( 1000, () -> {
-                    LOG.info( "sending: complete/absent" );
+                .join( Platform.schedule( 750, () -> {
+                    LOG.info( "sending: complete (Opt.absent())" );
                     return Opt.absent();
                 }));
     }
