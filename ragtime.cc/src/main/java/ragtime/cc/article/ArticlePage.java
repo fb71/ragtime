@@ -221,7 +221,7 @@ public class ArticlePage {
                 .then( __ -> {
                     result.add( "::swiper::" );
                     result.add( "::swiper?w=<Breite>,h=<Höhe>::" );
-                    result.add( "::excerpt::" );
+                    result.add( "::abstract::" );
                     result.add( "----" );
 
                     return state.uow.query( Article.class )

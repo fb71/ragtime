@@ -11,7 +11,7 @@ Musterstrasse 1\
 Telefon: +49 ...\
 Telefax: +49 ...\
 E-Mail: ...
-::excerpt::
+::abstract::
 
 ##### Umsatzsteuer:
 
