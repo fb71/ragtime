@@ -42,7 +42,7 @@ public class TopicTemplateContentProvider
     private static final Log LOG = LogFactory.getLog( TopicTemplateContentProvider.class );
 
     /** XXX The templates compatible with {@link TopicTemplateContentProvider} */
-    public static final List<String> templates = Arrays.asList( "topic", "insta", "insta-compact" );
+    public static final List<String> templates = Arrays.asList( "topic", "insta", "insta-compact", "company" );
 
 
     @Override
@@ -68,9 +68,17 @@ public class TopicTemplateContentProvider
 
         // XXX hack a config
         var topicUrlPart = request.path[0];
-        var loadHack = request.uow.query( TopicEntity.class )
+        var loadHack = request.uow
+                .query( TopicEntity.class )
                 .where( Expressions.eq( TopicEntity.TYPE.urlPart, topicUrlPart ) )
-                .singleResult().onSuccess( topic -> {
+                .executeCollect().onSuccess( rs -> {
+                    if (rs.isEmpty()) {
+                        throw new TemplateNotFoundException( topicUrlPart, null, "No such topic: " + topicUrlPart );
+                    }
+                    if (rs.size() > 1) {
+                        LOG.warn( "Multiple hits for topic: %s", topicUrlPart );
+                    }
+                    var topic = rs.get( 0 );
                     LOG.info( "Hack" );
                     request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
                         proto.topic.set( topic );

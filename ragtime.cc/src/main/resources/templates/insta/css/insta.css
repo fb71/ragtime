@@ -43,19 +43,6 @@ p {
     line-height: 1.4;
 }
 
-.ITiles {
-    --bs-gutter-x: 0.3rem;
-    --bs-gutter-y: 0.3rem;
-}
-.ITile {
-    font-size: calc(0.6vh + 0.6vw);
-    text-align: center;
-}
-
-.IClickable {
-    cursor: pointer;
-}
-
 .IHeader {
     height: var(--common-header-height);
     margin-bottom: calc(var(--common-face-height) * 0.5);

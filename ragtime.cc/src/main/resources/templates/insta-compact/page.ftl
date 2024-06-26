@@ -16,7 +16,8 @@
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
-    <link href="insta/css/insta.css" rel="stylesheet"/>
+    <link href="topic/css/topic.css" rel="stylesheet"/>
+    <link href="insta-compact/css/insta-compact.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
 

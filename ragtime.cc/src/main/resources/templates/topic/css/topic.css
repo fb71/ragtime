@@ -1,0 +1,17 @@
+/**
+ * Topic base styles
+ */
+ 
+/* ITiles *************************************************/
+.ITiles {
+    --bs-gutter-x: 0.3rem;
+    --bs-gutter-y: 0.3rem;
+}
+.ITile {
+    font-size: calc(0.6vh + 0.6vw);
+    text-align: center;
+}
+
+.IClickable {
+    cursor: pointer;
+}

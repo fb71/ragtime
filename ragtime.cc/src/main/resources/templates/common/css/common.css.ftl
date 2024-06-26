@@ -76,3 +76,23 @@
     border: 2px solid #ffc79c;
     box-shadow: 0 3px 3px rgba(0,0,0,0.5);
 }
+
+/* CFooter ************************************************/
+
+.CFooter {
+    background-color: var(--common-footer-bg);
+    color: var(--common-footer-color);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-align: center;
+    margin-bottom: 0px !important;
+}
+
+@media (min-width: 768px) {
+  .CFooter {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+  }
+}

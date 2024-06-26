@@ -1,5 +1,5 @@
 <#--
-  company
+  Company
 -->
 <#import "/commons.ftl" as c>
 
@@ -16,7 +16,7 @@
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
-    <link href="insta/css/insta.css" rel="stylesheet"/>
+    <link href="topic/css/topic.css" rel="stylesheet"/>
     <link href="company/css/company.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
@@ -27,66 +27,61 @@
 
 <body class="${pageClass}">
     <#-- Page header -->
-    <header class="IHeader" <#-- style="background-image: url(<@c.mediaUrl name="Raumfoto.jpg"/>)" -->>
-        <div class="IBgImage container" style="height:100%;
-            <#if config.bannerImage??>
-                background-image: url(media/${config.bannerImage.id});
-            </#if>
-            ">
-            <@c.editable msg="page.title">
-                <h1>${config.page.title}</h1>
-                <h4>${config.page.title2}</h4>
-            </@c.editable>
-            <#-- Face -->
-            <div class="IFace">
-                <@c.editable msg="page.title">
-                    <#if config.leadImage??>
-                        <img class="IFaceBordered" src="media/${config.leadImage.id}?w=180&h=180"></img>
-                    </#if>
-                </@c.editable>
+    <header class="CHeader border-bottom">
+        <div class="container">
+            <div class="row row-cols-2">
+                <#-- Title-->
+                <div class="col">
+                    <@c.editable msg="page.title">
+                        <h1>${config.page.title}</h1>
+                    </@c.editable>
+                </div>
+        
+                <#-- navbar-->
+                <div class="col-6">
+                    <nav class="CNavbar navbar navbar-expand-md">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav mb-lg-0">
+                                <#list topics?sequence?sort_by("order") as topic>
+                                    <li class="nav-item"><a class="nav-link" href="${topic.urlPart}">${topic.title}</a></li>
+                                </#list>
+                                <#list config.navItems?sequence?sort_by("order") as item>
+                                    <#if item.title == "Login">
+                                        <li class="nav-item"><a class="btn" href="${item.href}">${item.title}</a></li>
+                                    <#else>
+                                        <li class="nav-item"><a class="nav-link" href="${item.href}">${item.title}</a></li>
+                                    </#if>
+                                </#list>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+
+                <#-- div class="col-auto">
+                    <button type="button" class="btn btn-secondary">Secondary</button>
+                </div -->
             </div>
         </div>
     </header>
 
-    <#-- Topics -->
-    <div class="ITopics container">
-        <div class="ITopicsScroller">
-        <div class="row flex-nowrap">
-            <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto"> <#--  style="background-color: ${topic.color};">  -->
-                <@c.editable msg="topic.${topic.id}">
-                  <a href="${topic.urlPart}" style="display:block;">
-
-                      <#if topic.medias?sequence?size gt 0>
-                        <#assign media = topic.medias?sequence?first>
-                        <img src="media/${media.id}?w=75&h=75" class="img-fluid" alt="${media.name}"/>
-                      </#if>                      
-                      <br/>
-                      ${topic.title}
-                  </a>
-                </@c.editable>
-                </div>
-            </#list>
-        </div>
-        </div>
-    </div>
-
     <#if !hideTopicBio>
         <@c.editable msg="topic.${topic.id}">
-          <div class="ITopicBio container">
+          <div class="ITopicBio CSection container">
             ${topic.description}
           </div>
         </@c.editable>
     </#if>
     
     <#-- Content -->
-    <div class="IContent container">
-    <#nested>
+    <div class="IContent CSection container">
+        <#nested>
     </div>
 
     <#-- Footer -->
-    <#-- 
-    <footer class="CFooter">
+    <footer class="CFooter CSection">
         <div class="container">
             <p class="m-0 small">
             <@c.editable msg="page.footer">
@@ -101,7 +96,6 @@
             </p>
         </div>
     </footer>
-     -->    
 </body>
 </html>
 </#macro>
