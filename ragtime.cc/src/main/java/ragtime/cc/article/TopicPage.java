@@ -88,8 +88,10 @@ public class TopicPage {
             layout.set( RowLayout.filled().spacing( uic.space ) );
 
             add( form.newField().label( "Titel" )
+                    .description( "Die interne, *eindeutige* Bezeichnung des Topics.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Topics!" )
                     .viewer( new TextFieldViewer() )
-                    .model( new PropertyModel<>( state.topic.title ) )
+                    .model( new PermNameValidator( state.uow,
+                            new PropertyModel<>( state.topic.title ) ) )
                     .create() );
 
             add( form.newField() //.label( "Farbe" )
@@ -104,6 +106,7 @@ public class TopicPage {
                 .viewer( new TextFieldViewer().configure( (TextField t) -> {
                     t.multiline.set( true );
                     t.type.set( Type.MARKDOWN );
+                    TextAutocomplete.process( t, state.uow );
                 }))
                 .create()
                 .lc( RowConstraints.height( 200 ) ) );
@@ -121,11 +124,11 @@ public class TopicPage {
                 .create()
                 .lc( RowConstraints.height( 35 ) ) );
 
-        ui.body.add( form.newField().label( "URL (Test)" )
-                .viewer( new TextFieldViewer() )
-                .model( new PropertyModel<>( state.topic.urlPart ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
+//        ui.body.add( form.newField().label( "URL" )
+//                .viewer( new TextFieldViewer() )
+//                .model( new PropertyModel<>( state.topic.permName ) )
+//                .create()
+//                .lc( RowConstraints.height( 35 ) ) );
 
         // medias
         ui.body.add( new UIComposite() {{
@@ -166,7 +169,7 @@ public class TopicPage {
             }});
         }});
 
-//        form.subscribe( ev -> {
+//        XXX form.subscribe( ev -> {
 //            if (ev.getSource() instanceof TextFieldViewer viewer && viewer.) {
 //                urlPart.getValue().content.set( ev.newValue.toString() );
 //            }

@@ -60,14 +60,21 @@ public class BasicTopicTemplate
         Assert.isEqual( 1, site.r.path.length );
         this.site = site;
 
-        // article: ?a=<id>
-        var articleIdParam = site.r.httpRequest.getParameter( "a" );
-        if (articleIdParam != null) {
-            return processArticle( articleIdParam );
+        try {
+            // article
+            if (site.article.isPresent()) {
+                return processArticle( site.article.get() );
+            }
+            // topic
+            else {
+                return processTopic();
+            }
         }
-        // topic
-        else {
-            return processTopic();
+        catch (TemplateNotFoundException|RuntimeException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw new RuntimeException( e );
         }
     }
 
@@ -120,12 +127,10 @@ public class BasicTopicTemplate
     }
 
 
-    protected Promise<String> processArticle( String articleId ) {
+    protected Promise<String> processArticle( Article article ) throws Exception {
         var ctx = new TextProcessor.Context() {{ config = site.r.config; }};
         var content = new StringBuilder( 64 * 1024 ); // C64! :)
-
-        return site.r.uow.entity( Article.class, articleId )
-                .then( article -> processArticle( article, content, ctx ) );
+        return processArticle( article, content, ctx );
     }
 
 
@@ -143,12 +148,8 @@ public class BasicTopicTemplate
     }
 
 
-    @SuppressWarnings( "deprecation" )
     protected String processArticleLink( Article article ) {
-        // '${topic.urlPart}?a=${article.entity.id}'
-        return String.format( "<a href=\"%s?a=%s\">Weiter...</a>",
-                article.topic.fetch().waitForResult().get().urlPart.get(), // XXX waitForResult()
-                article.id() );
+        return String.format( "<a href=\"%s\">Weiter...</a>", article.permName.get() );
     }
 
 

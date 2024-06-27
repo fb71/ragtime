@@ -4,11 +4,11 @@
 <#--
   Page/Body 
  -->
-<@page.layout title="Tiles">
+<@page.layout title="${topic.title}">
     <div class="ITiles row row-cols-3">
         <#list articles?sequence as article>
             <@c.editable msg="article.${article.entity.id}">
-            <div class="ITile IClickable col" onclick="location.href='${topic.urlPart}?a=${article.entity.id}';">
+            <div class="ITile IClickable col" onclick="location.href='${article.entity.permName}';">
                 <#if article.entity.medias?sequence?size == 0>
                     ${article.content}
                 <#else>

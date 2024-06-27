@@ -46,7 +46,7 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav mb-lg-0">
                                 <#list topics?sequence?sort_by("order") as topic>
-                                    <li class="nav-item"><a class="nav-link" href="${topic.urlPart}">${topic.title}</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="${topic.permName}">${topic.title}</a></li>
                                 </#list>
                                 <#list config.navItems?sequence?sort_by("order") as item>
                                     <#if item.title == "Login">

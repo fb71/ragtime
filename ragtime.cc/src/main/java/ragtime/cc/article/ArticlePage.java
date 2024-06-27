@@ -13,13 +13,6 @@
  */
 package ragtime.cc.article;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.polymap.model2.query.Query.Order;
-
-import areca.common.Platform;
-import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -52,10 +45,8 @@ import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.media.MediasPage.MediaListItem;
 import ragtime.cc.media.MediasSelectState;
-import ragtime.cc.model.Article;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.model.TopicEntity;
-import ragtime.cc.web.http.MediaContentProvider;
 
 /**
  *
@@ -85,7 +76,7 @@ public class ArticlePage {
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
-        ui.init( parent ).title.set( state.article.$().title.get() );
+        ui.init( parent ).title.set( "Beitrag" );
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
@@ -106,7 +97,7 @@ public class ArticlePage {
                         .tooltip.set( "Das Topic dieses Textes" ) );
 
                 add( form.newField().label( "Position" )
-                        .description( "Die Position dieses Beitrags im Topic\nBeiträge ohne Angabe werden darunter nach Modifikationsdatum sortiert" )
+                        .description( "Die Position dieses Beitrags im Topic\nBeiträge ohne Angabe werden nach Modifikationsdatum sortiert" )
                         .viewer( new TextFieldViewer() )
                         .model( new Number2StringTransform(
                                 new PropertyModel<>( state.article.$().order ) ) )
@@ -115,8 +106,10 @@ public class ArticlePage {
             }});
 
             add( form.newField().label( "Name" )
-                    .model( new PropertyModel<>( state.article.$().title ) )
+                    .description( "Die interne, *eindeutige* Bezeichnung des Beitrags.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Beitrags!" )
                     .viewer( new TextFieldViewer() )
+                    .model( new PermNameValidator( state.uow,
+                            new PropertyModel<>( state.article.$().title ) ) )
                     .create()
                     .lc( RowConstraints.height( 35 ) ) );
 
@@ -125,10 +118,16 @@ public class ArticlePage {
                     .viewer( new TextFieldViewer().configure( (TextField t) -> {
                         t.multiline.set( true );
                         t.type.set( Type.MARKDOWN );
-                        autocompletes( t );
+                        TextAutocomplete.process( t, state.uow );
                     }))
                     .create()
                     .lc( RowConstraints.height( 300 ) ) );
+
+//            add( form.newField().label( "URL" )
+//                    .viewer( new TextFieldViewer() )
+//                    .model( new PropertyModel<>( state.article.$().permName ) )
+//                    .create()
+//                    .lc( RowConstraints.height( 35 ) ) );
 
             // medias
             add( new UIComposite() {{
@@ -214,44 +213,5 @@ public class ArticlePage {
     }
 
 
-    protected void autocompletes( TextField tf ) {
-        var t = Timer.start();
-        var result = new ArrayList<String>();
-        Platform.schedule( 2000, () -> null )
-                .then( __ -> {
-                    result.add( "::swiper::" );
-                    result.add( "::swiper?w=<Breite>,h=<Höhe>::" );
-                    result.add( "::abstract::" );
-                    result.add( "----" );
-
-                    return state.uow.query( Article.class )
-                            //.orderBy( Article.TYPE.title, Order.ASC ) // XXX does not work for newly created Article
-                            .maxResults( 7 )
-                            .executeCollect();
-                })
-                .then( rs -> {
-                    rs.forEach( article -> result.add( article.title.get() ) );
-                    result.add( "----" );
-
-                    return state.uow.query( MediaEntity.class )
-                            .orderBy( MediaEntity.TYPE.modified, Order.DESC )
-                            .maxResults( 7 )
-                            .executeCollect();
-                })
-                .onSuccess( rs -> {
-                    rs.forEach( media -> result.add( MediaContentProvider.PATH + "/" + media.name.get() ) );
-                    result.add( "----" );
-
-                    result.addAll( Arrays.asList( "frontpage?n=", "frontpage?t=", "home" ) );
-
-                    LOG.info( "autocomplete: %s [%s]", result.size(), t );
-                    if (!tf.isDisposed()) {
-                        tf.autocomplete.set( result );
-                    }
-                    else {
-                        LOG.warn( "autocomplete: TextField already disposed" );
-                    }
-                });
-    }
 
 }

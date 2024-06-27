@@ -77,6 +77,7 @@ public class ContentRepo {
             }
 
             return initRepo( permid )
+                    .then( repo -> checkPermNames( repo ).map( ___ -> repo ) )
                     .then( repo -> checkInitAccount( repo, account ).map( ___ -> repo ) )
                     .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) );
         });
@@ -107,6 +108,24 @@ public class ContentRepo {
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )
                 .create();
+    }
+
+
+    /**
+     *
+     */
+    protected static Promise<Submitted> checkPermNames( EntityRepository repo ) {
+        var uow2 = repo.newUnitOfWork();
+        return uow2.query( Article.class ).executeCollect()
+                .then( rs -> {
+                    rs.forEach( article -> article.title.set( article.title.get() ) );
+
+                    return uow2.query( TopicEntity.class ).executeCollect();
+                })
+                .then( rs -> {
+                    rs.forEach( topic -> topic.title.set( topic.title.get() ) );
+                    return uow2.submit();
+                });
     }
 
 
@@ -174,14 +193,12 @@ public class ContentRepo {
                             proto.description.set( defaults( "mainTopic.md" ) );
                             proto.order.set( 1 );
                             proto.medias.add( wohnung );
-                            proto.urlPart.set( "home" );
                         });
                         var legal = uow2.createEntity( TopicEntity.class, proto -> {
                             proto.title.set( "Rechtliches" );
                             proto.description.set( defaults( "legalTopic.md" ) );
                             proto.order.set( 2 );
                             proto.medias.add( wohnung );
-                            proto.urlPart.set( "legal" );
                         });
                         // Article
                         uow2.createEntity( Article.class, proto -> {

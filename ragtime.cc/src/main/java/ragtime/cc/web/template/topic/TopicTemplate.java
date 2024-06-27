@@ -22,6 +22,7 @@ import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
+import ragtime.cc.model.Article;
 import ragtime.cc.model.TopicEntity;
 import ragtime.cc.web.http.ContentProvider.Request;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
@@ -63,9 +64,15 @@ public abstract class TopicTemplate {
      *
      */
     public static class Site {
+
         public Request r;
+
         public TopicEntity topic;
+
+        public Opt<Article> article = Opt.absent();
+
         public TopicTemplateConfigEntity config;
+
         public Map<Object,Object> data;
     }
 

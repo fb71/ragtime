@@ -13,18 +13,22 @@
  */
 package ragtime.cc.web.template.topic;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.polymap.model2.query.Expressions;
+import org.polymap.model2.query.Query;
 
 import areca.common.Promise;
 import areca.common.Scheduler.Priority;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import freemarker.template.TemplateNotFoundException;
+import ragtime.cc.model.Article;
 import ragtime.cc.model.TopicEntity;
+import ragtime.cc.web.http.WebsiteServlet;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
 import ragtime.cc.web.template.CompositeTemplateModel;
 import ragtime.cc.web.template.HttpRequestParamsTemplateModel;
@@ -61,46 +65,77 @@ public class TopicTemplateContentProvider
             return Promise.completed( true, Priority.MAIN_EVENT_LOOP );
         }
 
+        // /home
+        if (resName.equals( WebsiteServlet.PATH_HOME )) {
+            return request.uow.query( TopicEntity.class )
+                    .orderBy( TopicEntity.TYPE.order, Query.Order.ASC )
+                    .executeCollect()
+                    .map( topics -> {
+                        request.httpResponse.sendRedirect( topics.get( 0 ).permName.get() );
+                        return true;
+                    });
+        }
+
         // topics
         var loadTopics = request.uow.query( TopicEntity.class ).executeCollect().onSuccess( rs -> {
             data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
         });
 
-        // XXX hack a config
-        var topicUrlPart = request.path[0];
-        var loadHack = request.uow
+        // permName -> topic/article
+        var permName = request.path[0];
+        var permNameInTopic = request.uow
                 .query( TopicEntity.class )
-                .where( Expressions.eq( TopicEntity.TYPE.urlPart, topicUrlPart ) )
-                .executeCollect().onSuccess( rs -> {
-                    if (rs.isEmpty()) {
-                        throw new TemplateNotFoundException( topicUrlPart, null, "No such topic: " + topicUrlPart );
-                    }
-                    if (rs.size() > 1) {
-                        LOG.warn( "Multiple hits for topic: %s", topicUrlPart );
-                    }
-                    var topic = rs.get( 0 );
-                    LOG.info( "Hack" );
-                    request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
-                        proto.topic.set( topic );
-                        proto.urlPart.set( topic.urlPart.get() );
-                        proto.topicTemplateName.set( topic.topicTemplateName.get() );
-                    });
+                .where( Expressions.eq( TopicEntity.TYPE.permName, permName ) )
+                .optResult();
+        var permNameInArticle = request.uow
+                .query( Article.class )
+                .where( Expressions.eq( Article.TYPE.permName, permName ) )
+                .optResult()
+                .thenOpt( article -> {
+                    topicTemplateSite.article = article;
+                    return article.get().topic.fetch();
+                });
+        var findTopic = permNameInTopic
+                .join( permNameInArticle )
+                .reduce( new ArrayList<TopicEntity>(), (r,opt) -> {
+                    //LOG.info( "Topic: %s", opt.map( t -> t.permName.get() ) );
+                    opt.ifPresent( t -> r.add( t ) );
                 });
 
+        // XXX hack a config
+        var hackTopicConfig = findTopic.map( rs -> {
+            if (rs.isEmpty()) {
+                throw new TemplateNotFoundException( permName, null, "No Topic/Article for permName (or Article has no Topic set): " + permName );
+            }
+            if (rs.size() > 1) {
+                throw new TemplateNotFoundException( permName, null, "Mehrere Beitraege/Topics haben die URL: " + permName );
+            }
+            var topic = rs.get( 0 );
+            LOG.info( "Hack" );
+            topicTemplateSite.config = request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
+                proto.topic.set( topic );
+                proto.topicTemplateName.set( topic.topicTemplateName.get() );
+            });
+            topicTemplateSite.topic = topic;
+            return topic;
+        });
+
         // find TopicTemplateConfigEntity
-        LOG.info( "Loading Topic/Config for: %s ...", topicUrlPart );
-        var loadTemplate = loadHack
-                .then( __ -> {
-                    return request.uow.query( TopicTemplateConfigEntity.class )
-                            .where( Expressions.eq( TopicTemplateConfigEntity.TYPE.urlPart, topicUrlPart ) )
-                            .executeCollect();
-                })
+        LOG.info( "Loading Topic/Config for: %s ...", permName );
+        var loadTemplate = hackTopicConfig
+                // XXX
+                .map( __ -> Arrays.asList( topicTemplateSite.config ) )
+//                .then( topic -> {
+//                    return request.uow.query( TopicTemplateConfigEntity.class )
+//                            .where( Expressions.is( TopicTemplateConfigEntity.TYPE.topic, topic ) )
+//                            .executeCollect();
+//                })
                 .map( configs -> {
                     if (configs.isEmpty()) {
-                        throw new TemplateNotFoundException( topicUrlPart, null, "No such topic: " + topicUrlPart );
+                        throw new TemplateNotFoundException( permName, null, "No such topic: " + permName );
                     }
                     if (configs.size() > 1) {
-                        throw new RuntimeException( "Multiple configs for: " + topicUrlPart + "(" + configs.size() + ")" );
+                        throw new RuntimeException( "Multiple configs for: " + permName + "(" + configs.size() + ")" );
                     }
                     return configs.get( 0 );
                 })
@@ -123,7 +158,7 @@ public class TopicTemplateContentProvider
                             .process( topicTemplateSite );
                 })
                 .map( ftl -> {
-                    LOG.info( "Loading topic template: %s", ftl );
+                    LOG.info( "Loading template: %s", ftl );
                     var cfg = TemplateLoader.configuration( config );
                     var template = cfg.getTemplate( ftl );
 

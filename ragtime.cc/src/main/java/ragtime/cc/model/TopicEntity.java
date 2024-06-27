@@ -15,6 +15,7 @@ package ragtime.cc.model;
 
 import static org.polymap.model2.query.Expressions.anyOf;
 
+import org.polymap.model2.Concerns;
 import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Defaults;
 import org.polymap.model2.ManyAssociation;
@@ -54,9 +55,18 @@ public class TopicEntity
 
     // instance *******************************************
 
+    /**
+     * An normalized, simplified, URL compatible name that identifies this Topic,
+     * auto updated when {@link #title} changes.
+     */
+    @Queryable
+    @Concerns( PermNameConcern.class )
+    public Property<String>     permName;
+
     /** Human readable, changeable label of this Topic */
     @Queryable
     @DefaultValue( "" )
+    @Concerns( UpdatePermNameConcern.class )
     public Property<String>     title;
 
     @DefaultValue( "" )
@@ -83,14 +93,6 @@ public class TopicEntity
     @Queryable
     @DefaultValue( "Basic" )
     public Property<String>     topicTemplateName;
-
-    /**
-     * The URL path that identifies this {@link #topic}
-     * @deprecated {@link TopicTemplateConfigEntity}
-     */
-    @Queryable
-    @Nullable
-    public Property<String>     urlPart;
 
     @Queryable
     public ManyAssociation<TopicEntity> members;

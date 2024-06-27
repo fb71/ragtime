@@ -14,6 +14,7 @@
 package ragtime.cc.model;
 
 import org.polymap.model2.Association;
+import org.polymap.model2.Concerns;
 import org.polymap.model2.ManyAssociation;
 import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
@@ -39,7 +40,16 @@ public class Article
 
     public static Article TYPE;
 
+    /**
+     * An normalized, simplified, URL compatible name that identifies this Article,
+     * auto updated when {@link #title} changes.
+     */
     @Queryable
+    @Concerns( PermNameConcern.class )
+    public Property<String>             permName;
+
+    @Queryable
+    @Concerns( UpdatePermNameConcern.class )
     public Property<String>             title;
 
     @Queryable

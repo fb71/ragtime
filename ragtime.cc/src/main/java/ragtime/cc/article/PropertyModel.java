@@ -38,7 +38,7 @@ public class PropertyModel<V>
 
     @Override
     public V get() {
-        return prop.get();
+        return prop.opt().orElse( null );
     }
 
     @Override

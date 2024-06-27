@@ -37,8 +37,8 @@ public class ArticleCreateState
     @Override
     public void initAction() {
         article.set( uow.createEntity( Article.class, proto -> {
-            proto.title.set( "Neuer Beitrag" );
-            proto.content.set( "# Überschrift\n\nText ..." );
+            //proto.title.set( "Neuer Beitrag" );
+            proto.content.set( "## Überschrift\n\nText..." );
         }));
         super.initAction();
     };

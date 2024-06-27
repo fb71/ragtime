@@ -36,7 +36,8 @@ public class TopicCreateState
     @State.Init
     @Override
     public void initAction() {
-        topic = uow.createEntity( TopicEntity.class, TopicEntity.defaults() );
+        topic = uow.createEntity( TopicEntity.class, TopicEntity.defaults().andThen( proto -> {
+        }));
         super.initAction();
     };
 

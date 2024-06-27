@@ -44,12 +44,6 @@ public class TopicTemplateConfigEntity
     public Association<TopicEntity>     topic;
 
     /**
-     * The URL path that identifies this {@link #topic}
-     */
-    @Queryable
-    public Property<String>             urlPart;
-
-    /**
      * Link to {@link TopicTemplate}
      */
     @Queryable

@@ -125,7 +125,7 @@ public class WebsiteServlet
                 .then( config -> {
                     request.config = config;
 
-                    // redirect: home
+                    // redirect: / -> /home
                     if (parts.length == 1) {
                         Assert.that( req.getPathInfo().endsWith( "/" ), "Home URL does not end with a '/'" );
                         resp.sendRedirect( PATH_HOME );
@@ -180,6 +180,7 @@ public class WebsiteServlet
                         + "    <body style=\"font-family: sans-serif;\">\n"
                         + "        <h1>Diese Seite existiert nicht (mehr)</h1>\n"
                         + "        <h3>Sie werden weitergeleitet zur: <a href='/" + PATH_HOME + "'>Home Page</a></h3>\n"
+                        + "        <hr/><p>" + e.getMessage() + "</p>\n"
                         + "    </body>\n"
                         + "</html>" );
             }

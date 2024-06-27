@@ -57,7 +57,7 @@
             <#list topics?sequence?sort_by("order") as topic>
                 <div class="ITopic col-auto"> <#--  style="background-color: ${topic.color};">  -->
                 <@c.editable msg="topic.${topic.id}">
-                  <a href="${topic.urlPart}" style="display:block;">
+                  <a href="${topic.permName}" style="display:block;">
 
                       <#if topic.medias?sequence?size gt 0>
                         <#assign media = topic.medias?sequence?first>

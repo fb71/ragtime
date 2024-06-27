@@ -4,11 +4,14 @@
 <#--
   Basic
 -->
-<@page.layout title="Basic">
+<@page.layout title="${topic.title}">
     <#list articles?sequence as article>
         <@c.editable msg="article.${article.entity.id}">
             ${article.content}
         </@c.editable>
-        <hr/>
+    
+        <#if article?counter < articles?sequence?size>
+            <hr/>
+        </#if>
     </#list>
 </@page.layout>
