@@ -24,9 +24,6 @@ import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
 import org.polymap.model2.query.Query.Order;
 import org.polymap.model2.runtime.EntityRuntimeContext.EntityStatus;
-import org.polymap.model2.runtime.UnitOfWork.Submitted;
-
-import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -62,10 +59,6 @@ public class MediasSelectState
 
     @State.Model
     public EntityListModel<MediaEntity> medias = new EntityListModel<>( MediaEntity.class ) {
-        {
-            // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
-        }
         @Override
         protected Query<MediaEntity> query() {
             var searchTxtMatch = Expressions.TRUE;
@@ -92,6 +85,18 @@ public class MediasSelectState
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
     };
+
+
+    @State.Dispose
+    public void disposeAction() {
+        LOG.warn( "disposeAction(): page.isOpen=%s", pageflow.isOpen( page ) );
+        if (page != null && pageflow.isOpen( page )) {
+            pageflow.close( page );
+        }
+        // do not remove newly created medias - rely on calling state for submit/discard
+        //uow.discard();
+        site.dispose();
+    }
 
 
     @State.Action
@@ -136,7 +141,10 @@ public class MediasSelectState
         try {
             media.mimetype.set( f.mimetype() );
             f.copyInto( media.out() );
-            uow.submit();
+
+            // we are working on behalf of another state...
+            //uow.submit();
+            medias.fireChangeEvent();
         }
         catch (IOException e) {
             throw new RuntimeException( e );
@@ -144,10 +152,9 @@ public class MediasSelectState
     }
 
 
-    @State.Action
-    public Promise<Submitted> deleteMediaAction( MediaEntity entity ) {
-        uow.removeEntity( entity );
-        return uow.submit();
-    }
+//    @State.Action
+//    public Promise<Submitted> deleteMediaAction( MediaEntity entity ) {
+//        uow.removeEntity( entity );
+//    }
 
 }

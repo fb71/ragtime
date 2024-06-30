@@ -233,7 +233,7 @@ public class MediaEntity
         try {
             var f = f();
             if (f.exists()) {
-                LOG.warn( "Overwrite: " + name.get() + ". -> FLUSHING CACHE!" );
+                LOG.warn( "Overwrite: " + name.get() + " -> FLUSHING CACHE!" );
                 thumbnails.clear();
             }
             return /*new BufferedOutputStream(*/ new FileOutputStream( f );

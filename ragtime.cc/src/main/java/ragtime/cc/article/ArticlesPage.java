@@ -149,7 +149,7 @@ public class ArticlesPage {
             // title
             add( new Text() {{
                 format.set( Format.HTML );
-                content.set( article.title.get() + "<br/>" +
+                content.set( article.title.opt().orElse( "[null]" ) + "<br/>" +
                         "<span style=\"font-size:10px; color:#808080;\">" + df.format( article.modified.get() ) + "</span>" );
             }});
             // Topic

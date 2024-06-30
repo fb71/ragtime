@@ -197,7 +197,7 @@ public class ArticlePage {
             icon.set( UICommon.ICON_DELETE );
             handler.set( ev -> {
                 ConfirmDialog.createAndOpen( "Beitrag",
-                        "<b><center>" + state.article.$().title.get() + "</center></b><br/><br/>" )
+                        "<b><center>" + state.article.$().title.opt().orElse( "[null]" ) + "</center></b><br/><br/>" )
                         .size.set( Size.of( 320, 200 ) )
                         .addDeleteAction( () -> {
                             state.deleteAction().onSuccess( __ -> {
@@ -211,7 +211,5 @@ public class ArticlePage {
         HelpPage.addAction( ArticlePage.class, site );
         return ui;
     }
-
-
 
 }

@@ -77,7 +77,7 @@ public class ContentRepo {
             }
 
             return initRepo( permid )
-                    .then( repo -> checkPermNames( repo ).map( ___ -> repo ) )
+                    //.then( repo -> checkPermNames( repo ).map( ___ -> repo ) )
                     .then( repo -> checkInitAccount( repo, account ).map( ___ -> repo ) )
                     .then( repo -> checkInitContent( repo, account ).map( ___ -> repo ) );
         });
