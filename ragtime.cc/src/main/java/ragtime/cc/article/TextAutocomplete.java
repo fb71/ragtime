@@ -25,6 +25,7 @@ import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.component2.TextField;
+import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.MediaEntity;
 import ragtime.cc.model.TopicEntity;
@@ -52,6 +53,14 @@ public class TextAutocomplete {
                     result.add( "::swiper::" );
                     result.add( "::swiper?w=<Breite>,h=<Höhe>::" );
                     result.add( "::abstract::" );
+
+                    return uow.query( AccountEntity.class ).optResult();
+                })
+                .then( opt -> {
+                    opt.ifPresent( account -> {
+                        result.add( "----" );
+                        result.add( String.format( "[EMail](mailto:%s)", account.email.get() ) );
+                    });
                     result.add( "----" );
 
                     // XXX orderBy() does not work for newly created Topic
