@@ -20,11 +20,11 @@
       <servlet>
         <servlet-name>ArecaUIServer</servlet-name>
         <servlet-class>areca.rt.server.servlet.ArecaUIServer</servlet-class>
-        <load-on-startup>1</load-on-startup>
         <init-param>
           <param-name>areca.appclass</param-name>
           <param-value>ragtime.cc.CCApp</param-value>
         </init-param>
+        <load-on-startup>1</load-on-startup>
       </servlet>
 
       <servlet-mapping>

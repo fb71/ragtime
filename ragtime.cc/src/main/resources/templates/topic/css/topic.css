@@ -2,6 +2,12 @@
  * Topic base styles
  */
  
+/* Calendar ***********************************************/
+.ICalendarEventTime {
+    font-weight: 600;
+    margin-bottom: 0px;    
+}
+
 /* ITiles *************************************************/
 .ITiles {
     --bs-gutter-x: 0.3rem;

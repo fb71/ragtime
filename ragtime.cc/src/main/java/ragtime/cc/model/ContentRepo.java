@@ -103,7 +103,7 @@ public class ContentRepo {
         return EntityRepository.newConfiguration()
                 .entities.set( Arrays.asList(
                         AccountEntity.info,
-                        Article.info, MediaEntity.info, TagEntity.info, TopicEntity.info,
+                        Article.info, MediaEntity.info, TagEntity.info, TopicEntity.info, CalendarEvent.info,
                         WebsiteConfigEntity.info, TemplateConfigEntity.info, TopicTemplateConfigEntity.info,
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )

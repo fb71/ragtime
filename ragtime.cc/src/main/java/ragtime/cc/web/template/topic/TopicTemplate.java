@@ -39,6 +39,7 @@ public abstract class TopicTemplate {
         put( "Basic", BasicTopicTemplate.class );
         put( "Tiles", TilesTopicTemplate.class );
         put( "Flex", FlexTopicTemplate.class );
+        put( "Calendar", CalendarTopicTemplate.class );
     }};
 
     /**

@@ -41,6 +41,7 @@ import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.AssociationModel;
 import ragtime.cc.ConfirmDialog;
 import ragtime.cc.EntityTransform;
+import ragtime.cc.Extensions;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.media.MediasPage.MediaListItem;
@@ -73,6 +74,8 @@ public class ArticlePage {
 
     private Form                form;
 
+    private UIComposite         formBody;
+
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
@@ -80,9 +83,12 @@ public class ArticlePage {
 
         ui.body.layout.set( FillLayout.defaults() );
         ui.body.add( new ScrollableComposite() {{
-            layout.set( uic.verticalL().fillHeight( true ) );
+            formBody = layout.set( uic.verticalL().fillHeight( true ) );
 
             form = new Form();
+
+            Extensions.ofType( ArticlePageExtension.class )
+                    .forEach( ex -> ex.doExtendFormStart( state, ArticlePage.this, site, formBody ) );
 
             add( new UIComposite() {{
                 lc( RowConstraints.height( 35 ) );
@@ -167,6 +173,9 @@ public class ArticlePage {
                     add( medias.createAndLoad() );
                 }});
             }});
+
+            Extensions.ofType( ArticlePageExtension.class )
+                    .forEach( ex -> ex.doExtendFormEnd( state, ArticlePage.this, site, form, formBody ) );
 
             form.load();
         }});
