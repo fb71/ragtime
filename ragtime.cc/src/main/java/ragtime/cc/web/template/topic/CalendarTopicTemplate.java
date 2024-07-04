@@ -49,6 +49,7 @@ public class CalendarTopicTemplate
         var account = site.r.uow.query( AccountEntity.class ).singleResult().waitForResult().get();
 
         return site.r.uow.query( CalendarEvent.class )
+                //.where( Expressions.gt( CalendarEvent.TYPE.start, new Date() ) )
                 .orderBy( CalendarEvent.TYPE.start, Order.ASC )
                 .executeCollect()
                 .map( rs -> {
@@ -56,9 +57,7 @@ public class CalendarTopicTemplate
                         var article = ce.article.fetch().waitForResult().get();
                         var event = new MapTemplateModel( processTopicArticle( article ) );
                         event.delegate.put( "start", new SimpleDate( ce.start.get(), TemplateDateModel.DATETIME ) );
-
                         event.delegate.put( "email", new SimpleScalar( account.email.get() ) );
-
                         period.delegate.add( event );
                     }
                     return "calendar.ftl";
