@@ -23,6 +23,7 @@ import areca.common.Platform;
 import areca.common.ProgressMonitor;
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
@@ -34,6 +35,9 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
+import areca.ui.statenaction.StateChangeEvent;
+import ragtime.cc.calendar.CalendarEventArticlePageEx;
+import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
 import ragtime.cc.web.template.TemplateInfo;
@@ -65,6 +69,8 @@ public class CCApp
         //LogFactory.setPackageLevel( State.class, Level.DEBUG );
         //LogFactory.setClassLevel( UIEventCollector.class, Level.DEBUG );
 
+        //System.setProperty( "org.slf4j.simpleLogger.logFile", "System.out" );
+
         // Mostly assertions
         Promise.setDefaultErrorHandler( defaultErrorHandler() );
         EventLoop.setDefaultErrorHandler( defaultErrorHandler() ); // process click events
@@ -74,6 +80,9 @@ public class CCApp
         // check/fail on startup
         LOG.info( "Templates: ..." );
         TemplateInfo.all();
+
+        // extensions
+        Extensions.register( CalendarEventArticlePageEx.class );
     }
 
 
@@ -108,6 +117,14 @@ public class CCApp
                         .activate();
 
                 ServerBrowserHistoryStrategy.start( pageflow );
+
+//                // track current account for ErrorPage
+//                EventManager.instance()
+//                        .subscribe( (StateChangeEvent ev) -> {
+//                            LOG.debug( "Current account: %s", ev.stateSite.opt( AccountEntity.class, MainRepo.SCOPE )
+//                                    .map( a -> a.email.get() ).orElse( "[???]" ) );
+//                        })
+//                        .performIf( StateChangeEvent.class, ev -> true );
             });
         }
         catch (Throwable e) {
