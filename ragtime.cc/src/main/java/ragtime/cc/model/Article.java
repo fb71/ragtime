@@ -75,4 +75,20 @@ public class Article
     @Queryable
     public ManyAssociation<MediaEntity> medias;
 
+
+    /**
+     * remove back association
+     */
+    @Override
+    public void onLifecycleChange( State state ) {
+        super.onLifecycleChange( state );
+        if (state == State.AFTER_REMOVED) {
+            // CalendarEvent
+            CalendarEvent.of( this ).waitForResult( opt -> opt.ifPresent( ce -> {
+                LOG.info( "Removing back link: %s", ce );
+                context.getUnitOfWork().removeEntity( ce );
+            }));
+        }
+    }
+
 }
