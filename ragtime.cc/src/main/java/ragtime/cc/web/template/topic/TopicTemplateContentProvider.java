@@ -58,8 +58,17 @@ public class TopicTemplateContentProvider
         data.put( "params", new HttpRequestParamsTemplateModel( request.httpRequest ) );
         data.put( "config", new CompositeTemplateModel( config ) );
 
-        // *.css
+        // robots/sitemap
         var resName = String.join( "/", request.path );
+        if (resName.equals( "robots.txt" ) || resName.equals( "sitemap.txt" )) {
+            return request.uow.query( TopicEntity.class ).executeCollect().map( rs -> {
+                data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
+                processFtl( resName + ".ftl", data );
+                return true;
+            });
+        }
+
+        // *.css
         if (resName.endsWith( ".css" )) {
             processFtl( resName + ".ftl", data );
             return Promise.completed( true, Priority.MAIN_EVENT_LOOP );
