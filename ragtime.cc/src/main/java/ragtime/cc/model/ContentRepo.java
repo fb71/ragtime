@@ -233,17 +233,17 @@ public class ContentRepo {
                             proto.colors.get().link.set( "#db7e00" );
                             proto.page.createValue( page -> {
                                 page.title.set( "Meine Website" );
-                                page.title2.set( "Hier sollte etwas anderes stehen" );
+                                page.title2.set( "Untertitel" );
                                 page.footer.set( "&copy; ..." );
                             });
                             proto.footerNavItems.createElement( navItem -> {
                                 navItem.title.set( "Datenschutz" );
-                                navItem.href.set( String.format( "frontpage?%s=Datenschutz", ArticleTemplateModel.PARAM_TITLE ) );
+                                navItem.href.set( "Datenschutz" );
                                 navItem.order.set( 2 );
                             });
                             proto.footerNavItems.createElement( navItem -> {
                                 navItem.title.set( "Impressum" );
-                                navItem.href.set( String.format( "frontpage?%s=Impressum", ArticleTemplateModel.PARAM_TITLE ) );
+                                navItem.href.set( "Impressum" );
                                 navItem.order.set( 3 );
                             });
                             proto.css.set( defaults( "config-default.css" ) );
