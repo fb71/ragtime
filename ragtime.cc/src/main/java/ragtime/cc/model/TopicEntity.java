@@ -32,7 +32,6 @@ import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
-import ragtime.cc.web.template.topic.TopicTemplate;
 
 /**
  *
@@ -48,8 +47,14 @@ public class TopicEntity
 
     public static TopicEntity TYPE;
 
+    /**
+     * Always creates a {@link TopicTemplateConfigEntity}.
+     */
     public static RConsumer<TopicEntity> defaults() {
         return proto -> {
+            proto.context.getUnitOfWork().createEntity( TopicTemplateConfigEntity.class, config -> {
+                config.topic.set( proto );
+            });
         };
     }
 
@@ -86,14 +91,6 @@ public class TopicEntity
     //@Concerns( PropertyChangeConcern.class )
     public Property<Integer>    order;
 
-    /**
-     * The name of the {@link TopicTemplate} to use.
-     * @deprecated {@link TopicTemplateConfigEntity#topic}
-     */
-    @Queryable
-    @DefaultValue( "Basic" )
-    public Property<String>     topicTemplateName;
-
     @Queryable
     public ManyAssociation<TopicEntity> members;
 
@@ -112,6 +109,28 @@ public class TopicEntity
     public Query<Article> articles() {
         return context.getUnitOfWork().query( Article.class )
                 .where( Expressions.is( Article.TYPE.topic, this ) );
+    }
+
+    /**
+     * remove back association
+     */
+    @Override
+    public void onLifecycleChange( State state ) {
+        super.onLifecycleChange( state );
+        if (state == State.AFTER_REMOVED) {
+
+            // TopicTemplateConfigEntity
+            // XXX without wait/block we are to late for (possible) subsequent submit()
+            TopicTemplateConfigEntity.of( this ).waitForResult( opt -> opt.ifPresent( config -> {
+                LOG.info( "Removing back link: %s", config );
+                context.getUnitOfWork().removeEntity( config );
+            }));
+
+            // articles
+            articles().executeCollect().waitForResult( rs -> {
+                rs.forEach( article -> article.topic.set( null ) );
+            });
+        }
     }
 
 }

@@ -188,18 +188,18 @@ public class ContentRepo {
                         var wohnung = uow2.createEntity( MediaEntity.class, defaultMedia( "wohnung.jpeg" ));
                         var areca = uow2.createEntity( MediaEntity.class, defaultMedia( "areca.jpeg" ));
                         // Topics
-                        var main = uow2.createEntity( TopicEntity.class, proto -> {
+                        var main = uow2.createEntity( TopicEntity.class, TopicEntity.defaults().andThen( proto -> {
                             proto.title.set( "Willkommen" );
                             proto.description.set( defaults( "mainTopic.md" ) );
                             proto.order.set( 1 );
                             proto.medias.add( wohnung );
-                        });
-                        var legal = uow2.createEntity( TopicEntity.class, proto -> {
+                        }));
+                        var legal = uow2.createEntity( TopicEntity.class, TopicEntity.defaults().andThen( proto -> {
                             proto.title.set( "Rechtliches" );
                             proto.description.set( defaults( "legalTopic.md" ) );
                             proto.order.set( 2 );
                             proto.medias.add( wohnung );
-                        });
+                        }));
                         // Article
                         uow2.createEntity( Article.class, proto -> {
                             proto.title.set( "Bedienung" );
@@ -220,7 +220,7 @@ public class ContentRepo {
                         });
                         // TemplateConfig
                         uow2.createEntity( TemplateConfigEntity.class, proto -> {
-                            proto.templateName.set( TopicTemplateContentProvider.templates.get( 0 ) );
+                            proto.templateName.set( TopicTemplateContentProvider.TEMPLATE_DEFAULT );
                             proto.bannerImage.set( areca );
                             proto.leadImage.set( wohnung );
                             proto.colors.get().headerBackground.set( "#e0ddd2");

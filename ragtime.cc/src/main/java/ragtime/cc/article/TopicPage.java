@@ -21,6 +21,7 @@ import areca.ui.Action;
 import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
@@ -33,18 +34,18 @@ import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.CompositeListViewer;
-import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.ConfirmDialog;
+import ragtime.cc.Extensions;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
+import ragtime.cc.article.TopicPageExtension.FormContext;
 import ragtime.cc.media.MediasPage.MediaListItem;
 import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.model.MediaEntity;
-import ragtime.cc.web.template.topic.TopicTemplate;
 
 /**
  *
@@ -73,86 +74,76 @@ public class TopicPage {
 
     protected Form              form;
 
+    protected UIComposite       formBody;
+
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
         ui.init( parent ).title.set( "Topic" );
 
-        form = new Form();
+        ui.body.layout.set( FillLayout.defaults() );
+        ui.body.add( new ScrollableComposite() {{
+            formBody = layout.set( uic.verticalL().fillHeight( false ) );
 
-        ui.body.layout.set( uic.verticalL().fillHeight( true ) );
+            form = new Form();
 
-        // title / color
-        ui.body.add( new UIComposite() {{
-            lc( RowConstraints.height( 35 ) );
-            layout.set( RowLayout.filled().spacing( uic.space ) );
-
-            add( form.newField().label( "Titel" )
-                    .description( "Die interne, *eindeutige* Bezeichnung des Topics.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Topics!" )
-                    .viewer( new TextFieldViewer() )
-                    .model( new PermNameValidator( state.uow,
-                            new PropertyModel<>( state.topic.title ) ) )
-                    .create() );
-
-            add( form.newField() //.label( "Farbe" )
-                    .viewer( new ColorPickerViewer() )
-                    .model( new PropertyModel<>( state.topic.color ) )
-                    .create()
-                    .lc( RowConstraints.width( 50 ) ) );
-        }});
-
-        ui.body.add( form.newField() //.label( "Beschreibung" )
-                .model( new PropertyModel<>( state.topic.description ) )
-                .viewer( new TextFieldViewer().configure( (TextField t) -> {
-                    t.multiline.set( true );
-                    t.type.set( Type.MARKDOWN );
-                    TextAutocomplete.process( t, state.uow );
-                }))
-                .create()
-                .lc( RowConstraints.height( 200 ) ) );
-
-        ui.body.add( form.newField().label( "Darstellung" )
-                .viewer( new SelectViewer( TopicTemplate.availableNames() ) )
-                .model( new PropertyModel<>( state.topic.topicTemplateName ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
-        ui.body.add( form.newField().label( "Reihenfolge" )
-                .viewer( new TextFieldViewer() )
-                .model( new Number2StringTransform(
-                        new PropertyModel<>( state.topic.order ) ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
-
-//        ui.body.add( form.newField().label( "URL" )
-//                .viewer( new TextFieldViewer() )
-//                .model( new PropertyModel<>( state.topic.permName ) )
-//                .create()
-//                .lc( RowConstraints.height( 35 ) ) );
-
-        // medias
-        ui.body.add( new UIComposite() {{
-            //lc( RowConstraints.height( 100 ) );
-            layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
-
-            // add button
+            // title / color
             add( new UIComposite() {{
-                lc( RowConstraints.height( 38 ) );
+                lc( RowConstraints.height( 35 ) );
                 layout.set( RowLayout.filled().spacing( uic.space ) );
-                add( new UIComposite() );
-                add( new Button() {{
-                    lc( RowConstraints.width( 60 ) );
-                    tooltip.set( "Bilder/Medien hinzufügen" );
-                    icon.set( "add_photo_alternate" );
-                    events.on( EventType.SELECT, ev -> {
-                        state.site.createState( new MediasSelectState( sel -> state.addMedias( sel ) ) ).activate();
-                    });
-                }});
+
+                add( form.newField().label( "Titel" )
+                        .description( "Die interne, *eindeutige* Bezeichnung des Topics.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Topics!" )
+                        .viewer( new TextFieldViewer() )
+                        .model( new PermNameValidator( state.uow,
+                                new PropertyModel<>( state.topic.title ) ) )
+                        .create() );
+
+                add( form.newField() //.label( "Farbe" )
+                        .viewer( new ColorPickerViewer() )
+                        .model( new PropertyModel<>( state.topic.color ) )
+                        .create()
+                        .lc( RowConstraints.width( 50 ) ) );
             }});
 
-            // list
+            add( form.newField() //.label( "Beschreibung" )
+                    .model( new PropertyModel<>( state.topic.description ) )
+                    .viewer( new TextFieldViewer().configure( (TextField t) -> {
+                        t.multiline.set( true );
+                        t.type.set( Type.MARKDOWN );
+                        TextAutocomplete.process( t, state.uow );
+                    }))
+                    .create()
+                    .lc( RowConstraints.height( 200 ) ) );
+
+            add( form.newField().label( "Reihenfolge" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new Number2StringTransform(
+                            new PropertyModel<>( state.topic.order ) ) )
+                    .create()
+                    .lc( RowConstraints.height( 35 ) ) );
+
+            // medias
             add( new UIComposite() {{
-                layout.set( FillLayout.defaults() );
+                //lc( RowConstraints.height( 100 ) );
+                layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
+
+                // add button
+                add( new UIComposite() {{
+                    lc( RowConstraints.height( 38 ) );
+                    layout.set( RowLayout.filled().spacing( uic.space ) );
+                    add( new UIComposite() );
+                    add( new Button() {{
+                        lc( RowConstraints.width( 60 ) );
+                        tooltip.set( "Bilder/Medien hinzufügen" );
+                        icon.set( "add_photo_alternate" );
+                        events.on( EventType.SELECT, ev -> {
+                            state.site.createState( new MediasSelectState( sel -> state.addMedias( sel ) ) ).activate();
+                        });
+                    }});
+                }});
+
+                // list
                 var medias = new ViewerContext<>()
                         .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
                             return new MediaListItem( media, () -> state.removeMediaAction( media ) );
@@ -163,18 +154,23 @@ public class TopicPage {
                             onSelect.set( media -> {
                                 LOG.info( "SELECT: %s", media );
                             });
+                            onLayout.set( c -> formBody.layout() );
                         }})
                         .model( state.medias );
                 add( medias.createAndLoad() );
             }});
-        }});
 
-//        XXX form.subscribe( ev -> {
-//            if (ev.getSource() instanceof TextFieldViewer viewer && viewer.) {
-//                urlPart.getValue().content.set( ev.newValue.toString() );
-//            }
-//        });
-        form.load();
+            // extensions
+            var ctx = new FormContext( state, TopicPage.this, site, formBody, form, uic );
+            Extensions.ofType( TopicPageExtension.class ).forEach( ex -> ex.doExtendFormEnd( ctx ) );
+
+            //        XXX form.subscribe( ev -> {
+            //            if (ev.getSource() instanceof TextFieldViewer viewer && viewer.) {
+            //                urlPart.getValue().content.set( ev.newValue.toString() );
+            //            }
+            //        });
+            form.load();
+        }});
 
         // action: submit
         site.actions.add( submitBtn = new Action() {{

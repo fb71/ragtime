@@ -37,9 +37,10 @@
 }
 
 .MessageCard {
-    background-color: #252525;
+    background-color: #2d2e2f; /* wie table.cell.even */
+    background-color: #2c2c2c; /* wie codemirror mbo template */
     border-top: 1px solid #444444;
-    border-radius: 6px;
+    border-radius: 4px;
 }
 /*
 .MessageCard {

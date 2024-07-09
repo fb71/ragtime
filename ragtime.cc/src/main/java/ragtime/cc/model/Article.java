@@ -84,6 +84,7 @@ public class Article
         super.onLifecycleChange( state );
         if (state == State.AFTER_REMOVED) {
             // CalendarEvent
+            // XXX without wait/block we are to late for (possible) subsequent submit()
             CalendarEvent.of( this ).waitForResult( opt -> opt.ifPresent( ce -> {
                 LOG.info( "Removing back link: %s", ce );
                 context.getUnitOfWork().removeEntity( ce );

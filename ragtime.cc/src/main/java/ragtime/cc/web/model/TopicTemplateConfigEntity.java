@@ -13,10 +13,15 @@
  */
 package ragtime.cc.web.model;
 
+import static org.polymap.model2.query.Expressions.is;
+
 import org.polymap.model2.Association;
+import org.polymap.model2.DefaultValue;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 
+import areca.common.Promise;
+import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -40,6 +45,17 @@ public class TopicTemplateConfigEntity
 
     public static TopicTemplateConfigEntity  TYPE;
 
+    /**
+     * Computed back association of {@link TopicTemplateConfigEntity#topic}
+     */
+    public static Promise<Opt<TopicTemplateConfigEntity>> of( TopicEntity topic ) {
+        return topic.context.getUnitOfWork().query( TopicTemplateConfigEntity.class )
+                .where( is( TopicTemplateConfigEntity.TYPE.topic, topic ) )
+                .optResult();
+    }
+
+    // instance *******************************************
+
     @Queryable
     public Association<TopicEntity>     topic;
 
@@ -47,6 +63,7 @@ public class TopicTemplateConfigEntity
      * Link to {@link TopicTemplate}
      */
     @Queryable
+    @DefaultValue( "Basic" )
     public Property<String>             topicTemplateName;
 
 }

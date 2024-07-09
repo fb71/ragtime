@@ -55,8 +55,8 @@ public class TemplateInfo {
         // XXX tomcat!? :(
         //var folders = IOUtils.readLines( cl().getResourceAsStream( TEMPLATES_BASE_PATH + "/" ), "UTF8" );
         var folders = new ArrayList<String>() {{
-            addAll( TemplateContentProvider.templates );
-            addAll( TopicTemplateContentProvider.templates );
+            addAll( TemplateContentProvider.TEMPLATES );
+            addAll( TopicTemplateContentProvider.TEMPLATES );
         }};
 
         for (var folder : folders) {

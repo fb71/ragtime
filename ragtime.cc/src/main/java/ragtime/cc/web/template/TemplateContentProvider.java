@@ -43,7 +43,7 @@ public class TemplateContentProvider
     private static final Log LOG = LogFactory.getLog( TemplateContentProvider.class );
 
     /** XXX The templates that are compatible with {@link TemplateContentProvider} */
-    public static final List<String> templates = Arrays.asList( "common", "first", "fb71" );
+    public static final List<String> TEMPLATES = Arrays.asList( "common", "first", "fb71" );
 
     private static final Pattern    MACRO_CALL = Pattern.compile("<@[^.]*\\.data name=\\\"([^\\\"]+)\\\" model=\"([^\"]+)\" params=\"([^\"]*)\"/>");
 

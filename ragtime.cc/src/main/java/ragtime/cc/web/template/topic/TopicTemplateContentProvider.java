@@ -46,7 +46,9 @@ public class TopicTemplateContentProvider
     private static final Log LOG = LogFactory.getLog( TopicTemplateContentProvider.class );
 
     /** XXX The templates compatible with {@link TopicTemplateContentProvider} */
-    public static final List<String> templates = Arrays.asList( "topic", "insta", "insta-compact", "company" );
+    public static final List<String> TEMPLATES = Arrays.asList( "topic", "insta", "insta-compact", "company" );
+
+    public static final String       TEMPLATE_DEFAULT = TEMPLATES.get( 2 );
 
 
     @Override
@@ -85,10 +87,26 @@ public class TopicTemplateContentProvider
                     });
         }
 
-        // topics
-        var loadTopics = request.uow.query( TopicEntity.class ).executeCollect().onSuccess( rs -> {
-            data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
-        });
+        // XXX filter topics without config
+//        var loadTopics = request.uow.query( TopicEntity.class ).execute()
+//                .then( opt -> {
+//                    return opt.isPresent()
+//                            ? TopicTemplateConfigEntity.of( opt.get() )
+//                            : Promise.absent( Priority.BACKGROUND );
+//                })
+//                .reduce( new ArrayList<TopicTemplateConfigEntity>(), (r,opt) -> {
+//                    LOG.warn( "Topic: %s", opt );
+//                    opt.ifPresent( tconfig -> r.add( tconfig ) );
+//                })
+//                .map( rs -> {
+//                    data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
+//                    return rs;
+//                });
+        var loadTopics = request.uow.query( TopicEntity.class ).executeCollect()
+                .map( rs -> {
+                    data.put( "topics", new IterableTemplateModel<>( rs, CompositeTemplateModel::new ) );
+                    return rs;
+                });
 
         // permName -> topic/article
         var permName = request.path[0];
@@ -109,58 +127,34 @@ public class TopicTemplateContentProvider
                 .reduce( new ArrayList<TopicEntity>(), (r,opt) -> {
                     //LOG.info( "Topic: %s", opt.map( t -> t.permName.get() ) );
                     opt.ifPresent( t -> r.add( t ) );
+                })
+                .map( rs -> {
+                    if (rs.isEmpty()) {
+                        throw new TemplateNotFoundException( permName, null, "No Topic/Article for permName (or Article has no Topic set): " + permName );
+                    }
+                    if (rs.size() > 1) {
+                        throw new TemplateNotFoundException( permName, null, "More than one Articles/Topics for URL: " + permName );
+                    }
+                    data.put( "topic", new CompositeTemplateModel( rs.get( 0 ) ) );
+                    return topicTemplateSite.topic = rs.get( 0 );
                 });
 
-        // XXX hack a config
-        var hackTopicConfig = findTopic.map( rs -> {
-            if (rs.isEmpty()) {
-                throw new TemplateNotFoundException( permName, null, "No Topic/Article for permName (or Article has no Topic set): " + permName );
-            }
-            if (rs.size() > 1) {
-                throw new TemplateNotFoundException( permName, null, "Mehrere Beitraege/Topics haben die URL: " + permName );
-            }
-            var topic = rs.get( 0 );
-            LOG.info( "Hack" );
-            topicTemplateSite.config = request.uow.createEntity( TopicTemplateConfigEntity.class, proto -> {
-                proto.topic.set( topic );
-                proto.topicTemplateName.set( topic.topicTemplateName.get() );
-            });
-            topicTemplateSite.topic = topic;
-            return topic;
-        });
-
-        // find TopicTemplateConfigEntity
-        LOG.info( "Loading Topic/Config for: %s ...", permName );
-        var loadTemplate = hackTopicConfig
-                // XXX
-                .map( __ -> Arrays.asList( topicTemplateSite.config ) )
-//                .then( topic -> {
-//                    return request.uow.query( TopicTemplateConfigEntity.class )
-//                            .where( Expressions.is( TopicTemplateConfigEntity.TYPE.topic, topic ) )
-//                            .executeCollect();
-//                })
-                .map( configs -> {
-                    if (configs.isEmpty()) {
-                        throw new TemplateNotFoundException( permName, null, "No such topic: " + permName );
+        // TopicTemplateConfigEntity
+        var loadTopicTemplate = findTopic
+                .then( topic -> TopicTemplateConfigEntity.of( topicTemplateSite.topic ) )
+                .map( opt -> {
+                    if (opt.isAbsent()) {
+                        throw new TemplateNotFoundException( permName, null, "Ver&ouml;ffentlichung auf der Website ist nicht konfiguriert f&uuml;r das Topic: " + topicTemplateSite.topic.title.get() );
                     }
-                    if (configs.size() > 1) {
-                        throw new RuntimeException( "Multiple configs for: " + permName + "(" + configs.size() + ")" );
-                    }
-                    return configs.get( 0 );
-                })
-                .then( topicConfig -> {
-                    topicTemplateSite.config = topicConfig;
-                    data.put( "topicConfig", new CompositeTemplateModel( topicConfig ) );
-                    return topicConfig.topic.fetch();
-                })
-                .onSuccess( topic -> {
-                    topicTemplateSite.topic = topic;
-                    data.put( "topic", new CompositeTemplateModel( topic ) );
+                    topicTemplateSite.config = opt.get();
+                    data.put( "topicConfig", new CompositeTemplateModel( topicTemplateSite.config ) );
+                    return topicTemplateSite.config;
                 });
 
         // process TopicTemplate
+        LOG.info( "Loading Topic/Config for: %s ...", permName );
         return loadTopics
-                .then( __ -> loadTemplate )
+                .then( __ -> loadTopicTemplate )
                 .then( topic -> {
                     return TopicTemplate.forName( topicTemplateSite.config.topicTemplateName.get() )
                             .orElseThrow( () -> new RuntimeException( "No such TopicTemplate: " + topicTemplateSite.config.topicTemplateName.get() ) )

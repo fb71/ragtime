@@ -44,7 +44,7 @@ public class CalendarEventArticlePageEx
     @Override
     public void doExtendFormEnd( ArticleEditState state, ArticlePage page, PageSite pagesite, Form form, UIComposite formBody ) {
         CalendarEvent.of( state.article.$() ).onSuccess( opt -> {
-            //
+            // doExtendForm
             RConsumer<CalendarEvent> doExtendForm = ce -> {
                 formBody.components.add( 0, form.newField().label( "Termin: Start" )
                         .description( "Startzeit des Termins" )

@@ -23,7 +23,6 @@ import areca.common.Platform;
 import areca.common.ProgressMonitor;
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
-import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Level;
 import areca.common.log.LogFactory.Log;
@@ -35,11 +34,10 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
-import areca.ui.statenaction.StateChangeEvent;
 import ragtime.cc.calendar.CalendarEventArticlePageEx;
-import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
+import ragtime.cc.web.WebTopicPageEx;
 import ragtime.cc.web.template.TemplateInfo;
 
 /**
@@ -83,6 +81,7 @@ public class CCApp
 
         // extensions
         Extensions.register( CalendarEventArticlePageEx.class );
+        Extensions.register( WebTopicPageEx.class );
     }
 
 

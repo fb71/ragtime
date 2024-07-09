@@ -140,10 +140,10 @@ public class WebsiteServlet
                     else {
                         request.path = ArrayUtils.remove( parts, 0 );
                         var templateName = config.templateName.get();
-                        if (TopicTemplateContentProvider.templates.contains( templateName )) {
+                        if (TopicTemplateContentProvider.TEMPLATES.contains( templateName )) {
                             return new TopicTemplateContentProvider().process( request );
                         }
-                        else if (TemplateContentProvider.templates.contains( templateName )) {
+                        else if (TemplateContentProvider.TEMPLATES.contains( templateName )) {
                             return new TemplateContentProvider().process( request );
                         }
                         else {
