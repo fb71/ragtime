@@ -37,6 +37,8 @@ import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import ragtime.cc.Workspace;
+import ragtime.cc.insta.model.InstaPostEntity;
+import ragtime.cc.insta.model.TopicInstaConfigEntity;
 import ragtime.cc.web.http.WebsiteServlet;
 import ragtime.cc.web.model.TemplateConfigEntity;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
@@ -105,6 +107,7 @@ public class ContentRepo {
                         AccountEntity.info,
                         Article.info, MediaEntity.info, TagEntity.info, TopicEntity.info, CalendarEvent.info,
                         WebsiteConfigEntity.info, TemplateConfigEntity.info, TopicTemplateConfigEntity.info,
+                        InstaPostEntity.info, TopicInstaConfigEntity.info,
                         ModelVersionEntity.info ) )
                 .store.set( new No2Store( dbfile ) )
                 .create();

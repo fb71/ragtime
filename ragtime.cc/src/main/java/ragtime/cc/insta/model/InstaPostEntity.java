@@ -14,9 +14,14 @@
 package ragtime.cc.insta.model;
 
 import org.polymap.model2.Association;
+import org.polymap.model2.Nullable;
 import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
+import org.polymap.model2.query.Expressions;
+import org.polymap.model2.runtime.UnitOfWork;
 
+import areca.common.Promise;
+import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -29,19 +34,33 @@ import ragtime.cc.model.Common;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class PostEntity
+public class InstaPostEntity
         extends Common {
 
-    private static final Log LOG = LogFactory.getLog( PostEntity.class );
+    private static final Log LOG = LogFactory.getLog( InstaPostEntity.class );
 
-    public static final ClassInfo<PostEntity> info = PostEntityClassInfo.instance();
+    public static final ClassInfo<InstaPostEntity> info = InstaPostEntityClassInfo.instance();
 
-    public static PostEntity TYPE;
+    public static InstaPostEntity TYPE;
+
+    /**
+     * Computed back association.
+     */
+    public static Promise<Opt<InstaPostEntity>> of( Article article, UnitOfWork uow ) {
+        return uow.query( InstaPostEntity.class )
+                .where( Expressions.is( InstaPostEntity.TYPE.article, article ) )
+                .optResult();
+    }
+
+    // instance *******************************************
 
     @Queryable
     public Association<Article> article;
 
     @Queryable
     public Property<String>     instaRef;
+
+    @Nullable
+    public Property<String>     text;
 
 }

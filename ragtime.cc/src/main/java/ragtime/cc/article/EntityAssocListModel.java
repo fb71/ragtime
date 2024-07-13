@@ -54,21 +54,21 @@ public class EntityAssocListModel<V extends Entity>
 
     @Override
     public Promise<Opt<V>> load( int first, int max ) {
-        LOG.info( "Load: %s", assoc.info().getName() );
+        LOG.debug( "Load: %s", assoc.info().getName() );
         return assoc.fetch()
                 .<Opt<V>>map( (opt,next) -> {
                     // XXX filter out deleted Entities (that are still in the assoc)
                     if (opt.isPresent()) {
-                        LOG.info( "sending: %s", opt );
+                        LOG.debug( "sending: %s", opt );
                         next.consumeResult( opt );
                     }
                     else {
-                        LOG.info( "NOT sending: %s", opt );
+                        LOG.debug( "NOT sending: %s", opt );
                     }
                 })
                 // XXX ManyAssociation.fetch() does not seem to return absent as last element
                 .join( Platform.schedule( 750, () -> {
-                    LOG.info( "sending: complete (Opt.absent())" );
+                    LOG.debug( "sending: complete (Opt.absent())" );
                     return Opt.absent();
                 }));
     }

@@ -35,6 +35,8 @@ import areca.ui.layout.MaxWidthLayout;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.calendar.CalendarEventArticlePageEx;
+import ragtime.cc.insta.InstaService;
+import ragtime.cc.insta.InstaTopicPageEx;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
 import ragtime.cc.web.WebTopicPageEx;
@@ -82,6 +84,7 @@ public class CCApp
         // extensions
         Extensions.register( CalendarEventArticlePageEx.class );
         Extensions.register( WebTopicPageEx.class );
+        Extensions.register( InstaTopicPageEx.class );
     }
 
 
@@ -114,6 +117,8 @@ public class CCApp
                         .putContext( new UICommon(), State.Context.DEFAULT_SCOPE )
                         //.putContext( new CCAppStatePageMapping( pageflow ), State.Context.DEFAULT_SCOPE )
                         .activate();
+
+                InstaService.start();
 
                 ServerBrowserHistoryStrategy.start( pageflow );
 

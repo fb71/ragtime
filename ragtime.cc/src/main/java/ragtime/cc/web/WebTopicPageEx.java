@@ -24,11 +24,13 @@ import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.viewer.SelectViewer;
 import ragtime.cc.article.PropertyModel;
+import ragtime.cc.article.TopicPage;
 import ragtime.cc.article.TopicPageExtension;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
 import ragtime.cc.web.template.topic.TopicTemplate;
 
 /**
+ * Extends {@link TopicPage} by means of managing {@link TopicTemplateConfigEntity}.
  *
  * @author Falko Bräutigam
  */
