@@ -1,7 +1,8 @@
 <#--
-  insta
+  insta-compact
 -->
-<#import "/commons.ftl" as c>
+<#import "commons.ftl" as c>
+<#import "insta#page.ftl" as super>
 
 <#--
   The main page layout. 
@@ -17,6 +18,7 @@
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
     <link href="topic/css/topic.css" rel="stylesheet"/>
+    <link href="insta/css/insta.css" rel="stylesheet"/>
     <link href="insta-compact/css/insta-compact.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
@@ -49,59 +51,20 @@
     </header>
 
     <#-- Topics -->
-    <div class="ITopics container">
-        <div class="ITopicsScroller">
-        <div class="row flex-nowrap">
-            <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto"> <#--  style="background-color: ${topic.color};">  -->
-                <@c.editable msg="topic.${topic.id}">
-                  <a href="${topic.permName}" style="display:block;">
+    <@super.topicsSection/>
 
-                      <#if topic.medias?sequence?size gt 0>
-                        <#assign media = topic.medias?sequence?first>
-                        <img src="media/${media.id}?w=75&h=75" class="img-fluid" alt="${media.name}"/>
-                      </#if>                      
-                      <br/>
-                      ${topic.title}
-                  </a>
-                </@c.editable>
-                </div>
-            </#list>
-        </div>
-        </div>
-    </div>
-
+    <#-- TopicBio -->
     <#if !hideTopicBio>
-        <@c.editable msg="topic.${topic.id}">
-          <div class="ITopicBio container">
-            ${topic.description}
-          </div>
-        </@c.editable>
+        <@super.topicBioSection/>
     </#if>
     
     <#-- Content -->
-    <div class="IContent container">
-    <#nested>
-    </div>
+    <@super.contentSection>
+        <#nested>        
+    </@super.contentSection>
 
     <#-- Footer -->
-    <#-- 
-    <footer class="CFooter">
-        <div class="container">
-            <p class="m-0 small">
-            <@c.editable msg="page.footer">
-                <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
-            </@c.editable>
-            <@c.editable msg="page.navigation">
-                <#list config.footerNavItems?sequence?sort_by("order") as item>
-                    <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
-                </#list>
-            </@c.editable>
-            <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
-            </p>
-        </div>
-    </footer>
-     -->    
+    <@super.footerSection/>
 </body>
 </html>
 </#macro>

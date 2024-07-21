@@ -12,6 +12,8 @@
  */
 package ragtime.cc.web.template;
 
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,6 +119,9 @@ public abstract class TemplateContentProviderBase
     public static class TemplateLoader
             extends ClassTemplateLoader {
 
+        /** The separator between template name and qualifier */
+        private static final String QUALIFIER = "#";
+
         private static Map<String,Configuration> cfg = new ConcurrentHashMap<>();
 
         public static Configuration configuration( TemplateConfigEntity config ) {
@@ -150,14 +155,27 @@ public abstract class TemplateContentProviderBase
         }
 
         @Override
-        protected URL getURL( String name ) {
+        protected URL getURL( String qualified ) {
+//            var path = substringBeforeLast( name, "/" ) + "/";
+//            name = substringAfterLast( name, "/" );
+
+            var qualifier = (String)null;
+            var name = qualified;
+            if (qualified.contains( QUALIFIER )) {
+               qualifier = substringBefore( qualified, QUALIFIER );
+               name = substringAfter( qualified, QUALIFIER );
+            }
+
             var t = template;
             var result = (URL)null;
             while (result == null && t != null) {
-                result = t.resource( name );
+                // check qualifier
+                if (qualifier == null || qualifier.equals( t.name )) {
+                    result = t.resource( name );
+                }
                 t = result == null ? t.parent() : t;
             }
-            //LOG.warn( "TEMPLATE: %s (%s)", name, t != null ? t.name : "not found" );
+            LOG.warn( "TEMPLATE: %s (%s)", qualified, t != null ? t.name : "not found" );
             return result;
         }
     }

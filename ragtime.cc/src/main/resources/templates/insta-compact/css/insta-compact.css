@@ -1,55 +1,8 @@
 /***
- * Styles of the insta template.
+ * Styles of the insta-compact template.
  */
-:root {
-    --bs-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
-
-    /** The base/standard height of the header. */
-    --common-header-height-base: calc(15vh + 5vw);
-
-    /** Customizable factor */
-    --common-header-height-factor: 1;
-    /** The height that is actually applied. */
-    --common-header-height: calc(var(--common-header-height-base) * var(--common-header-height-factor));
-    
-    /** Customizable factor */
-    --common-face-height-factor: 0.9;
-    /** The height that is actually applied. */
-    --common-face-height: calc(var(--common-header-height-base) * var(--common-face-height-factor));
-}
-
-a {
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 300;
-    margin-bottom: 0.4em;
-}
-h5, h6 {
-    font-weight: 400;    
-}
-p {
-    margin-bottom: 0.9em;
-    line-height: 1.4;
-}
-
 .IHeader {
-    height: var(--common-header-height);
-    
-    margin-left: auto;
-    margin-right: auto;
-    background-color: var(--common-header-bg);
-    color: var(--common-header-color);
-}
-
-.IBgImage {
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    margin-bottom: 0px;
 }
 
 .IHeader h1 {
@@ -67,105 +20,17 @@ p {
     text-shadow: 0px 1px 5px rgb(0 0 0 / 70%);
 }
     
-.IHeader .IFace {
-    position: absolute;
-    top: calc(var(--common-header-height) - calc(var(--common-face-height) / 2));
-    width: var(--common-face-height);
-    height: var(--common-face-height);
-    border-radius: 100%;
-    margin-left: calc(var(--bs-gutter-x) * .5);
-    border: 3px solid var(--common-page-bg);
-    background-color: var(--common-header-bg)
-}
-
-.IHeader .IFaceBordered {
-    width: 100%;
-    height: 100%;
-    border-radius: 100px;
-    /*border: 2px solid #cdcdcd;*/
-}
-
 .ITopics {
-    padding-left: calc(var(--common-face-height) * 1.35);
-    margin-bottom: 1em;
-}
-
-.ITopicsScroller {
-    overflow-x: scroll;
-    scrollbar-width: none;
-    /*box-shadow: 0px 0 15px inset rgba(${config.colors.pageBackground@rgb},100%);*/
-}
-.ITopicsScroller::-webkit-scrollbar {
-  display: none;
+    padding-left: calc(var(--common-face-height) + 40px);
+    padding-top: 0.25em;
 }
 
 .ITopic {
-    --bs-gutter-x: calc(var(--common-face-height) * 0.20);
-    width: calc(var(--common-face-height) * 0.6);
-    height: calc(var(--common-face-height) * 0.6);
-    min-width: 75px;
-    min-height: 75px;
-    margin-top: 8px;
-    font-size: smaller;
-    text-align: center;
-    color: var(--common-link-color);
+    min-width: 65px;
 }
-.ITopic img {
-    height: auto;
-    width: 100%;
-    border-radius: 50px;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
-    border: 1px solid white;
-    /* for inset shadow */
-    z-index: -1;
-    position: relative;
-}
+
 .ITopic img:hover {
     box-shadow: 0 1px 4px rgb(0 0 0 / 60%);
     border: 1px solid var(--common-link-color);
 }
 
-.ITopicBio {
-    color: var(--common-accent-color);
-    line-height: 1.2;
-}
-.ITopicBio p,
-.ITopicBio dl,
-.ITopicBio ol,
-.ITopicBio ul {
-    margin-bottom: 0.9em;
-}
-.ITopicBio h1,
-.ITopicBio h2,
-.ITopicBio h3,
-.ITopicBio h4,
-.ITopicBio h5 {
-    margin-bottom: 0.4em;
-}
-
-.IContent {
-    margin-top: 2em;
-    margin-bottom: 2em;
-}
-
-.IContent .carousel {
-    margin-bottom: 40px;
-    max-width: 380px;
-}
-
-.IContent img {
-    border-radius: 4px;
-}
-
-@media (max-width: 768px) {
-  .IContent {
-    margin-top: 25px;
-  }
-  .IContent .carousel {
-    margin-bottom: 25px;
-  }
-}
-
-.lead {
-    margin-bottom: 0px;
-}

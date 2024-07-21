@@ -58,21 +58,6 @@ p {
     background-position: center center;
     background-size: cover;
 }
-
-.IHeader h1 {
-    padding-top: calc(var(--common-header-height) * 0.3);
-    font-weight: 500;
-}
-.IHeader h1,
-.IHeader h3,
-.IHeader h4,
-.IHeader .lead {
-    text-align: right;
-    margin-bottom: 0px;
-    margin-right: calc(var(--bs-gutter-x) * .5);
-    line-height: 1.1;    
-    text-shadow: 0px 1px 5px rgb(0 0 0 / 70%);
-}
     
 .IHeader .IFace {
     position: absolute;
@@ -80,7 +65,8 @@ p {
     width: var(--common-face-height);
     height: var(--common-face-height);
     border-radius: 100%;
-    margin-left: calc(var(--bs-gutter-x) * .5);
+    /*margin-left: calc(var(--bs-gutter-x) * .5);*/
+    margin-left: 0px;
     border: 3px solid var(--common-page-bg);
     background-color: var(--common-header-bg)
 }
@@ -124,13 +110,13 @@ p {
 .ITopic {
     --bs-gutter-x: calc(var(--common-face-height) * 0.20);
     width: calc(var(--common-face-height) * 0.6);
-    height: calc(var(--common-face-height) * 0.6);
-    min-width: 75px;
-    min-height: 75px;
-    margin-top: 8px;
+    /*height: calc(var(--common-face-height) * 0.6);*/
+    min-width: 65px;
+    /*min-height: 75px;*/
     font-size: smaller;
     text-align: center;
     color: var(--common-link-color);
+    overflow-x: hidden;
 }
 .ITopic img {
     height: auto;
@@ -142,6 +128,7 @@ p {
     z-index: -1;
     position: relative;
     margin-bottom: 0.3em;
+    margin-top: 3px; /* space for shadow*/
 }
 .ITopic img:hover {
     box-shadow: 0 1px 4px rgb(0 0 0 / 60%);

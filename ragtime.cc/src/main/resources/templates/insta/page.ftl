@@ -51,6 +51,29 @@
     </div>
 
     <#-- Topics -->
+    <@topicsSection/>
+
+    <#-- TopicBio -->
+    <#if !hideTopicBio>
+        <@topicBioSection/>
+    </#if>
+    
+    <#-- Content -->
+    <@contentSection>
+        <#nested>        
+    </@contentSection>
+
+    <#-- Footer -->
+    <@footerSection/>
+</body>
+</html>
+</#macro>
+
+
+<#--
+  topicsSection 
+-->
+<#macro topicsSection>
     <div class="ITopics ISection container">
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
@@ -64,7 +87,7 @@
                         <img src="media/${media.id}?w=75&h=75" class="img-fluid" alt="${media.name}"/>
                       </#if>                      
                       <br/>
-                      ${topic.title}
+                      <span>${topic.title?replace(" ", "&nbsp;")}</span>
                   </a>
                 </@c.editable>
                 </div>
@@ -72,22 +95,33 @@
         </div>
         </div>
     </div>
+</#macro>
 
-    <#if !hideTopicBio>
-        <@c.editable msg="topic.${topic.id}">
-          <div class="ITopicBio ISection container">
-            ${topic.description}
-          </div>
-        </@c.editable>
-    </#if>
-    
-    <#-- Content -->
+<#--
+  topicBioSection 
+-->
+<#macro topicBioSection>
+    <@c.editable msg="topic.${topic.id}">
+      <div class="ITopicBio ISection container">
+        ${topic.description}
+      </div>
+    </@c.editable>
+</#macro>
+
+<#--
+  contentSection 
+-->
+<#macro contentSection>
     <div class="IContent ISection container">
-    <#nested>
+        <#nested>
     </div>
+</#macro>
 
-    <#-- Footer -->
-    <#-- 
+<#--
+  footerSection 
+-->
+<#macro footerSection>
+<#--
     <footer class="IFooter ISection">
         <div class="container">
             <p class="m-0 small">
@@ -103,7 +137,7 @@
             </p>
         </div>
     </footer>
-     -->    
-</body>
-</html>
+-->
 </#macro>
+
+
