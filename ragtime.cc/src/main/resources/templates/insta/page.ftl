@@ -70,17 +70,23 @@
 </#macro>
 
 
-<#--
-  topicsSection 
--->
+<#-- topicsSection -->
 <#macro topicsSection>
     <div class="ITopics ISection container">
         <div class="ITopicsScroller">
         <div class="row flex-nowrap">
+            <#assign selected = topic>
             <#list topics?sequence?sort_by("order") as topic>
-                <div class="ITopic col-auto"> <#--  style="background-color: ${topic.color};">  -->
+                <#--  style="background-color: ${topic.color};">  -->
+                <#if selected.id = topic.id>
+                    <div class="ITopic col-auto active" aria-current="page"> 
+                <#else>
+                    <div class="ITopic col-auto"> 
+                </#if>
                 <@c.editable msg="topic.${topic.id}">
-                  <a href="${topic.permName}" style="display:block;">
+                  <#if selected.id != topic.id>
+                    <a href="${topic.permName}" style="display:block;" title="${topic.title}">
+                  </#if>
 
                       <#if topic.medias?sequence?size gt 0>
                         <#assign media = topic.medias?sequence?first>
@@ -88,7 +94,10 @@
                       </#if>                      
                       <br/>
                       <span>${topic.title?replace(" ", "&nbsp;")}</span>
-                  </a>
+
+                  <#if selected.id != topic.id>
+                    </a>
+                  </#if>
                 </@c.editable>
                 </div>
             </#list>
@@ -97,9 +106,7 @@
     </div>
 </#macro>
 
-<#--
-  topicBioSection 
--->
+<#-- topicBioSection -->
 <#macro topicBioSection>
     <@c.editable msg="topic.${topic.id}">
       <div class="ITopicBio ISection container">
