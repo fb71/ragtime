@@ -22,6 +22,7 @@ import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.ScrollableComposite;
+import areca.ui.component2.Text;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComponent;
@@ -161,14 +162,29 @@ public class TopicPage {
             }});
 
             // extensions
+            //add( new Separator() );
+            add( new Text() {{
+                //lc( RowConstraints.height( 100 ) );
+                //enabled.set( false );
+                styles.add( CssStyle.of( "color", "#808080" ) );
+                format.set( Format.HTML );
+                content.set( "<em>" //"<hr class=\"Separator\"/>"
+                        + "<h2>Ausgabekanäle</h2>"
+                        + "Das Topic kann mit einem oder mehreren <b>Ausgabekanälen</b> verbunden werden. "
+                        + "Der Ausgabekanel bestimmt ob und wie die Beiträge des Topics dargestellt werden. "
+                        + "Standardmäßig ist jedes Topic mit der <b>Website</b> verbunden."
+                        + "</em>" );
+                }
+                @Override
+                public int computeMinHeight( int width ) {
+                    var lines = (content.get().length() * 7) / width;
+                    return (lines * 17) + 50;
+                }
+            });
+
             var ctx = new FormContext( state, TopicPage.this, site, formBody, form, uic );
             Extensions.ofType( TopicPageExtension.class ).forEach( ex -> ex.doExtendFormEnd( ctx ) );
 
-            //        XXX form.subscribe( ev -> {
-            //            if (ev.getSource() instanceof TextFieldViewer viewer && viewer.) {
-            //                urlPart.getValue().content.set( ev.newValue.toString() );
-            //            }
-            //        });
             form.load();
         }});
 
