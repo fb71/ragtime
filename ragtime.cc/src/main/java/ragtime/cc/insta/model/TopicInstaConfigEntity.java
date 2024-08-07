@@ -20,6 +20,7 @@ import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 
 import areca.common.Promise;
+import areca.common.Scheduler.Priority;
 import areca.common.base.Opt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -47,9 +48,14 @@ public class TopicInstaConfigEntity
      * Computed back association of {@link TopicInstaConfigEntity#topic}
      */
     public static Promise<Opt<TopicInstaConfigEntity>> of( TopicEntity topic ) {
-        return topic.context.getUnitOfWork().query( TopicInstaConfigEntity.class )
-                .where( is( TopicInstaConfigEntity.TYPE.topic, topic ) )
-                .optResult();
+        if (topic != null) {
+            return topic.context.getUnitOfWork().query( TopicInstaConfigEntity.class )
+                    .where( is( TopicInstaConfigEntity.TYPE.topic, topic ) )
+                    .optResult();
+        }
+        else {
+            return Promise.absent( Priority.MAIN_EVENT_LOOP );
+        }
     }
 
     // instance *******************************************
