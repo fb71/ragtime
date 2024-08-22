@@ -39,7 +39,7 @@
 }
 
 .CEditable {
-    box-sizing: content-box;
+    /*box-sizing: content-box;*/
     /* cursor: pointer; */
     transition: 
         box-shadow 300ms,
