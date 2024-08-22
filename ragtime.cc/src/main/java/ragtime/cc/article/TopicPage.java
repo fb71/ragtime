@@ -96,7 +96,7 @@ public class TopicPage {
                 add( form.newField().label( "Titel" )
                         .description( "Die interne, *eindeutige* Bezeichnung des Topics.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Topics!" )
                         .viewer( new TextFieldViewer() )
-                        .model( new PermNameValidator( state.uow,
+                        .model( new PermNameValidator( state.topic,
                                 new PropertyModel<>( state.topic.title ) ) )
                         .create() );
 

@@ -112,9 +112,9 @@ public class ArticlePage {
             }});
 
             add( form.newField().label( "Name" )
-                    .description( "Die interne, *eindeutige* Bezeichnung des Beitrags.\nACHTUNG!: Beim Ändern, ändert sich auch die URL des Beitrags!" )
+                    .description( "Die interne, eindeutige Bezeichnung des Beitrags.\nACHTUNG: Beim Ändern, ändert sich auch die URL des Beitrages!" )
                     .viewer( new TextFieldViewer() )
-                    .model( new PermNameValidator( state.uow,
+                    .model( new PermNameValidator( state.article.$(),
                             new PropertyModel<>( state.article.$().title ) ) )
                     .create()
                     .lc( RowConstraints.height( 35 ) ) );
