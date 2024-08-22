@@ -39,7 +39,7 @@
 }
 
 .CEditable {
-    box-sizing: border-box;
+    box-sizing: content-box;
     /* cursor: pointer; */
     transition: 
         box-shadow 300ms,
@@ -57,8 +57,8 @@
 }
 
 .CEditable:hover {
-    /* border: 1px solid #b72a44; */
-    box-shadow: 0 0 4px inset rgba(230,0,20,80%);
+    /* border: 1px dashed #b72a44; */
+    /* box-shadow: 0 0 4px inset rgba(230,0,20,80%); */
     border-radius: 4px;
     filter: brightness(1.1);
     /*transform: scale(1.05);*/

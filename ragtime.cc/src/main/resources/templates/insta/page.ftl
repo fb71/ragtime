@@ -84,9 +84,7 @@
                     <div class="ITopic col-auto"> 
                 </#if>
                 <@c.editable msg="topic.${topic.id}">
-                  <#if selected.id != topic.id>
                     <a href="${topic.permName}" style="display:block;" title="${topic.title}">
-                  </#if>
 
                       <#if topic.medias?sequence?size gt 0>
                         <#assign media = topic.medias?sequence?first>
@@ -95,9 +93,7 @@
                       <br/>
                       <span>${topic.title?replace(" ", "&nbsp;")}</span>
 
-                  <#if selected.id != topic.id>
                     </a>
-                  </#if>
                 </@c.editable>
                 </div>
             </#list>
