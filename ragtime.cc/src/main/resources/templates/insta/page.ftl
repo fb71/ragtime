@@ -126,15 +126,15 @@
 <#macro footerSection>
     <footer class="IFooter ISection">
         <div class="container">
-            <p class="m-0 small">
             <@c.editable msg="page.footer">
+            <p class="m-0 small">
                 <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
                 <#list config.footerNavItems?sequence?sort_by("order") as item>
                     <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
                 </#list>
-            </@c.editable>
-            <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
+                <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
             </p>
+            </@c.editable>
         </div>
     </footer>
 </#macro>
