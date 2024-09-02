@@ -124,14 +124,11 @@
   footerSection 
 -->
 <#macro footerSection>
-<#--
     <footer class="IFooter ISection">
         <div class="container">
             <p class="m-0 small">
             <@c.editable msg="page.footer">
                 <nobr>${config.page.footer}</nobr>&nbsp;&nbsp;-&nbsp;
-            </@c.editable>
-            <@c.editable msg="page.navigation">
                 <#list config.footerNavItems?sequence?sort_by("order") as item>
                     <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
                 </#list>
@@ -140,7 +137,6 @@
             </p>
         </div>
     </footer>
--->
 </#macro>
 
 
