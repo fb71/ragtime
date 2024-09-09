@@ -95,6 +95,21 @@ p {
 }
 
 .ITopics {
+  --swiper-navigation-size: 25px;
+  --swiper-navigation-top-offset: 40%;
+  --swiper-navigation-sides-offset: 0px;
+  --swiper-navigation-color: #eee;
+}
+.swiper-button-next,
+.swiper-button-prev {
+    text-shadow: 0 1px 3px rgb(0 0 0 / 50%);
+    font-weight: bold;
+}
+.swiper-button-next.swiper-button-disabled,
+.swiper-button-prev.swiper-button-disabled {
+    opacity: 0;
+    cursor: auto;
+    pointer-events: none;
 }
 
 .ITopicsScroller {
@@ -109,9 +124,11 @@ p {
 
 .ITopic {
     --bs-gutter-x: calc(var(--common-face-height) * 0.20);
-    width: calc(var(--common-face-height) * 0.6);
+    padding: 0 4px 0 4px; /*space for shadow*/
+    
+    width: calc(var(--common-face-height) * 0.50);
     /*height: calc(var(--common-face-height) * 0.6);*/
-    min-width: 65px;
+    min-width: 58px;
     /*min-height: 75px;*/
     font-size: 12px;
     text-align: center;

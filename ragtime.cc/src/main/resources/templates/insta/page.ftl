@@ -12,14 +12,18 @@
     <title>${title} - ${config.page.title}</title>
     <meta charset="iso-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
+    <link href="common/swiper11.1.12/swiper-bundle.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
     <link href="topic/css/topic.css" rel="stylesheet"/>
     <link href="insta/css/insta.css" rel="stylesheet"/>
     <#-- TemplateConfigEntity styles-->
     <link href="config.css" rel="stylesheet"/>
+    
     <script src="common/bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="common/swiper11.1.12/swiper-bundle.min.js" type="text/javascript"></script>
     <script src="common/js/common.js" type="text/javascript"></script>
 </head>
 
@@ -51,7 +55,7 @@
     </div>
 
     <#-- Topics -->
-    <@topicsSection/>
+    <@topicsSectionSwiper/>
 
     <#-- TopicBio -->
     <#if !hideTopicBio>
@@ -69,8 +73,74 @@
 </html>
 </#macro>
 
+<#--
+  topicsSectionSwiper
+-->
+<#macro topicsSectionSwiper>
+    <div class="ITopics ISection container">
+        <#-- Slider main container -->
+        <div class="swiper">
+          <#-- Additional required wrapper -->
+          <div class="swiper-wrapper">
 
-<#-- topicsSection -->
+            <#assign selected = topic>
+            <#list topics?sequence?sort_by("order") as topic>
+                <#--  style="background-color: ${topic.color};">  -->
+                <#if selected.id = topic.id>
+                    <div class="ITopic swiper-slide active" aria-current="page"> 
+                <#else>
+                    <div class="ITopic swiper-slide"> 
+                </#if>
+                <@c.editable msg="topic.${topic.id}">
+                    <a href="${topic.permName}" style="display:block;" title="${topic.title}">
+
+                      <#if topic.medias?sequence?size gt 0>
+                        <#assign media = topic.medias?sequence?first>
+                        <img src="media/${media.id}?w=75&h=75" class="img-fluid" alt="${media.name}"/>
+                      </#if>                      
+                      <br/>
+                      <span>${topic.title?replace(" ", "&nbsp;")}</span>
+
+                    </a>
+                </@c.editable>
+                </div>
+            </#list>
+          </div>
+          <#-- navigation buttons -->
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>        
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const swiper = new Swiper('.swiper', {
+          direction: 'horizontal',
+          loop: false,
+          slidesPerView: 'auto',
+          spaceBetween: 10,
+          autoHeight: true,
+          
+          breakpoints: {
+            640: {
+              spaceBetween: 20
+            }
+          },
+          
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        
+          //scrollbar: {
+          //  el: '.swiper-scrollbar',
+          //},
+        });
+    </script>
+</#macro>
+
+<#--
+  topicsSection
+-->
 <#macro topicsSection>
     <div class="ITopics ISection container">
         <div class="ITopicsScroller">
@@ -102,7 +172,9 @@
     </div>
 </#macro>
 
-<#-- topicBioSection -->
+<#-- 
+  topicBioSection
+-->
 <#macro topicBioSection>
     <@c.editable msg="topic.${topic.id}">
       <div class="ITopicBio ISection container">

@@ -1,5 +1,5 @@
 <#--
-  Media ::swiper:: as Bootstrap caraousel
+  Media ::swiper:: as Bootstrap carousel
   -->
 <#import "/commons.ftl" as c>
 

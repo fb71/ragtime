@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
+    <link href="common/swiper11.1.12/swiper-bundle.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>
     <link href="topic/css/topic.css" rel="stylesheet"/>
@@ -24,6 +25,7 @@
     <link href="config.css" rel="stylesheet"/>
 
     <script src="common/bs5.3.3/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="common/swiper11.1.12/swiper-bundle.min.js" type="text/javascript"></script>
     <script src="common/js/common.js" type="text/javascript"></script>
 </head>
 
@@ -51,7 +53,7 @@
     </header>
 
     <#-- Topics -->
-    <@super.topicsSection/>
+    <@super.topicsSectionSwiper/>
 
     <#-- TopicBio -->
     <#if !hideTopicBio>
