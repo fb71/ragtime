@@ -122,6 +122,9 @@
           
           breakpoints: {
             640: {
+              spaceBetween: 15
+            },
+            1000: {
               spaceBetween: 20
             }
           },
