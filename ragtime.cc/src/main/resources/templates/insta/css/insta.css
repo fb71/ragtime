@@ -98,8 +98,9 @@ p {
   --swiper-navigation-size: 25px;
   --swiper-navigation-top-offset: 40%;
   --swiper-navigation-sides-offset: 0px;
-  --swiper-navigation-color: #eee;
+  --swiper-navigation-color: var(--common-link-color);
 }
+
 .swiper-button-next,
 .swiper-button-prev {
     text-shadow: 0 1px 3px rgb(0 0 0 / 50%);
