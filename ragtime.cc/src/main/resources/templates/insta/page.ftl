@@ -78,9 +78,7 @@
 -->
 <#macro topicsSectionSwiper>
     <div class="ITopics ISection container">
-        <#-- Slider main container -->
-        <div class="swiper">
-          <#-- Additional required wrapper -->
+        <div id="topics-swiper" class="swiper">
           <div class="swiper-wrapper">
 
             <#assign selected = topic>
@@ -113,7 +111,7 @@
     </div>
 
     <script type="text/javascript">
-        const swiper = new Swiper('.swiper', {
+        new Swiper('#topics-swiper', {
           direction: 'horizontal',
           loop: false,
           slidesPerView: 'auto',
@@ -133,10 +131,6 @@
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
           },
-        
-          //scrollbar: {
-          //  el: '.swiper-scrollbar',
-          //},
         });
     </script>
 </#macro>

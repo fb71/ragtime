@@ -67,7 +67,7 @@ public class Swiper
             ctx.data.put( "medias", new IterableTemplateModel<>( medias.get(), CompositeTemplateModel::new ) );
 
             content.delete( match.start(), match.end() );
-            content.insert( match.start(), processFtl( "carousel.ftl", ctx ) );
+            content.insert( match.start(), processFtl( "swiper.ftl", ctx ) );
         }
     }
 

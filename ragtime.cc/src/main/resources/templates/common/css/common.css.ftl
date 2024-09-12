@@ -77,6 +77,28 @@
     box-shadow: 0 3px 3px rgba(0,0,0,0.5);
 }
 
+/* Swiper: ::swiper (and ITopics) ************************/ 
+
+.swiper {
+    --swiper-pagination-bullet-size: 5px;
+    --swiper-navigation-size: 21px;
+}
+.swiper-button-next,
+.swiper-button-prev {
+    text-shadow: 0 1px 3px rgba(0 0 0 / 60%);
+    --stroke-color: rgba(255 255 255 / 60%);
+    text-shadow:
+        -1px -1px 0 var(--stroke-color),
+        1px -1px 0 var(--stroke-color),
+        -1px 1px 0 var(--stroke-color),
+        1px 1px 0 var(--stroke-color);
+    font-weight: bold;
+}
+.swiper-button-next.swiper-button-disabled,
+.swiper-button-prev.swiper-button-disabled {
+    opacity: 0;
+}
+
 /* CFooter ************************************************/
 
 .CFooter {
