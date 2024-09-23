@@ -231,8 +231,8 @@ public class LoginState {
                 })
                 .map( account -> {
                     Email.send( account.email.get(), "Neues Passwort",
-                            "Dein neues Passwort für *fb71.org* lautet: " + newPwd +
-                            "\n\n    Login: https://fb71.org/cc/" +
+                            "Dein neues Passwort für *ZABOO* lautet: " + newPwd +
+                            "\n\n    Login: https://zaboo.io/cc/" +
                             "\n\nWenn Sie kein neues Passwort angefordert haben, dann" +
                             "\nantworten Sie bitte auf diese EMail mit einem kurzen Hinweis." +
                             "\nVielen Dank!" );

@@ -70,7 +70,7 @@
                 <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
               </@c.editable>
             </#list>
-            <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
+            <nobr>Made by <a target="_blank" href="https://zaboo.io/">Wizard & Crew</a></nobr>
             </p>
         </div>
     </footer>    

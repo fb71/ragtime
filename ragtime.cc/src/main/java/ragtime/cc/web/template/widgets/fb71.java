@@ -34,7 +34,7 @@ public class fb71
         var match = FB71.matcher( content );
         for (var pos = 0; match.find( pos ); pos = match.start()) {
             content.delete( match.start(), match.end() );
-            content.insert( match.start(), "fb71.net" );
+            content.insert( match.start(), "ZABOO" );
         }
     }
 

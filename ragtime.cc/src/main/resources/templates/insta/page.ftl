@@ -201,7 +201,7 @@
                 <#list config.footerNavItems?sequence?sort_by("order") as item>
                     <nobr><a href="${item.href}">${item.title}</a></nobr>&nbsp;&nbsp;-&nbsp;
                 </#list>
-                <nobr>Made by <a target="_blank" href="https://fb71.org/">Wizard & Crew</a></nobr>
+                <nobr>Made by <a target="_blank" href="https://zaboo.io/">Wizard & Crew</a></nobr>
             </p>
             </@c.editable>
         </div>
