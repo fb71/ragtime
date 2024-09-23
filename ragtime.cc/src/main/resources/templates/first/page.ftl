@@ -6,9 +6,8 @@
 <#macro layout title pageclass>
 <html>
 <head>
-    <title>${title} - ${config.page.title}</title>
-    <meta charset="iso-8859-1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <@c.head title=title/>
+
     <link href="common/bs5.3.3/bootstrap.min.css" rel="stylesheet"/>
     <#-- Template styles -->
     <link href="css/common.css" rel="stylesheet"/>

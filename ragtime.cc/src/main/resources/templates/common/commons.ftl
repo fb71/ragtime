@@ -30,6 +30,20 @@
 </#macro>
 
 <#--
+  Head 
+-->
+<#macro head title>
+    <title>${title} - ${config.page.title}</title>
+    <meta charset="iso-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <#if config.favicon??>
+        <link rel="icon" href="media/${config.favicon.id}" type="${config.favicon.mimetype}">
+    <#else>
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    </#if>
+</#macro>
+
+<#--
   Wraps element for in-place editing. 
   -->
 <#macro editable msg>

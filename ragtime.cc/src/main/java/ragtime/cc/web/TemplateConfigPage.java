@@ -114,10 +114,20 @@ public class TemplateConfigPage {
                     cssClasses.add( "MessageCard" );
                     addDecorator( new Label().content.set( "Seite" ) );
 
-                    add( form.newField().label( "Titel" )
-                            .viewer( new TextFieldViewer() )
-                            .model( new PropertyModel<>( config.page.get().title ) )
-                            .create() );
+                    add( new UIComposite() {{
+                        lc( RowConstraints.height( 32 ) ); //Text.DEFAULT_HEIGHT ) );
+                        layout.set( RowLayout.filled().spacing( uic.spaceL ) );
+                        add( form.newField().label( "Titel" )
+                                .viewer( new TextFieldViewer() )
+                                .model( new PropertyModel<>( config.page.get().title ) )
+                                .create() );
+                        add( form.newField()/*.label( "favicon" )*/
+                                .description( "Browser-Bild\nGröße: 16x16 oder 32x32" )
+                                .viewer( new MediaPickerViewer( state.site ) )
+                                .model( new EntityAssocModel<>( config.favicon ) )
+                                .create()
+                                .lc( RowConstraints.width( 32 ) ) );
+                    }});
                     add( form.newField().label( "Titel 2" )
                             .viewer( new TextFieldViewer() )
                             .model( new PropertyModel<>( config.page.get().title2 ) )
@@ -128,7 +138,7 @@ public class TemplateConfigPage {
                             .create() );
                 }});
 
-                // Fotos
+                // Bilder
                 add( new UIComposite() {{
                     lc( RowConstraints.height( 100 ) );
                     layout.set( uic.verticalL().margins( uic.spaceL, 10 ).spacing( uic.space ) );

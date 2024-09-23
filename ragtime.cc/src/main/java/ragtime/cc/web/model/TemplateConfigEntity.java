@@ -51,6 +51,9 @@ public class TemplateConfigEntity
 
     public Property<PageConfig>         page;
 
+    @Nullable
+    public Association<MediaEntity>     favicon;
+
     public CollectionProperty<NavItem>  navItems;
 
     @Defaults
