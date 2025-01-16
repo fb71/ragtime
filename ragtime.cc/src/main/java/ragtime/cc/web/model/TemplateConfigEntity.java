@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024, the @authors. All rights reserved.
+ * Copyright (C) 2024-25, the @authors. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -83,4 +83,13 @@ public class TemplateConfigEntity
      */
     @DefaultValue( "" )
     public Property<String>             js;
+
+    /**
+     * Configurable EMail address used by {@link CalendarTopicTemplate}.
+     * <p>
+     * This is an quick-and-dirty solution.
+     */
+    @Nullable
+    public Property<String>             email;
+
 }

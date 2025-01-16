@@ -46,7 +46,10 @@ public class CalendarTopicTemplate
         var period = new IterableTemplateModel<>( new ArrayList<MapTemplateModel>() );
         site.data.put( "period", period );
 
-        var account = site.r.uow.query( AccountEntity.class ).singleResult().waitForResult().get();
+        var email = site.r.config.email.opt().orElseGet( () -> {
+            var account = site.r.uow.query( AccountEntity.class ).singleResult().waitForResult().get();
+            return account.email.get();
+        });
 
         return site.r.uow.query( CalendarEvent.class )
                 //.where( Expressions.gt( CalendarEvent.TYPE.start, new Date() ) )
@@ -57,7 +60,7 @@ public class CalendarTopicTemplate
                         var article = ce.article.fetch().waitForResult().get();
                         var event = new MapTemplateModel( processTopicArticle( article ) );
                         event.delegate.put( "start", new SimpleDate( ce.start.get(), TemplateDateModel.DATETIME ) );
-                        event.delegate.put( "email", new SimpleScalar( account.email.get() ) );
+                        event.delegate.put( "email", new SimpleScalar( email ) );
                         period.delegate.add( event );
                     }
                     return "calendar.ftl";

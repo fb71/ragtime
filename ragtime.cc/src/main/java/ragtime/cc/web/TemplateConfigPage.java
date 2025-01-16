@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024, the @authors. All rights reserved.
+ * Copyright (C) 2024-2025, the @authors. All rights reserved.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -267,6 +267,21 @@ public class TemplateConfigPage {
                         });
                     }});
                 }});
+
+                // EMail
+                add( new UIComposite() {{
+                    layout.set( uic.verticalL().fillHeight( false ) );
+                    cssClasses.add( "MessageCard" );
+                    addDecorator( new Label().content.set( "Kalender" ) ).get();
+
+                    add( form.newField().label( "EMail  (" + state.account.email.get() + ")" )
+                            .description( "EMail-Adresse für die 'Termin buchen' Funktion.\nNur angeben, wenn abweichend vom Standard!" )
+                            .viewer( new TextFieldViewer() )
+                            .model( new PropertyModel<>( config.email ) )
+                            .create() );
+                }});
+
+                // separator
                 add( new Text().layoutConstraints.set( RowConstraints.height( 10 ) ) );
 
                 ui.body.layout();
