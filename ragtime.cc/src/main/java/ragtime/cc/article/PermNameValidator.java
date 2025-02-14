@@ -31,6 +31,7 @@ import ragtime.cc.model.Article;
 import ragtime.cc.model.Common;
 import ragtime.cc.model.PermNameConcern;
 import ragtime.cc.model.TopicEntity;
+import ragtime.cc.web.http.WebsiteServlet;
 
 /**
  *
@@ -60,6 +61,9 @@ public class PermNameValidator
             return new ValidationResult( "Titel darf nicht leer sein." );
         }
         var permName = PermNameConcern.permName( value );
+        if (permName.equals( WebsiteServlet.PATH_HOME )) {
+            return new ValidationResult( "'" + WebsiteServlet.PATH_HOME + "' ist reserviert und darf nicht benutzt werden." );
+        }
         var count = new MutableInt();
         var t = Timer.start();
         var uow = entity.context.getUnitOfWork();
