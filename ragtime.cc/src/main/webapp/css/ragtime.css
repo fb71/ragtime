@@ -3,6 +3,10 @@
     overflow: hidden; /*visible;*/
 }
 
+.NoBorder {
+    border: none;
+    box-shadow: none;
+}
 .btn:hover {
     margin-top: -1px;
 }
