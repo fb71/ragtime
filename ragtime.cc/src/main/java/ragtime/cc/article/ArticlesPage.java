@@ -41,9 +41,9 @@ import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
 import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.ViewerContext;
-import areca.ui.viewer.model.ListModelBase;
 import ragtime.cc.HelpPage;
 import ragtime.cc.model.Article;
+import ragtime.cc.web.http.WebsiteServlet;
 
 /**
  *
@@ -105,7 +105,7 @@ public class ArticlesPage {
                 lc( RowConstraints.width( 150 ) );
                 content.set( "Web-Seite ansehen..." );
                 tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
-                href.set( String.format( "website/%s/home", state.account.permid.get() ) );
+                href.set( String.format( "website/%s/%s", state.account.permid.get(), WebsiteServlet.PATH_HOME ) );
             }});
         }});
 
@@ -143,7 +143,7 @@ public class ArticlesPage {
      */
     protected class ListItem extends UIComposite {
 
-        protected ListItem( Article article, ListModelBase<Article> model ) {
+        protected ListItem( Article article ) {
             lc( RowConstraints.height( 54 ));
             layout.set( RowLayout.filled().margins( 10, 10 ) );
             // title

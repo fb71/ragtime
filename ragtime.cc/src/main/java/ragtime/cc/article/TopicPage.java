@@ -146,7 +146,7 @@ public class TopicPage {
 
                 // list
                 var medias = new ViewerContext<>()
-                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                        .viewer( new CompositeListViewer<MediaEntity>( media -> {
                             return new MediaListItem( media, () -> state.removeMediaAction( media ) );
                         }) {{
                             oddEven.set( true );

@@ -117,7 +117,7 @@ public class TopicsPage {
     protected class ListItem extends UIComposite {
 
         protected ListItem( TopicEntity topic ) {
-            lc( RowConstraints.height( 54 ));
+            lc( RowConstraints.height( 54 ) );
             layout.set( RowLayout.filled().margins( 10, 10 ) );
             add( new Text() {{
                 format.set( Format.HTML );

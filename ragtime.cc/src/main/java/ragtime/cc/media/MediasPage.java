@@ -121,7 +121,7 @@ public class MediasPage {
                 layout.set( FillLayout.defaults() );
 
                 medias = new ViewerContext()
-                        .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                        .viewer( new CompositeListViewer<MediaEntity>( (media) -> {
                             return new MediaListItem( media, () -> {
                                 ConfirmDialog.createAndOpen( "Media", "<b><center>" + media.name.get() + "</center></b>" )
                                         .size.set( Size.of( 320, 200 ) )

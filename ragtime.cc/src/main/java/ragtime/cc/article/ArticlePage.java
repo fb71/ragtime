@@ -159,7 +159,7 @@ public class ArticlePage {
                     //lc( RowConstraints.height( 70 ) );
                     layout.set( FillLayout.defaults() );
                     var medias = new ViewerContext<>()
-                            .viewer( new CompositeListViewer<MediaEntity>( (media,model) -> {
+                            .viewer( new CompositeListViewer<MediaEntity>( media -> {
                                 return new MediaListItem( media, () -> state.removeMediaAction( media ) );
                             }) {{
                                 oddEven.set( true );
