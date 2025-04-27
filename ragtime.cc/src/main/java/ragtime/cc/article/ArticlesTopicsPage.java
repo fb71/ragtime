@@ -13,11 +13,14 @@
  */
 package ragtime.cc.article;
 
+import static areca.common.Scheduler.Priority.BACKGROUND;
 import static java.text.DateFormat.MEDIUM;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -26,6 +29,7 @@ import java.text.SimpleDateFormat;
 
 import org.polymap.model2.query.Query.Order;
 
+import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -48,16 +52,17 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import areca.ui.viewer.AccordionViewer;
-import areca.ui.viewer.AccordionViewer.ModelBuilder;
 import areca.ui.viewer.CellBuilder;
 import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.CompositeListViewer;
+import areca.ui.viewer.DrillingTreeLayout;
 import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
+import areca.ui.viewer.TreeViewer;
 import areca.ui.viewer.Viewer;
 import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
+import areca.ui.viewer.model.LazyTreeModel;
 import areca.ui.viewer.model.ListModelBase;
 import areca.ui.viewer.model.ModelBase;
 import areca.ui.viewer.model.Pojos;
@@ -77,7 +82,7 @@ import ragtime.cc.model.TopicEntity;
  */
 @RuntimeInfo
 public class ArticlesTopicsPage
-        implements CellBuilder<Object>, ModelBuilder<Object> {
+        implements CellBuilder<Object> {
 
     private static final Log LOG = LogFactory.getLog( ArticlesTopicsPage.class );
 
@@ -136,9 +141,9 @@ public class ArticlesTopicsPage
             layout.set( FillLayout.defaults() );
 
             add( new ViewerContext<>()
-                    .model( state.topics )
-                    .viewer( new AccordionViewer<>() {{
-                        modelBuilder.set( ArticlesTopicsPage.this );
+                    .model( new ArticlesTopicsModel() )
+                    .viewer( new TreeViewer<>() {{
+                        treeLayout.set( new DrillingTreeLayout<>() );
                         cellBuilder.set( ArticlesTopicsPage.this );
                         lines.set( true );
                         oddEven.set( false );
@@ -148,9 +153,49 @@ public class ArticlesTopicsPage
         }};
     }
 
+    /**
+     *
+     */
+    class ArticlesTopicsModel implements LazyTreeModel<Object> {
 
-    @Override
-    public ListModelBase<?> buildModel( Object selected, AccordionViewer<Object> viewer ) {
+        @Override
+        public Promise<List<? extends Object>> loadChildren( Object item, int first, int max ) {
+            // root
+            if (item == null) {
+                return state.uow.query( TopicEntity.class )
+                        .orderBy( TopicEntity.TYPE.order, Order.ASC )
+                        .executeCollect().map( ArrayList::new ); // XXX
+            }
+            // Topic
+            else if (item instanceof TopicEntity topic) {
+                return topic.articles().executeCollect()
+                        .map( ArrayList<Object>::new )
+                        .map( rs -> add( rs, new TopicContent( topic ) ) );
+            }
+            else if (item instanceof TopicContent tc) {
+                return Promise.completed( singletonList( new TopicContentEdit( tc.topic ) ), BACKGROUND );
+            }
+            // Article
+            else if (item instanceof Article article) {
+                return Promise.completed( singletonList( new ArticleContentEdit( article ) ), BACKGROUND );
+            }
+//            else if (item instanceof ArticleContent ac) {
+//                return Promise.completed( singletonList( new ArticleContentEdit( ac.article ) ), BACKGROUND );
+//            }
+            else {
+                throw new RuntimeException( "Unhandled value type: " + item );
+            }
+        }
+
+        protected <R> List<R> add( List<R> l, R elm) {
+            l.add( 0, elm );
+            return l;
+        }
+    }
+
+
+    //@Override
+    public ListModelBase<?> buildModel( Object selected, TreeViewer<Object> viewer ) {
         // root
         if (selected == null) {
             return new EntityListModel<>( TopicEntity.class, () ->
@@ -202,23 +247,23 @@ public class ArticlesTopicsPage
     public UIComponent buildCell( int index, Object value, ModelBase model, Viewer viewer ) {
         // Topic
         if (value instanceof TopicEntity topic) {
-            return new TopicCell( topic, (AccordionViewer<Object>)viewer );
+            return new TopicCell( topic, (TreeViewer<Object>)viewer );
         }
         else if (value instanceof TopicContent tc) {
-            return new TopicContentCell( tc, (AccordionViewer<Object>)viewer );
+            return new TopicContentCell( tc, (TreeViewer<Object>)viewer );
         }
         else if (value instanceof TopicContentEdit tc) {
-            return new TopicContentEditCell( tc, (AccordionViewer<Object>)viewer );
+            return new TopicContentEditCell( tc, (TreeViewer<Object>)viewer );
         }
         // Article
         else if (value instanceof Article article) {
-            return new ArticleCell( article, (AccordionViewer<Object>)viewer );
+            return new ArticleCell( article, (TreeViewer<Object>)viewer );
         }
         else if (value instanceof ArticleContent ac) {
-            return new ArticleContentCell( ac, (AccordionViewer<Object>)viewer );
+            return new ArticleContentCell( ac, (TreeViewer<Object>)viewer );
         }
         else if (value instanceof ArticleContentEdit ac) {
-            return new ArticleContentEditCell( ac, (AccordionViewer<Object>)viewer );
+            return new ArticleContentEditCell( ac, (TreeViewer<Object>)viewer );
         }
         else {
             throw new RuntimeException( "Unhandled value type: " + value );
@@ -241,16 +286,19 @@ public class ArticlesTopicsPage
 
         protected UIComposite   content;
 
-        protected void init( String _icon, String c, Object value, AccordionViewer<Object> viewer, RConsumer<UIComposite> contentBuilder ) {
+        protected void init( String _icon, String c, Object value, TreeViewer<Object> viewer, RConsumer<UIComposite> contentBuilder ) {
             cssClasses.add( "Clickable" );
             lc( RowConstraints.height( HEIGHT ));
             lm( RowLayout.defaults().fillWidth( true ).spacing( 5 ) );
+
+            if (viewer.isExpanded( value )) {
+                styles.add( CssStyle.of( "background-color", "#252525" ) );
+            }
             // icon
             icon = add( new Button() {{
                 lc( RC );
                 icon.set( _icon );
                 type.set( Type.NAVIGATE );
-                cssClasses.add( "NoBorder" );
                 color.set( Color.ofHex( c ));
                 //styles.add( CssStyle.of( "color", "#808080" ) );
             }});
@@ -267,18 +315,17 @@ public class ArticlesTopicsPage
                 lc( RC );
                 icon.set( "keyboard_arrow_down" );
                 type.set( Type.NAVIGATE );
-                cssClasses.add( "NoBorder" );
                 events.on( EventType.SELECT, ev -> {
                     toggle( value, viewer, handle );
                 });
             }});
         }
 
-        private void toggle( Object value, AccordionViewer<Object> viewer, Button btn ) {
+        private void toggle( Object value, TreeViewer<Object> viewer, Button btn ) {
             if (!viewer.isExpanded( value )) {
                 expanded.put( value.getClass(), ExpandableCell.this );
                 ExpandableCell.this.styles.add( CssStyle.of( "background-color", "#252525" ) );
-                ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "bold" ) );
+                //ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "bold" ) );
                 //ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-accent2-color)" ) );
                 btn.icon.set( "keyboard_arrow_up" );
                 viewer.expand( value );
@@ -304,7 +351,7 @@ public class ArticlesTopicsPage
      */
     protected class TopicCell extends ExpandableCell {
 
-        protected TopicCell( TopicEntity topic, AccordionViewer<Object> viewer ) {
+        protected TopicCell( TopicEntity topic, TreeViewer<Object> viewer ) {
             init( "topic", "#c96e5e", topic, viewer, container -> {
                 container.tooltip.set( "Topic: " + topic.title.get() );
                 container.add( new Text() {{
@@ -323,7 +370,7 @@ public class ArticlesTopicsPage
      */
     protected class TopicContentCell extends ExpandableCell {
 
-        protected TopicContentCell( TopicContent tc, AccordionViewer<Object> viewer ) {
+        protected TopicContentCell( TopicContent tc, TreeViewer<Object> viewer ) {
             init( "edit", "#c96e5e", tc, viewer, container -> {
                 container.add( new Text() {{
                     format.set( Format.HTML );
@@ -342,7 +389,7 @@ public class ArticlesTopicsPage
 
        private Form form;
 
-       protected TopicContentEditCell( TopicContentEdit tc, AccordionViewer<Object> viewer ) {
+       protected TopicContentEditCell( TopicContentEdit tc, TreeViewer<Object> viewer ) {
            layout.set( RowLayout.verticals().margins( 10, 22 ).spacing( 15 ).fillWidth( true ) );
 
            form = new Form();
@@ -450,7 +497,7 @@ public class ArticlesTopicsPage
     */
    protected class ArticleCell extends ExpandableCell {
 
-       protected ArticleCell( Article article, AccordionViewer<Object> viewer ) {
+       protected ArticleCell( Article article, TreeViewer<Object> viewer ) {
            init( "description", "#5a88b9", article, viewer, container -> {
                container.add( new Text() {{
                    format.set( Format.HTML );
@@ -466,7 +513,7 @@ public class ArticlesTopicsPage
     */
    protected class ArticleContentCell extends ExpandableCell {
 
-       protected ArticleContentCell( ArticleContent ac, AccordionViewer<Object> viewer ) {
+       protected ArticleContentCell( ArticleContent ac, TreeViewer<Object> viewer ) {
            init( "edit", "#5a88b9", ac, viewer, container -> {
                container.add( new Text() {{
                    format.set( Format.HTML );
@@ -483,7 +530,7 @@ public class ArticlesTopicsPage
 
        private Form form;
 
-       protected ArticleContentEditCell( ArticleContentEdit ac, AccordionViewer<Object> viewer ) {
+       protected ArticleContentEditCell( ArticleContentEdit ac, TreeViewer<Object> viewer ) {
            layout.set( RowLayout.verticals().margins( 10, 22 ).spacing( 15 ).fillWidth( true ) );
 
            form = new Form();

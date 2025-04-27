@@ -22,8 +22,6 @@ import java.lang.annotation.Target;
 
 import org.polymap.model2.Property;
 
-import ragtime.cc.web.template.widgets.Markdown;
-
 /**
  * Denotes the format of the {@link Property} value.
  *

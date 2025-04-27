@@ -2,8 +2,13 @@
     background-color: #2e2e2e;
     overflow: hidden; /*visible;*/
 }
-
-.NoBorder {
+.TableCell.Clickable:hover {
+    /* Mobil geht sonst der dunkle Hintegrund verloren*/
+    filter: none;
+    /* color: white; */
+}
+.TableCell button {
+    /* no borders in List or Tree */
     border: none;
     box-shadow: none;
 }

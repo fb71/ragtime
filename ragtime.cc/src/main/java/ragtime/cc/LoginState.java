@@ -49,6 +49,7 @@ import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
 import ragtime.cc.model.PasswordEncryption;
 import ragtime.cc.web.WebsiteEditPage;
+import ragtime.cc.web.WebsiteEditState;
 
 /**
  * The start {@link State} of the application.
@@ -141,7 +142,7 @@ public class LoginState {
     protected void advanceState( AccountEntity account ) {
         ContentRepo.of( account ).onSuccess( contentRepo -> {
             var contentUow = contentRepo.newUnitOfWork();
-            site.createState( new MainState() )
+            site.createState( new WebsiteEditState() )
                     .putContext( account, MainRepo.SCOPE )
                     .putContext( repo, MainRepo.SCOPE )
                     .putContext( uow, MainRepo.SCOPE )
