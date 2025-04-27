@@ -73,7 +73,7 @@ public abstract class BaseState<P> {
         // trigger disposeAction() when page is closed
         EventManager.instance()
                 .subscribe( ev -> disposeAction() )
-                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.page.get() == page )
+                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.clientPage == page )
                 .unsubscribeIf( () -> site.isDisposed() );
         //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
     };
