@@ -74,7 +74,7 @@ public abstract class BaseState<P> {
         EventManager.instance()
                 .subscribe( ev -> disposeAction() )
                 .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.clientPage == page )
-                .unsubscribeIf( () -> site.isDisposed() );
+                .unsubscribeIf( () -> isDisposed() );
         //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
     };
 
@@ -92,7 +92,9 @@ public abstract class BaseState<P> {
 
 
     public boolean isDisposed() {
-        return site.isDisposed();
+        // site is null if event is handled in unsubscribeIf() in member init
+        // which may happen in initializer before site is injected
+        return site != null && site.isDisposed();
     }
 
 

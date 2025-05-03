@@ -17,6 +17,7 @@ import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
 import areca.common.Platform;
+import areca.common.base.Lazy.RLazy;
 import areca.common.base.Sequence;
 import areca.common.event.EventCollector;
 import areca.common.event.EventManager;
@@ -85,13 +86,13 @@ public class WebsiteEditPage {
         ui.init( parent ); //.title.set( "Bearbeiten" );
 
         // IFrame
-        var iframe = new IFrame() {{
+        RLazy<IFrame> iframe = new RLazy<>( () -> new IFrame() {{
             src.set( String.format( "website/%s/home?edit=true", state.account.permid.get() ) );
 
             // IFrame msg
             EventManager.instance()
                     .subscribe( (IFrameMsgEvent ev) -> onEditableClick( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> Pageflow.current().topPage() == WebsiteEditPage.this )
+                    .performIf( IFrameMsgEvent.class, ev -> true ) //ev -> Pageflow.current().topPage() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
@@ -113,7 +114,7 @@ public class WebsiteEditPage {
                     })
                     .performIf( EntityLifecycleEvent.class, ev -> ev.state == AFTER_SUBMIT )
                     .unsubscribeIf( () -> isDisposed() );
-        }};
+        }});
         // check admin
         if (state.account.isAdmin.get()) {
             ui.body.layout.set( RowLayout.filled().margins( 50, 100 ) );
@@ -123,7 +124,7 @@ public class WebsiteEditPage {
                 events.on( EventType.SELECT, ev -> {
                     ui.body.components.disposeAll();
                     ui.body.layout.set( new BrowserLayout() );
-                    ui.body.add( iframe );
+                    ui.body.add( iframe.supply() );
                     ui.body.layout();
 
                     // XXX attempt to hide Page header and/or browser bar
@@ -133,7 +134,7 @@ public class WebsiteEditPage {
         }
         else {
             ui.body.layout.set( new BrowserLayout() );
-            ui.body.add( iframe );
+            ui.body.add( iframe.supply() );
         }
 
         // action: articles
@@ -165,7 +166,7 @@ public class WebsiteEditPage {
         site.actions.add( new Action() {{
             icon.set( "refresh" );
             description.set( "Web-Seite neu laden" );
-            handler.set( ev -> iframe.reload() );
+            handler.set( ev -> iframe.ifInitialized( IFrame::reload ) );
         }});
         // help
         HelpPage.addAction( WebsiteEditPage.class, site );

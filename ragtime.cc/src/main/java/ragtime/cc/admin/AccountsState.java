@@ -70,9 +70,9 @@ public class AccountsState
     public LazyListModel<AccountEntity> accounts = new EntityListModel<>( AccountEntity.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<AccountEntity> query() {

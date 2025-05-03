@@ -62,9 +62,9 @@ public class ArticlesState
     public LazyListModel<Article> articles = new EntityListModel<>( Article.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<Article> query() {
