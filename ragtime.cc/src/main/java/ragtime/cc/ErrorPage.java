@@ -82,6 +82,7 @@ public class ErrorPage {
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
+        site.isDialog.set( true );
         ui.init( parent ).title.set( "Problem" );
 
         ui.body.layout.set( RowLayout.verticals().fillWidth( true ).spacing( 15 ).margins( 15, 15 ) );
