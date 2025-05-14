@@ -36,12 +36,12 @@ import ragtime.cc.model.TopicEntity;
  * @author Falko Bräutigam
  */
 @RuntimeInfo
-public class ArticlesTopicsState
-        extends BaseState<ArticlesTopicsPage> {
+public class ContentState
+        extends BaseState<ContentPage> {
 
-    private static final Log LOG = LogFactory.getLog( ArticlesTopicsState.class );
+    private static final Log LOG = LogFactory.getLog( ContentState.class );
 
-    public static final ClassInfo<ArticlesTopicsState> INFO = ArticlesTopicsStateClassInfo.instance();
+    public static final ClassInfo<ContentState> INFO = ContentStateClassInfo.instance();
 
     /**
      * Model: searchTxt
@@ -81,8 +81,8 @@ public class ArticlesTopicsState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new ArticlesTopicsPage() )
-                .putContext( ArticlesTopicsState.this, Page.Context.DEFAULT_SCOPE )
+        pageflow.create( page = new ContentPage() )
+                .putContext( ContentState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
     };

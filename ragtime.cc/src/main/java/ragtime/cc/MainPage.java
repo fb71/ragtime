@@ -39,7 +39,7 @@ import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.admin.AccountsState;
 import ragtime.cc.article.ArticleEditState;
-import ragtime.cc.article.ArticlesTopicsState;
+import ragtime.cc.article.ContentState;
 import ragtime.cc.article.TopicEditState;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.EntityLifecycleEvent;
@@ -185,7 +185,7 @@ public class MainPage {
         protected void onEditableClick2( IFrameMsgEvent ev ) {
             LOG.info( "IFrame: %s (%s)", ev.msg, state.account.email.get() );
             var id = substringAfter( ev.msg, "." );
-            disposableChildState = state.site.createState( new ArticlesTopicsState() )
+            disposableChildState = state.site.createState( new ContentState() )
                     .activate();
         }
 

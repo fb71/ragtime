@@ -45,7 +45,7 @@ import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.admin.AccountsState;
 import ragtime.cc.article.ArticleEditState;
-import ragtime.cc.article.ArticlesTopicsState;
+import ragtime.cc.article.ContentState;
 import ragtime.cc.article.TopicEditState;
 import ragtime.cc.article.TopicsState;
 import ragtime.cc.media.MediasState;
@@ -140,7 +140,7 @@ public class WebsiteEditPage {
         site.actions.add( new Action() {{
             icon.set( "article" );
             description.set( "Beiträge" );
-            handler.set( ev -> state.site.createState( new ArticlesTopicsState() ).activate() );
+            handler.set( ev -> state.site.createState( new ContentState() ).activate() );
         }});
         // action: medias
         site.actions.add( new Action() {{
