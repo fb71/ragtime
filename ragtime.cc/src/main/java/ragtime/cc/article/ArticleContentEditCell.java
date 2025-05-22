@@ -13,8 +13,13 @@
  */
 package ragtime.cc.article;
 
+import static java.lang.String.format;
+
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import areca.ui.component2.Button;
+import areca.ui.component2.Events.EventType;
 import areca.ui.component2.TextField;
 import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComposite;
@@ -26,7 +31,8 @@ import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.AssociationModel;
 import ragtime.cc.EntityTransform;
-import ragtime.cc.article.ContentPage.ArticleContentEdit;
+import ragtime.cc.article.ContentState.ArticleContentEdit;
+import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.article.ContentPage.ContentPageCell;
 import ragtime.cc.model.TopicEntity;
 
@@ -49,11 +55,23 @@ public class ArticleContentEditCell
 
         form = new Form();
 
+        form.subscribe( ev -> {
+            if (form.isChanged() && form.isValid() ) {
+                registerSaveAction( () -> {
+                    form.submit();
+                    return true;
+                });
+            }
+            else {
+                removeSaveAction();
+            }
+        });
+
         add( new UIComposite() {{
             lc( RowConstraints.height( 35 ) );
             layout.set( RowLayout.filled().spacing( 15 ) );
 
-            var topics = new EntityTransform<>( uow, TopicEntity.class, TopicEntity.TYPE.title,
+            var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
                     new AssociationModel<>( value.article().topic ) );
             add( form.newField()
                     .viewer( new SelectViewer( topics.values(), "Wählen..." ) )
@@ -83,9 +101,34 @@ public class ArticleContentEditCell
                 .viewer( new TextFieldViewer().configure( (TextField t) -> {
                     t.multiline.set( true );
                     t.type.set( Type.MARKDOWN );
-                    TextAutocomplete.process( t, uow );
+                    TextAutocomplete.process( t, state.uow );
                 }))
                 .create()
                 .lc( RowConstraints.height( 300 ) ) );
+
+        // medias
+        add( new UIComposite() {{
+            //lc( RowConstraints.height( 100 ) );
+            layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
+
+            // add button
+            add( new UIComposite() {{
+                lc( RowConstraints.height( 38 ) );
+                layout.set( RowLayout.filled().spacing( 15 ) );
+                add( new UIComposite() );
+                add( new Button() {{
+                    lc( RowConstraints.width( 60 ) );
+                    tooltip.set( format( "Bilder/Medien zum diesem Artikel hinzufügen", value.article().title.get() ) );
+                    icon.set( "add_photo_alternate" );
+                    events.on( EventType.SELECT, ev -> {
+                        state.site.createState( new MediasSelectState( sel -> value.addMedias( sel ) ) ).activate();
+                    });
+                }});
+            }});
+        }});
+
+        Platform.schedule( 100, () -> { // avoid PermNameValidator block page open
+            form.load();
+        });
     }
 }

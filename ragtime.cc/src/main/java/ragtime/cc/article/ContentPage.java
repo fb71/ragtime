@@ -13,24 +13,16 @@
  */
 package ragtime.cc.article;
 
-import static areca.common.Scheduler.Priority.BACKGROUND;
 import static java.text.DateFormat.MEDIUM;
-import static java.util.Collections.singletonList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import org.polymap.model2.query.Query.Order;
-import org.polymap.model2.runtime.UnitOfWork;
-import org.polymap.model2.runtime.UnitOfWork.Submitted;
-
-import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -56,9 +48,14 @@ import areca.ui.viewer.DrillingTreeLayout;
 import areca.ui.viewer.TreeViewer;
 import areca.ui.viewer.Viewer;
 import areca.ui.viewer.ViewerContext;
-import areca.ui.viewer.model.LazyTreeModel;
 import areca.ui.viewer.model.ModelBase;
-import ragtime.cc.MainPage;
+import ragtime.cc.UICommon;
+import ragtime.cc.article.ContentState.ArticleContent;
+import ragtime.cc.article.ContentState.ArticleContentEdit;
+import ragtime.cc.article.ContentState.MediaContent;
+import ragtime.cc.article.ContentState.TopicContent;
+import ragtime.cc.article.ContentState.TopicContentEdit;
+import ragtime.cc.media.MediaCell;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.TopicEntity;
 
@@ -77,57 +74,66 @@ public class ContentPage
     protected static final DateFormat df = SimpleDateFormat.getDateTimeInstance( MEDIUM, MEDIUM, Locale.GERMAN );
 
     @Page.Part
-    protected PageContainer ui;
+    protected PageContainer     ui;
 
     @Page.Context
-    protected ContentState  state;
+    protected ContentState      state;
 
 //    @Page.Context
 //    protected UICommon          uic;
 
     @Page.Context
-    protected PageSite      site;
+    protected PageSite          site;
 
-    private Map<Class<?>,ExpandableCell>  expanded = new HashMap<>();
+    private Action              submitBtn;
 
-    private Action          submitBtn;
+    private Map<String,Callable<Boolean>> saveActions = new HashMap<>();
+
+    private boolean             modelChanged;
 
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Inhalte" );
 
+        // action: submit
+        site.actions.add( new Action() {{
+            submitBtn = this;
+            description.set( "Änderungen speichern" );
+            //icon.set( UICommon.ICON_SAVE );
+            type.set( Button.Type.SUBMIT );
+            enabled.set( false );
+            //
+            handler.set( ev -> {
+                for (var action : saveActions.values()) {
+                    action.call();
+                }
+                state.submitAction().onSuccess( __ -> {
+                    modelChanged = false;
+                    saveActions.clear();
+                    updateSaveEnabled();
+                });
+            });
+            // listen to model changes
+            state.contentModel
+                    .subscribe( ev -> { modelChanged = true; updateSaveEnabled(); })
+                    .unsubscribeIf( () -> site.isClosed() );
+        }});
         // action: new
         site.actions.add( new Action() {{
             icon.set( "add" );
-            description.set( "Neues Topic anlegen" );
+            description.set( "Neues Thema anlegen" );
             //handler.set( ev -> state.createTopicAction() );
         }});
 
         ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 15 ) );
 
-//        // search
-//        ui.body.add( new TextField() {{
-//            layoutConstraints.set( RowConstraints.height( 35 ) );
-//            content.set( state.searchTxt.get() );
-//            events.on( EventType.TEXT, ev -> {
-//                state.searchTxt.set( content.get() );
-//            });
-//        }});
-
-        ui.body.add( createAsPart() );
-        return ui;
-    }
-
-    /**
-     * Init as a part of {@link MainPage}.
-     */
-    public UIComponent createAsPart() {
-        return new ScrollableComposite() {{
+        // TreeViewer
+        ui.body.add( new ScrollableComposite() {{
             layout.set( FillLayout.defaults() );
 
             add( new ViewerContext<>()
-                    .model( new ContentModel() )
+                    .model( state.contentModel )
                     .viewer( new TreeViewer<>() {{
                         treeLayout.set( new DrillingTreeLayout<>() );
                         cellBuilder.set( ContentPage.this );
@@ -136,61 +142,34 @@ public class ContentPage
                         exclusive.set( false );
                     }})
                     .createAndLoad() );
-        }};
+        }});
+        return ui;
     }
 
 
-    /** */
-    protected static record TopicContent( TopicEntity topic ) { }
-
-    /** */
-    static record TopicContentEdit( TopicEntity topic ) { }
-
-    /** */
-    protected static record ArticleContent( Article article ) { }
-
-    /** */
-    protected static record ArticleContentEdit( Article article ) { }
-
-
-    /**
-     *
-     */
-    class ContentModel implements LazyTreeModel<Object> {
-
-        @Override
-        public Promise<List<? extends Object>> loadChildren( Object item, int first, int max ) {
-            // root
-            if (item == null) {
-                return state.uow.query( TopicEntity.class )
-                        .orderBy( TopicEntity.TYPE.order, Order.ASC )
-                        .executeCollect().map( ArrayList::new ); // XXX
-            }
-            // Topic
-            else if (item instanceof TopicEntity topic) {
-                return topic.articles().executeCollect()
-                        .map( ArrayList<Object>::new )
-                        .map( rs -> add( rs, new TopicContent( topic ) ) );
-            }
-            else if (item instanceof TopicContent tc) {
-                return Promise.completed( singletonList( new TopicContentEdit( tc.topic ) ), BACKGROUND );
-            }
-            // Article
-            else if (item instanceof Article article) {
-                return Promise.completed( singletonList( new ArticleContentEdit( article ) ), BACKGROUND );
-            }
-//            else if (item instanceof ArticleContent ac) {
-//                return Promise.completed( singletonList( new ArticleContentEdit( ac.article ) ), BACKGROUND );
-//            }
-            else {
-                throw new RuntimeException( "Unhandled value type: " + item );
-            }
+    protected void updateSaveEnabled() {
+        if (modelChanged || !saveActions.isEmpty()) {
+            submitBtn.enabled.set( true );
+            submitBtn.icon.set( UICommon.ICON_SAVE );
         }
-
-        protected <R> List<R> add( List<R> l, R elm) {
-            l.add( 0, elm );
-            return l;
+        else {
+            submitBtn.enabled.set( false);
         }
+    }
+
+
+    protected void registerSaveAction( String name, Callable<Boolean> action ) {
+        LOG.info( "registerSaveAction(): %s", name );
+        saveActions.put( name, action );
+        //Assert.isNull( previous );
+        updateSaveEnabled();
+    }
+
+
+    protected void removeSaveAction( String name ) {
+        LOG.info( "removeSaveAction(): %s", name );
+        saveActions.remove( name );
+        updateSaveEnabled();
     }
 
 
@@ -201,30 +180,36 @@ public class ContentPage
 
         // Topic
         if (value instanceof TopicEntity topic) {
-            result = new TopicCell() {{ value = topic; }};
-        }
-        else if (value instanceof TopicContent tc) {
-            result = new TopicContentCell() {{ value = tc; }};
+            result = new TopicCell();
         }
         else if (value instanceof TopicContentEdit tc) {
             result = new TopicContentEditCell( tc );
         }
+        else if (value instanceof TopicContent tc) {
+            result = new TopicContentCell();
+        }
         // Article
         else if (value instanceof Article article) {
-            result = new ArticleCell() {{ value = article; }};
-        }
-        else if (value instanceof ArticleContent ac) {
-            result = new ArticleContentCell() {{ value = ac; }};
+            result = new ArticleCell();
         }
         else if (value instanceof ArticleContentEdit ac) {
-            result = new ArticleContentEditCell() {{ value = ac; }};
+            result = new ArticleContentEditCell();
+        }
+        else if (value instanceof ArticleContent ac) {
+            result = new ArticleContentCell();
+        }
+        // Media
+        else if (value instanceof MediaContent media) {
+            result = new MediaCell();
         }
         else {
             throw new RuntimeException( "Unhandled value type: " + value );
         }
+        result.value = value;
         result.viewer = (TreeViewer<Object>)viewer;
+        result.page = this;
         result.pageSite = site;
-        result.uow = state.uow;
+        result.state = state;
         result.create();
         return result;
     }
@@ -242,18 +227,34 @@ public class ContentPage
 
         protected TreeViewer<Object>    viewer;
 
+        protected ContentPage           page;
+
         protected PageSite              pageSite;
 
-        protected UnitOfWork            uow;
+        protected ContentState          state;
 
         protected abstract void create();
 
+        /**
+         * Adds the given {@link Button} to the action area (toolbar) of this cell.
+         */
         protected void addAction( Button btn ) {
-            throw new RuntimeException( "not yet..." );
+            LOG.warn( "addAction(): not yet..." );
+            //throw new RuntimeException( "not yet..." );
         }
 
-        protected Promise<Submitted> submit() {
-            return uow.submit(); // XXX
+        public void registerSaveAction( Callable<Boolean> action ) {
+            page.registerSaveAction( getClass().getName(), action );
+        }
+
+        public void removeSaveAction() {
+            page.removeSaveAction( getClass().getName() );
+        }
+
+        @Override
+        public void dispose() {
+            removeSaveAction();
+            super.dispose();
         }
     }
 
@@ -264,11 +265,11 @@ public class ContentPage
     public static abstract class ExpandableCell<V>
             extends ContentPageCell<V> {
 
-        static final int        HEIGHT = 54;
+        public static final int     HEIGHT = 54;
+
+        public static final String  SECOND_LINE = "<br/><span class=\"SecondLine\">%s</span>";
 
         static final RowConstraints RC = RowConstraints.height( HEIGHT ).width.set( HEIGHT );
-
-        static final String     SECOND_LINE = "<br/><span style=\"font-size:10px; color:#8a8a8a;\">%s</span>";
 
         protected Button        icon, handle;
 
@@ -277,10 +278,10 @@ public class ContentPage
         protected void create( String _icon, String c, RConsumer<UIComposite> contentBuilder ) {
             cssClasses.add( "Clickable" );
             lc( RowConstraints.height( HEIGHT ));
-            lm( RowLayout.defaults().fillWidth( true ).spacing( 5 ) );
+            lm( RowLayout.defaults().fillWidth( true ).margins( 0, -1 ).spacing( 5 ) );
 
             if (viewer.isExpanded( value )) {
-                styles.add( CssStyle.of( "background-color", "#252525" ) );
+                styles.add( CssStyle.of( "background-color", "var(--basic-primary-color)" ) ); //"#252525" ) );
             }
             // icon
             icon = add( new Button() {{
@@ -311,49 +312,36 @@ public class ContentPage
 
         private void toggle( Button btn ) {
             if (!viewer.isExpanded( value )) {
-                //expanded.put( value.getClass(), ExpandableCell.this );
-                ExpandableCell.this.styles.add( CssStyle.of( "background-color", "#252525" ) );
-                //ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "bold" ) );
-                //ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-accent2-color)" ) );
                 btn.icon.set( "keyboard_arrow_up" );
-                viewer.expand( value );
+                onExpand();
             }
             else {
-                //expanded.remove( value );
-                ExpandableCell.this.styles.remove( CssStyle.of( "background-color", "" ) );
-                ExpandableCell.this.styles.remove( CssStyle.of( "font-weight", "" ) );
                 btn.icon.set( "keyboard_arrow_down" );
-                viewer.collapse( value );
+                onCollapse();
             }
+        }
+
+        protected void onExpand() {
+            //expanded.put( value.getClass(), ExpandableCell.this );
+            ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-primary-color)" ) );
+            //ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "bold" ) );
+            //ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-accent2-color)" ) );
+            viewer.expand( value );
+        }
+
+        protected void onCollapse() {
+            //expanded.remove( value );
+            ExpandableCell.this.styles.remove( CssStyle.of( "background-color", "" ) );
+            ExpandableCell.this.styles.remove( CssStyle.of( "font-weight", "" ) );
+            viewer.collapse( value );
         }
 
         @Override
         protected void addAction( Button btn ) {
             btn.lc( RC );
             btn.type.set( Button.Type.NAVIGATE );
+            btn.cssClasses.add( "Action" );
             components.add( 2, btn ).orElseError();
-        }
-    }
-
-
-    /**
-     *
-     */
-    class TopicCell
-            extends ExpandableCell<TopicEntity> {
-
-        @Override
-        protected void create() {
-            create( "topic", "#c96e5e", container -> {
-                container.tooltip.set( "Topic: " + value.title.get() );
-                container.add( new Text() {{
-                    format.set( Format.HTML );
-                    content.set( value.title.get() + "<br/>..." );
-                    value.articles().executeCollect().onSuccess( articles -> {
-                        content.set( value.title.get() + SECOND_LINE.formatted( "Beiträge: " + articles.size() ) );
-                    });
-                }});
-            });
         }
     }
 
@@ -369,7 +357,7 @@ public class ContentPage
             create( "edit", "#c96e5e", container -> {
                 container.add( new Text() {{
                     format.set( Format.HTML );
-                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Topic '" + value.topic.title.get() + "' bearbeiten..." ) );
+                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Topic '" + value.topic().title.get() + "' bearbeiten..." ) );
 //                    content.set( "Inhalt bearbeiten...<br/>" +
 //                            "<span style=\"font-size:10px; color:#808080;\">" + abbreviate( tc.topic.description.get(), 50 ) + "</span>" );
                 }});
@@ -406,7 +394,7 @@ public class ContentPage
             create( "edit", "#5a88b9", container -> {
                 container.add( new Text() {{
                     format.set( Format.HTML );
-                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Artikel '" + value.article.title.get() + "' bearbeiten..." ) );
+                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Artikel '" + value.article().title.get() + "' bearbeiten..." ) );
                 }});
             });
         }

@@ -54,6 +54,7 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.rt.server.EventLoop;
 import areca.ui.Size;
+import areca.ui.component2.Image;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
 import ragtime.cc.AsyncWorker;
@@ -195,6 +196,12 @@ public class MediaEntity
 
         private String cacheKey() {
             return String.format( "%s|%s|%s", id(), size, outputFormat );
+        }
+
+        public Promise<String> createBase64() {
+            return create().then( bytes -> AsyncWorker.pool( () -> {
+                return Image.base64( bytes );
+            }));
         }
 
         public Promise<byte[]> create() {

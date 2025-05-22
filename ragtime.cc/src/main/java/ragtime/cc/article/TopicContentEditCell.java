@@ -13,6 +13,9 @@
  */
 package ragtime.cc.article;
 
+import static java.lang.String.format;
+
+import areca.common.Platform;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.ui.component2.Button;
@@ -23,16 +26,12 @@ import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
 import areca.ui.viewer.ColorPickerViewer;
-import areca.ui.viewer.CompositeListViewer;
 import areca.ui.viewer.TextFieldViewer;
-import areca.ui.viewer.ViewerContext;
 import areca.ui.viewer.form.Form;
-import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ContentPage.ContentPageCell;
-import ragtime.cc.article.ContentPage.TopicContentEdit;
-import ragtime.cc.media.MediasPage.MediaListItem;
-import ragtime.cc.model.MediaEntity;
+import ragtime.cc.article.ContentState.TopicContentEdit;
+import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.model.TopicEntity;
 
 /**
@@ -42,16 +41,19 @@ import ragtime.cc.model.TopicEntity;
  * @author Falko Bräutigam
  */
 class TopicContentEditCell
-        extends ContentPageCell {
+        extends ContentPageCell<TopicContentEdit> {
 
     private static final Log LOG = LogFactory.getLog( TopicContentEditCell.class );
 
-    protected TopicEntity   topic;
+    protected TopicContentEdit  tc;
 
-    private Form            form;
+    protected TopicEntity       topic;
+
+    private Form                form;
 
 
     public TopicContentEditCell( TopicContentEdit tc ) {
+        this.tc = tc;
         this.topic = tc.topic();
     }
 
@@ -85,17 +87,17 @@ class TopicContentEditCell
                 .viewer( new TextFieldViewer().configure( (TextField t) -> {
                     t.multiline.set( true );
                     t.type.set( Type.MARKDOWN );
-                    TextAutocomplete.process( t, uow );
+                    TextAutocomplete.process( t, state.uow );
                 }))
                 .create()
-                .lc( RowConstraints.height( 200 ) ) );
+                .lc( RowConstraints.height( 150 ) ) );
 
-        add( form.newField().label( "Reihenfolge" )
-                .viewer( new TextFieldViewer() )
-                .model( new Number2StringTransform(
-                        new PropertyModel<>( topic.order ) ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
+//        add( form.newField().label( "Reihenfolge" )
+//                .viewer( new TextFieldViewer() )
+//                .model( new Number2StringTransform(
+//                        new PropertyModel<>( topic.order ) ) )
+//                .create()
+//                .lc( RowConstraints.height( 35 ) ) );
 
         // medias
         add( new UIComposite() {{
@@ -109,32 +111,30 @@ class TopicContentEditCell
                 add( new UIComposite() );
                 add( new Button() {{
                     lc( RowConstraints.width( 60 ) );
-                    tooltip.set( "Bilder/Medien hinzufügen" );
+                    tooltip.set( format( "Bilder/Medien zum diesem Thema hinzufügen", topic.title.get() ) );
                     icon.set( "add_photo_alternate" );
                     events.on( EventType.SELECT, ev -> {
-                        //state.site.createState( new MediasSelectState( sel -> state.addMedias( sel ) ) ).activate();
+                        state.site.createState( new MediasSelectState( sel -> tc.addMedias( sel ) ) ).activate();
                     });
                 }});
             }});
-
-            // list
-            var medias = new ViewerContext<>()
-                    .viewer( new CompositeListViewer<MediaEntity>( media -> {
-                        return new MediaListItem( media, () -> {} ); //state.removeMediaAction( media ) );
-                    }) {{
-                        oddEven.set( true );
-                        spacing.set( 0 );
-                        lines.set( true );
-                        onSelect.set( media -> {
-                            LOG.info( "SELECT: %s", media );
-                        });
-                        onLayout.set( c -> TopicContentEditCell.this.layout() );
-                    }})
-                    .model( new EntityAssocListModel<>( topic.medias ) );
-            add( medias.createAndLoad() );
         }});
 
-        form.load();
+        Platform.schedule( 100, () -> { // avoid PermNameValidator block page open
+            form.load();
+        });
+
+        form.subscribe( ev -> {
+            if (form.isChanged() && form.isValid() ) {
+                registerSaveAction( () -> {
+                    form.submit();
+                    return true;
+                });
+            }
+            else {
+                removeSaveAction();
+            }
+        });
 
         // submit
         addAction( new Button() {{
@@ -143,7 +143,7 @@ class TopicContentEditCell
             enabled.set( false );
             events.on( EventType.SELECT, ev -> {
                 form.submit();
-                submit().onSuccess( __ -> {
+                state.submitAction().onSuccess( submitted -> {
                     enabled.set( false );
                 });
             });

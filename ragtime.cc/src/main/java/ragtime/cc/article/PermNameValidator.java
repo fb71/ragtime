@@ -90,7 +90,7 @@ public class PermNameValidator
                             ? new ValidationResult( "URL existiert bereits: " + permName )
                             : null;
                 })
-                .waitForResult().orElse( VALID );
+                .waitForResult().orElse( VALID ); // XXX waiting
     }
 
 }

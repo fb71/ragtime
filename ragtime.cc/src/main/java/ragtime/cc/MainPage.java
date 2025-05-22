@@ -184,9 +184,8 @@ public class MainPage {
 
         protected void onEditableClick2( IFrameMsgEvent ev ) {
             LOG.info( "IFrame: %s (%s)", ev.msg, state.account.email.get() );
-            var id = substringAfter( ev.msg, "." );
-            disposableChildState = state.site.createState( new ContentState() )
-                    .activate();
+            //var id = substringAfter( ev.msg, "." );
+            disposableChildState = state.site.createState( new ContentState() ).activate();
         }
 
 
