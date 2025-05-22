@@ -19,11 +19,14 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.MutableObject;
 
+import areca.common.MutableInt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
+import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Text;
+import ragtime.cc.ConfirmDialog;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ContentPage.ExpandableCell;
 import ragtime.cc.article.ContentState.MediaContent;
@@ -98,7 +101,26 @@ public class MediaCell
             icon.set( UICommon.ICON_DELETE );
             tooltip.set( "Löschen" );
             events.on( EventType.SELECT, ev -> {
-                value.remove();
+                var count = new MutableInt( 0 );
+                media.articles()
+                        .then( rs -> {
+                            count.add( rs.size() );
+                            return media.topics();
+                        })
+                        .onSuccess( rs -> {
+                            count.add( rs.size() );
+                            if (count.intValue() > 1) {
+                                value.remove( false );
+                            }
+                            else {
+                                ConfirmDialog.create( "Löschen",
+                                        "<b>" + media.name.get() + "</b> - wird in keinem Artikel oder Thema mehr verwendet.<br/><br/>Soll es gelöscht werden?" )
+                                        .size.set( Size.of( 320, 230 ) )
+                                        .addNoAction( () -> value.remove( false ) )
+                                        .addDeleteAction( () -> value.remove( true ) )
+                                        .open();
+                            }
+                        });
             });
         }});
     }

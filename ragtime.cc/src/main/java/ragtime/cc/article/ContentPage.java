@@ -159,7 +159,7 @@ public class ContentPage
 
 
     protected void registerSaveAction( String name, Callable<Boolean> action ) {
-        LOG.info( "registerSaveAction(): %s", name );
+        LOG.debug( "registerSaveAction(): %s", name );
         saveActions.put( name, action );
         //Assert.isNull( previous );
         updateSaveEnabled();
@@ -167,7 +167,7 @@ public class ContentPage
 
 
     protected void removeSaveAction( String name ) {
-        LOG.info( "removeSaveAction(): %s", name );
+        LOG.debug( "removeSaveAction(): %s", name );
         saveActions.remove( name );
         updateSaveEnabled();
     }

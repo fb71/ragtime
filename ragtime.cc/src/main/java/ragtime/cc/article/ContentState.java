@@ -241,7 +241,7 @@ public class ContentState
             return value;
         }
 
-        public void remove() {
+        public void remove( boolean delete ) {
             if (parent instanceof TopicEntity topic) {
                 topic.medias.remove( media() );
             }
@@ -250,6 +250,9 @@ public class ContentState
             }
             else {
                 throw new RuntimeException( "Unhandled parent type: " + parent );
+            }
+            if (delete) {
+                value.context.getUnitOfWork().removeEntity( media() );
             }
             contentModel().fireChangeEvent();
         }
