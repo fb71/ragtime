@@ -28,10 +28,15 @@ import ragtime.cc.model.TopicEntity;
 class TopicCell
         extends ExpandableCell<TopicEntity> {
 
+    private Button deleteBtn;
+
+    private Button settingsBtn;
+
+
     @Override
     protected void create() {
         create( "topic", "#c96e5e", container -> {
-            container.tooltip.set( "Thema: " + value.title.get() );
+            container.tooltip.set( "Topic: " + value.title.get() );
             container.add( new Text() {{
                 format.set( Format.HTML );
                 content.set( value.title.get() + "<br/>..." );
@@ -47,7 +52,7 @@ class TopicCell
     protected void onExpand() {
         super.onExpand();
         // delete
-        addAction( new Button() {{
+        deleteBtn = addAction( new Button() {{
             //icon.set( "close" );
             icon.set( UICommon.ICON_DELETE );
             tooltip.set( "Löschen" );
@@ -56,7 +61,7 @@ class TopicCell
             });
         }});
         // settings
-        addAction( new Button() {{
+        settingsBtn = addAction( new Button() {{
             icon.set( "settings" );
             tooltip.set( "Einstellungen bearbeiten" );
             events.on( EventType.SELECT, ev -> {
@@ -78,6 +83,9 @@ class TopicCell
 
     @Override
     protected void onCollapse() {
+        removeAction( deleteBtn );
+        removeAction( settingsBtn );
         super.onCollapse();
     }
+
 }

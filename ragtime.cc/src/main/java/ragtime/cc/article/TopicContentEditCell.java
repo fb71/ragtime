@@ -25,9 +25,9 @@ import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
-import areca.ui.viewer.ColorPickerViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
+import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ContentPage.ContentPageCell;
 import ragtime.cc.article.ContentState.TopicContentEdit;
@@ -59,7 +59,7 @@ class TopicContentEditCell
 
 
     protected void create() {
-        layout.set( RowLayout.verticals().margins( 10, 22 ).spacing( 15 ).fillWidth( true ) );
+        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ) );
 
         form = new Form();
 
@@ -75,11 +75,19 @@ class TopicContentEditCell
                             new PropertyModel<>( topic.title ) ) )
                     .create() );
 
-            add( form.newField() //.label( "Farbe" )
-                    .viewer( new ColorPickerViewer() )
-                    .model( new PropertyModel<>( topic.color ) )
+            add( form.newField().label( "Position" )
+                    .description( "Die Position in der Reihenfolge der Topics" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new Number2StringTransform(
+                            new PropertyModel<>( topic.order ) ) )
                     .create()
-                    .lc( RowConstraints.width( 50 ) ) );
+                    .lc( RowConstraints.width( 80 ) ) );
+
+//            add( form.newField() //.label( "Farbe" )
+//                    .viewer( new ColorPickerViewer() )
+//                    .model( new PropertyModel<>( topic.color ) )
+//                    .create()
+//                    .lc( RowConstraints.width( 50 ) ) );
         }});
 
         add( form.newField() //.label( "Beschreibung" )
@@ -91,13 +99,6 @@ class TopicContentEditCell
                 }))
                 .create()
                 .lc( RowConstraints.height( 150 ) ) );
-
-//        add( form.newField().label( "Reihenfolge" )
-//                .viewer( new TextFieldViewer() )
-//                .model( new Number2StringTransform(
-//                        new PropertyModel<>( topic.order ) ) )
-//                .create()
-//                .lc( RowConstraints.height( 35 ) ) );
 
         // medias
         add( new UIComposite() {{
@@ -111,7 +112,7 @@ class TopicContentEditCell
                 add( new UIComposite() );
                 add( new Button() {{
                     lc( RowConstraints.width( 60 ) );
-                    tooltip.set( format( "Bilder/Medien zum diesem Thema hinzufügen", topic.title.get() ) );
+                    tooltip.set( format( "Bilder/Medien zum diesem Topic hinzufügen", topic.title.get() ) );
                     icon.set( "add_photo_alternate" );
                     events.on( EventType.SELECT, ev -> {
                         state.site.createState( new MediasSelectState( sel -> tc.addMedias( sel ) ) ).activate();
@@ -120,7 +121,7 @@ class TopicContentEditCell
             }});
         }});
 
-        Platform.schedule( 100, () -> { // avoid PermNameValidator block page open
+        Platform.schedule( 500, () -> { // avoid PermNameValidator block page open
             form.load();
         });
 

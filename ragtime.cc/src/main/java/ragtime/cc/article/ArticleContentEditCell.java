@@ -51,7 +51,7 @@ public class ArticleContentEditCell
 
     @Override
     protected void create() {
-        layout.set( RowLayout.verticals().margins( 10, 22 ).spacing( 15 ).fillWidth( true ) );
+        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ) );
 
         form = new Form();
 
@@ -74,7 +74,7 @@ public class ArticleContentEditCell
             var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
                     new AssociationModel<>( value.article().topic ) );
             add( form.newField()
-                    .viewer( new SelectViewer( topics.values(), "Wählen..." ) )
+                    .viewer( new SelectViewer( topics.values(), "-Keinem Topic zugeordnet-" ) )
                     .model( topics )
                     .create()
                     .tooltip.set( "Das Topic dieses Textes" ) );

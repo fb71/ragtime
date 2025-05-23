@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import areca.common.Assert;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -30,7 +31,6 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Color;
-import areca.ui.Size;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.ScrollableComposite;
@@ -122,11 +122,11 @@ public class ContentPage
         // action: new
         site.actions.add( new Action() {{
             icon.set( "add" );
-            description.set( "Neues Thema anlegen" );
+            description.set( "Neues Topic anlegen" );
             //handler.set( ev -> state.createTopicAction() );
         }});
 
-        ui.body.layout.set( RowLayout.filled().vertical().margins( Size.of( 10, 10 ) ).spacing( 15 ) );
+        ui.body.layout.set( RowLayout.filled().vertical().margins( 0, 0 ).spacing( 15 ) );
 
         // TreeViewer
         ui.body.add( new ScrollableComposite() {{
@@ -237,17 +237,22 @@ public class ContentPage
 
         /**
          * Adds the given {@link Button} to the action area (toolbar) of this cell.
+         * @return
          */
-        protected void addAction( Button btn ) {
+        protected Button addAction( Button btn ) {
             LOG.warn( "addAction(): not yet..." );
-            //throw new RuntimeException( "not yet..." );
+            return btn;
         }
 
-        public void registerSaveAction( Callable<Boolean> action ) {
+        protected void removeAction( Button btn ) {
+            LOG.warn( "removeAction(): not yet..." );
+        }
+
+        protected void registerSaveAction( Callable<Boolean> action ) {
             page.registerSaveAction( getClass().getName(), action );
         }
 
-        public void removeSaveAction() {
+        protected void removeSaveAction() {
             page.removeSaveAction( getClass().getName() );
         }
 
@@ -275,14 +280,12 @@ public class ContentPage
 
         protected UIComposite   content;
 
-        protected void create( String _icon, String c, RConsumer<UIComposite> contentBuilder ) {
-            cssClasses.add( "Clickable" );
-            lc( RowConstraints.height( HEIGHT ));
-            lm( RowLayout.defaults().fillWidth( true ).margins( 0, -1 ).spacing( 5 ) );
+        protected boolean       expandable = true;
 
-            if (viewer.isExpanded( value )) {
-                styles.add( CssStyle.of( "background-color", "var(--basic-primary-color)" ) ); //"#252525" ) );
-            }
+        protected void create( String _icon, String c, RConsumer<UIComposite> contentBuilder ) {
+            lc( RowConstraints.height( HEIGHT ));
+            lm( RowLayout.defaults().fillWidth( true ).margins( 5, -1 ).spacing( 5 ) );
+
             // icon
             icon = add( new Button() {{
                 lc( RC );
@@ -293,21 +296,31 @@ public class ContentPage
             }});
             // content
             content = add( new UIComposite() {{
-                lm( RowLayout.filled().margins( 0, 10 ) );
+                lm( RowLayout.filled().margins( 0, 11 ) );
                 contentBuilder.accept( this );
-                events.on( EventType.CLICK, ev -> {
-                    toggle( handle );
-                });
+                if (expandable) {
+                    events.on( EventType.CLICK, ev -> {
+                        toggle( handle );
+                    });
+                }
             }});
             // handle
             handle = add( new Button() {{
                 lc( RC );
-                icon.set( "keyboard_arrow_down" );
                 type.set( Type.NAVIGATE );
-                events.on( EventType.SELECT, ev -> {
-                    toggle( handle );
-                });
+                if (expandable) {
+                    icon.set( "keyboard_arrow_down" );
+                    events.on( EventType.SELECT, ev -> {
+                        toggle( handle );
+                    });
+                }
+                else {
+                    enabled.set( false );
+                }
             }});
+            if (expandable) {
+                cssClasses.add( "Clickable" );
+            }
         }
 
         private void toggle( Button btn ) {
@@ -322,10 +335,8 @@ public class ContentPage
         }
 
         protected void onExpand() {
-            //expanded.put( value.getClass(), ExpandableCell.this );
-            ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-primary-color)" ) );
-            //ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "bold" ) );
-            //ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-accent2-color)" ) );
+            ExpandableCell.this.styles.add( CssStyle.of( "background-color", "var(--basic-bg3-color)" ) );
+            ExpandableCell.this.styles.add( CssStyle.of( "font-weight", "500" ) );
             viewer.expand( value );
         }
 
@@ -337,11 +348,17 @@ public class ContentPage
         }
 
         @Override
-        protected void addAction( Button btn ) {
+        protected Button addAction( Button btn ) {
             btn.lc( RC );
             btn.type.set( Button.Type.NAVIGATE );
             btn.cssClasses.add( "Action" );
             components.add( 2, btn ).orElseError();
+            return btn;
+        }
+
+        @Override
+        protected void removeAction( Button btn ) {
+            Assert.that( components.remove( btn ).isPresent() );
         }
     }
 

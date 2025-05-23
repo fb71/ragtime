@@ -48,6 +48,7 @@ public class MediaCell
 
         create( "image", "#666666", container -> { //#ada673
             container.tooltip.set( "Media: " + media.name.get() );
+            expandable = false;
 
             container.add( new Text() {{
                 format.set( Format.HTML );
@@ -63,7 +64,7 @@ public class MediaCell
                         .onSuccess( _topics -> {
                             if (!isDisposed()) {
                                 content.set( name + SECOND_LINE.formatted( mime
-                                        + " - Themen: " + _topics.size()
+                                        + " - Topic: " + _topics.size()
                                         + " - Beiträge: " + articles.getValue().size()
                                 ));
                             }
@@ -114,7 +115,7 @@ public class MediaCell
                             }
                             else {
                                 ConfirmDialog.create( "Löschen",
-                                        "<b>" + media.name.get() + "</b> - wird in keinem Artikel oder Thema mehr verwendet.<br/><br/>Soll es gelöscht werden?" )
+                                        "<b>" + media.name.get() + "</b> - wird in keinem Artikel oder Topic mehr verwendet.<br/><br/>Soll es gelöscht werden?" )
                                         .size.set( Size.of( 320, 230 ) )
                                         .addNoAction( () -> value.remove( false ) )
                                         .addDeleteAction( () -> value.remove( true ) )
