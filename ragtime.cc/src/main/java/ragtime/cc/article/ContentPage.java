@@ -15,6 +15,7 @@ package ragtime.cc.article;
 
 import static java.text.DateFormat.MEDIUM;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.text.SimpleDateFormat;
 
 import areca.common.Assert;
 import areca.common.base.Consumer.RConsumer;
+import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -58,6 +60,7 @@ import ragtime.cc.article.ContentState.TopicContentEdit;
 import ragtime.cc.media.MediaCell;
 import ragtime.cc.model.Article;
 import ragtime.cc.model.TopicEntity;
+import ragtime.cc.web.WebsiteEditPage.WebsiteEditEvent;
 
 /**
  *
@@ -91,10 +94,40 @@ public class ContentPage
 
     private boolean             modelChanged;
 
+    protected TreeViewer<Object> tree;
+
 
     @Page.CreateUI
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Inhalte" );
+
+//        Platform.schedule( 2500, () -> {
+//            var path = new ArrayList<>();
+//            state.uow
+//                    .query( TopicEntity.class ).executeCollect()
+//                    .then( rs -> {
+//                        path.add( rs.get( 0 ) );
+//                        return rs.get( 0 ).articles().executeCollect();
+//                    })
+//                    .onSuccess( rs -> {
+//                        path.add( rs.get( 0 ) );
+//                        tree.expand( path );
+//                    });
+//        });
+//
+//        Platform.schedule( 5000, () -> {
+//            var path = new ArrayList<>();
+//            state.uow
+//                    .query( TopicEntity.class ).executeCollect()
+//                    .then( rs -> {
+//                        path.add( rs.get( 1 ) );
+//                        return rs.get( 1 ).articles().executeCollect();
+//                    })
+//                    .onSuccess( rs -> {
+//                        path.add( rs.get( 0 ) );
+//                        tree.expand( path );
+//                    });
+//        });
 
         // action: submit
         site.actions.add( new Action() {{
@@ -134,7 +167,7 @@ public class ContentPage
 
             add( new ViewerContext<>()
                     .model( state.contentModel )
-                    .viewer( new TreeViewer<>() {{
+                    .viewer( tree = new TreeViewer<>() {{
                         treeLayout.set( new DrillingTreeLayout<>() );
                         cellBuilder.set( ContentPage.this );
                         lines.set( true );
@@ -143,7 +176,26 @@ public class ContentPage
                     }})
                     .createAndLoad() );
         }});
+
+        EventManager.instance()
+                .subscribe( (WebsiteEditEvent ev) -> onWebsiteEditEvent( ev ) )
+                .performIf( WebsiteEditEvent.class, ev -> true )
+                .unsubscribeIf( () -> site.isClosed() );
         return ui;
+    }
+
+
+    protected void onWebsiteEditEvent( WebsiteEditEvent ev ) {
+        // topic
+        ev.topic().ifPresent( topic -> {
+            tree.expand( Arrays.asList( topic ) );
+        });
+        // article
+        ev.article().ifPresent( article -> {
+            article.topic.fetch().onSuccess( topic -> {
+                tree.expand( Arrays.asList( topic, article ) );
+            });
+        });
     }
 
 

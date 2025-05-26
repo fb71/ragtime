@@ -13,10 +13,10 @@
  */
 package ragtime.cc.article;
 
-import static areca.common.Scheduler.Priority.BACKGROUND;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class ContentState
                         });
             }
             else if (item instanceof TopicContent tc) {
-                return Promise.completed( asList( new TopicContentEdit( tc.topic() ) ), BACKGROUND );
+                return Promise.async( asList( new TopicContentEdit( tc.topic() ) ) );
             }
             // Article
             else if (item instanceof Article article) {
@@ -132,6 +132,10 @@ public class ContentState
                         addAll( rs.stream().map( m -> new MediaContent( m, article ) ).toList() );
                     }};
                 });
+            }
+            // Media
+            else if (item instanceof MediaContent mc) {
+                return Promise.async( Collections.emptyList() );
             }
             else {
                 throw new RuntimeException( "Unhandled value type: " + item );

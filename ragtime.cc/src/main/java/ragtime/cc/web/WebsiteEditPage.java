@@ -16,13 +16,17 @@ package ragtime.cc.web;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
+import java.util.EventObject;
+
 import areca.common.Platform;
+import areca.common.base.Opt;
 import areca.common.base.Sequence;
 import areca.common.event.EventCollector;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
+import areca.common.reflect.NoRuntimeInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Position;
@@ -90,8 +94,8 @@ public class WebsiteEditPage {
 
             // IFrame msg
             EventManager.instance()
-                    .subscribe( (IFrameMsgEvent ev) -> onEditableClick( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> Pageflow.current().topPage() == WebsiteEditPage.this )
+                    .subscribe( (IFrameMsgEvent ev) -> onEditableClick2( ev ) )
+                    .performIf( IFrameMsgEvent.class, ev -> true ) //Pageflow.current().topPage() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> isDisposed() );
 
             // Entity submitted -> reload
@@ -210,11 +214,68 @@ public class WebsiteEditPage {
         }
     }
 
+
+    protected void onEditableClick2( IFrameMsgEvent ev ) {
+        LOG.info( "IFrame: %s (%s)", ev.msg, state.account.email.get() );
+        var id = substringAfter( ev.msg, "." );
+        // article
+        if (ev.msg.startsWith( "article." )) {
+            state.uow.entity( Article.class, id ).onSuccess( article -> {
+                if (disposableChildState != null) {
+                    disposableChildState = state.site.createState( new ContentState() ).activate();
+                }
+                EventManager.instance().publish( new WebsiteEditEvent( article ) );
+            });
+        }
+        // page.title -> settings
+        else if (ev.msg.startsWith( "page." )) {
+            disposableChildState = state.site.createState( new TemplateConfigState() ).activate();
+        }
+        // topic
+        else if (ev.msg.startsWith( "topic." )) {
+            state.uow.entity( TopicEntity.class, id ).onSuccess( topic -> {
+                if (disposableChildState == null) {
+                    disposableChildState = state.site.createState( new ContentState() ).activate();
+                }
+                EventManager.instance().publish( new WebsiteEditEvent( topic ) );
+            });
+        }
+        else {
+            LOG.warn( "Unhandled msg: %s", ev.msg );
+        }
+    }
+
+
+    @NoRuntimeInfo
+    private void ensureContentState() {
+        throw new RuntimeException( "yet to be implemented..." );
+    }
+
+
+    /**
+     *
+     */
+    public static class WebsiteEditEvent
+            extends EventObject {
+
+        public WebsiteEditEvent( Object source ) {
+            super( source );
+        }
+
+        public Opt<Article> article() {
+            return Opt.of( getSource() instanceof Article article ? article : null );
+        }
+
+        public Opt<TopicEntity> topic() {
+            return getSource() instanceof TopicEntity topic ?  Opt.of( topic ): Opt.absent();
+        }
+    }
+
     /**
      *
      */
     public static class BrowserLayout
-                extends AbsoluteLayout {
+            extends AbsoluteLayout {
 
         @Override
         public void layout( UIComposite composite ) {

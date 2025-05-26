@@ -47,8 +47,8 @@ public class MediaCell
         var mime = media.mimetype.opt().orElse( "?" );
 
         create( "image", "#666666", container -> { //#ada673
+            //expandable = false;
             container.tooltip.set( "Media: " + media.name.get() );
-            expandable = false;
 
             container.add( new Text() {{
                 format.set( Format.HTML );
