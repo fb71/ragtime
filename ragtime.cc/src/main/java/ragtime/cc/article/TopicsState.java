@@ -81,7 +81,7 @@ public class TopicsState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new TopicsPage() )
+        createStatePage( new TopicsPage() )
                 .putContext( TopicsState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

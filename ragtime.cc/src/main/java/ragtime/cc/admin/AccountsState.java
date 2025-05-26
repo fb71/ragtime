@@ -92,7 +92,7 @@ public class AccountsState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new AccountsPage() )
+        createStatePage( new AccountsPage() )
                 .putContext( AccountsState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };

@@ -81,7 +81,7 @@ public class MediasState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new MediasPage() )
+        createStatePage( new MediasPage() )
                 .putContext( MediasState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

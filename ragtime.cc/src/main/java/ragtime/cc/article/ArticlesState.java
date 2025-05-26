@@ -84,7 +84,7 @@ public class ArticlesState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new ArticlesPage() )
+        createStatePage( new ArticlesPage() )
                 .putContext( ArticlesState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };

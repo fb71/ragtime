@@ -23,10 +23,13 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.NoRuntimeInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import areca.ui.pageflow.Pageflow.PageBuilder;
 import areca.ui.pageflow.PageflowEvent;
 import areca.ui.pageflow.PageflowEvent.EventType;
 import areca.ui.statenaction.State;
+import areca.ui.statenaction.StateBuilder;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.MainRepo;
@@ -75,8 +78,16 @@ public abstract class BaseState<P> {
                 .subscribe( ev -> disposeAction() )
                 .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.clientPage == page )
                 .unsubscribeIf( () -> isDisposed() );
-        //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
     };
+
+
+    /**
+     * Creates the {@link Page} of this {@link State}.
+     */
+    protected PageBuilder createStatePage( @SuppressWarnings( "hiding" ) P page ) {
+        this.page = page;
+        return pageflow.create( page );
+    }
 
 
     @State.Dispose
@@ -103,4 +114,11 @@ public abstract class BaseState<P> {
         return uow.submit(); //.onSuccess( __ -> disposeAction() );
     }
 
+
+    /**
+     * See {@link StateSite#createState(Object)}
+     */
+    protected StateBuilder createState( Object newState ) {
+        return site.createState( newState );
+    }
 }
