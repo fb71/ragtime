@@ -149,7 +149,7 @@ public class BasicTopicTemplate
 
 
     protected String processArticleLink( Article article ) {
-        return String.format( "<a href=\"%s\">Weiter...</a>", article.permName.get() );
+        return String.format( "<a class=\"CFurther\" href=\"%s\">[Weiter...]</a>", article.permName.get() );
     }
 
 
