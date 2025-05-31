@@ -50,7 +50,7 @@ public class TemplateConfigState
         super.initAction();
         config = uow.query( TemplateConfigEntity.class ).singleResult();
 
-        pageflow.create( page = new TemplateConfigPage() )
+        createStatePage( new TemplateConfigPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( uic, Page.Context.DEFAULT_SCOPE )
                 .open();

@@ -63,7 +63,7 @@ public class ArticleEditState
 
         medias = new EntityAssocListModel<>( article.get().medias );
 
-        pageflow.create( page = new ArticlePage() )
+        createStatePage( new ArticlePage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( uic, Page.Context.DEFAULT_SCOPE )
                 .open();

@@ -34,7 +34,6 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import areca.ui.pageflow.Pageflow;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.web.template.widgets.Markdown;
 
@@ -59,7 +58,7 @@ public class HelpPage {
             description.set( "Hilfe anzeigen" );
             order.set( 100 );
             handler.set( ev -> {
-                Pageflow.current().create( new HelpPage() )
+                pageSite.createPage( new HelpPage() )
                         .putContext( pageClass.getSimpleName(), Page.Context.DEFAULT_SCOPE )
                         .open();
             });

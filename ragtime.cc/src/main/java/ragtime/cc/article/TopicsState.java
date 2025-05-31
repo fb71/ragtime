@@ -59,9 +59,9 @@ public class TopicsState
     public LazyListModel<TopicEntity> topics = new EntityListModel<>( TopicEntity.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<TopicEntity> query() {
@@ -81,7 +81,7 @@ public class TopicsState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new TopicsPage() )
+        createStatePage( new TopicsPage() )
                 .putContext( TopicsState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

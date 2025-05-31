@@ -39,7 +39,7 @@ public class WebsiteEditState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new WebsiteEditPage() )
+        createStatePage( new WebsiteEditPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

@@ -54,7 +54,7 @@ public class TopicEditState
         super.initAction();
         medias = new EntityAssocListModel<>( topic.medias );
 
-        pageflow.create( page = new TopicPage() )
+        createStatePage( new TopicPage() )
                 .putContext( this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();
