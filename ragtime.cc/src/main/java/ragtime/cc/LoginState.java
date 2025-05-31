@@ -86,6 +86,8 @@ public class LoginState {
     @State.Model
     public Model<String>    pwd = new Pojo<>( "" );
 
+    private LoginPage       page;
+
 
     @State.Init
     public void init() {
@@ -103,7 +105,7 @@ public class LoginState {
                     });
                 }
                 else {
-                    pageflow.create( new LoginPage() )
+                    pageflow.create( page = new LoginPage() )
                             .putContext( this, Page.Context.DEFAULT_SCOPE )
                             .putContext( uic, Page.Context.DEFAULT_SCOPE )
                             .open();
@@ -133,6 +135,8 @@ public class LoginState {
                     account.lastLogin.set( new Date() );
                     storeNewCookie( account );
                     uow.submit();
+
+                    pageflow.close( page );
 
                     advanceState( account );
                 });

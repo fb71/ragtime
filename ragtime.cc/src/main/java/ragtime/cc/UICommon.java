@@ -27,9 +27,13 @@ public class UICommon {
 
     private static final Log LOG = LogFactory.getLog( UICommon.class );
 
-    public static final String ICON_SAVE = "save";
-    public static final String ICON_DELETE = "delete";
-    public static final String ICON_CHECK = "check";
+    public static final String  ICON_SAVE = "save";
+    public static final String  ICON_DELETE = "delete";
+    public static final String  ICON_CHECK = "check";
+
+    /** The standard preferred size of a page. */
+    public static final Integer PAGE_WIDTH = Integer.valueOf( 600 );
+    public static final Integer PAGE_WIDTH_MIN = Integer.valueOf( 450 );
 
     /** Default space in the UI */
     public int space = 15;

@@ -47,7 +47,7 @@ public class TextAutocomplete {
     public static void process( TextField tf, UnitOfWork uow ) {
         var t = Timer.start();
         var result = new ArrayList<String>();
-        Platform.schedule( 2000, () -> null )
+        Platform.schedule( 1000, () -> null )
                 // widgets
                 .then( __ -> {
                     result.add( "::swiper::" );

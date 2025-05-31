@@ -83,6 +83,7 @@ public class WebsiteEditPage {
 
     @Page.CreateUI
     public UIComponent createUI( UIComposite parent ) {
+        site.prefWidth.set( 800 ).minWidth.set( 550 );
         ui.init( parent ); //.title.set( "Bearbeiten" );
 
         // IFrame
