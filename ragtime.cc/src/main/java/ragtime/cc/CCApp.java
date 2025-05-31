@@ -30,8 +30,7 @@ import areca.rt.server.EventLoop;
 import areca.rt.server.ServerApp;
 import areca.rt.server.ServerBrowserHistoryStrategy;
 import areca.rt.server.servlet.ArecaUIServer;
-import areca.ui.component2.UIComposite;
-import areca.ui.layout.MaxWidthLayout;
+import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.calendar.CalendarEventArticlePageEx;
@@ -104,13 +103,9 @@ public class CCApp
             LOG.info( "createUI(): ..." );
 
             createUI( rootWindow -> {
-                rootWindow.layout.set( MaxWidthLayout.width( 680 ).fillHeight.set( true ) );
-                var pageflowContainer = rootWindow.add( new UIComposite() {{
-                    cssClasses.add( "MaxWidth" );
-                }});
-                rootWindow.layout();
-
-                var pageflow = Pageflow.start( pageflowContainer );
+                Page.DEFAULT_PAGE_WIDTH = UICommon.PAGE_WIDTH;
+                Page.DEFAULT_PAGE_WIDTH_MIN = UICommon.PAGE_WIDTH_MIN;
+                var pageflow = Pageflow.start( rootWindow );
 
                 State.start( new LoginState() )
                         .putContext( pageflow, State.Context.DEFAULT_SCOPE )

@@ -56,9 +56,9 @@ public class MediasState
     public EntityListModel<MediaEntity> medias = new EntityListModel<>( MediaEntity.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<MediaEntity> query() {
@@ -81,7 +81,7 @@ public class MediasState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new MediasPage() )
+        createStatePage( new MediasPage() )
                 .putContext( MediasState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

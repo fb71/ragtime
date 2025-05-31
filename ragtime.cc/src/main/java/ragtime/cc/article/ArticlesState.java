@@ -62,9 +62,9 @@ public class ArticlesState
     public LazyListModel<Article> articles = new EntityListModel<>( Article.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<Article> query() {
@@ -84,7 +84,7 @@ public class ArticlesState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new ArticlesPage() )
+        createStatePage( new ArticlesPage() )
                 .putContext( ArticlesState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };

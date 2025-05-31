@@ -3,8 +3,18 @@
     --basic-primary-color: #45466c;
 }
 .RootWindow {
-    background-color: #2e2e2e;
+    /*background-color: #2e2e2e;*/
+    background-color: #444140;
     overflow: hidden; /*visible;*/
+}
+.PageRoot {
+    /*box-shadow: 0px 0px 10px rgb(255 255 255 / 15%);*/
+    overflow: hidden; /* border/radius */
+}
+.PageResting {
+    border: 2px solid white;
+    filter: blur(2px) saturate(50%) brightness(90%);
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
 .TableCell.Clickable:hover {

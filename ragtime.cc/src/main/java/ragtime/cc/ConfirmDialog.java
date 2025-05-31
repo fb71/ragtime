@@ -132,6 +132,7 @@ public class ConfirmDialog
 
     @Override
     protected UIComponent onCreateUI( UIComposite parent ) {
+        pageSite.isDialog.set( true );
         this.ui = new DialogContainer( this, parent );
         //ui.init( parent );
         title.onInitAndChange( (v,__) -> ui.title.set( v ) );

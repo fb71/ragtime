@@ -80,7 +80,7 @@ public class MediasSelectState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new MediasSelectPage() )
+        createStatePage( new MediasSelectPage() )
                 .putContext( MediasSelectState.this, Page.Context.DEFAULT_SCOPE )
                 .putContext( site.get( UICommon.class ), Page.Context.DEFAULT_SCOPE )
                 .open();

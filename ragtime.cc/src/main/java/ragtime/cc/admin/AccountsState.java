@@ -70,9 +70,9 @@ public class AccountsState
     public LazyListModel<AccountEntity> accounts = new EntityListModel<>( AccountEntity.class ) {
         {
             // re-fire events from searchTxt
-            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> site.isDisposed() );
+            searchTxt.subscribe( ev -> fireChangeEvent() ).unsubscribeIf( () -> isDisposed() );
             // fire event on Entity change
-            fireChangeEventOnEntitySubmit( () -> site.isDisposed() );
+            fireChangeEventOnEntitySubmit( () -> isDisposed() );
         }
         @Override
         protected Query<AccountEntity> query() {
@@ -92,7 +92,7 @@ public class AccountsState
     @State.Init
     public void initAction() {
         super.initAction();
-        pageflow.create( page = new AccountsPage() )
+        createStatePage( new AccountsPage() )
                 .putContext( AccountsState.this, Page.Context.DEFAULT_SCOPE )
                 .open();
     };

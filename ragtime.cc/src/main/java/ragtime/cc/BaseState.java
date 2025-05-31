@@ -23,10 +23,13 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.NoRuntimeInfo;
 import areca.common.reflect.RuntimeInfo;
+import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
+import areca.ui.pageflow.Pageflow.PageBuilder;
 import areca.ui.pageflow.PageflowEvent;
 import areca.ui.pageflow.PageflowEvent.EventType;
 import areca.ui.statenaction.State;
+import areca.ui.statenaction.StateBuilder;
 import areca.ui.statenaction.StateSite;
 import ragtime.cc.model.AccountEntity;
 import ragtime.cc.model.MainRepo;
@@ -73,10 +76,18 @@ public abstract class BaseState<P> {
         // trigger disposeAction() when page is closed
         EventManager.instance()
                 .subscribe( ev -> disposeAction() )
-                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.page.get() == page )
-                .unsubscribeIf( () -> site.isDisposed() );
-        //page.site.subscribe( EventType.PAGE_CLOSED, ev -> disposeAction() );
+                .performIf( PageflowEvent.class, ev -> ev.type == EventType.PAGE_CLOSED && ev.clientPage == page )
+                .unsubscribeIf( () -> isDisposed() );
     };
+
+
+    /**
+     * Creates the {@link Page} of this {@link State}.
+     */
+    protected PageBuilder createStatePage( @SuppressWarnings( "hiding" ) P page ) {
+        this.page = page;
+        return pageflow.create( page );
+    }
 
 
     @State.Dispose
@@ -92,7 +103,9 @@ public abstract class BaseState<P> {
 
 
     public boolean isDisposed() {
-        return site.isDisposed();
+        // site is null if event is handled in unsubscribeIf() in member init
+        // which may happen in initializer before site is injected
+        return site != null && site.isDisposed();
     }
 
 
@@ -101,4 +114,11 @@ public abstract class BaseState<P> {
         return uow.submit(); //.onSuccess( __ -> disposeAction() );
     }
 
+
+    /**
+     * See {@link StateSite#createState(Object)}
+     */
+    protected StateBuilder createState( Object newState ) {
+        return site.createState( newState );
+    }
 }
