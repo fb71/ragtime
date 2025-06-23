@@ -41,7 +41,7 @@ public class PermNameConcern
         result = result.replaceAll( "[^\\p{ASCII}]", "" );
         result = result.replaceAll( "[^a-zA-Z0-9]", "-" ).replaceAll( "--+", "-" );
         //result = result.toLowerCase( Locale.ENGLISH );
-        LOG.info( "%s -> %s", value, result );
+        LOG.debug( "%s -> %s", value, result );
         return result;
     }
 

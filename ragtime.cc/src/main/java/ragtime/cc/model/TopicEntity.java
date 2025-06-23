@@ -24,6 +24,7 @@ import org.polymap.model2.Property;
 import org.polymap.model2.Queryable;
 import org.polymap.model2.query.Expressions;
 import org.polymap.model2.query.Query;
+import org.polymap.model2.runtime.UnitOfWork;
 
 import areca.common.Promise;
 import areca.common.base.Consumer.RConsumer;
@@ -31,6 +32,7 @@ import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
 import areca.common.reflect.RuntimeInfo;
+import ragtime.cc.web.http.WebsiteServlet;
 import ragtime.cc.web.model.TopicTemplateConfigEntity;
 
 /**
@@ -46,6 +48,16 @@ public class TopicEntity
     public static final ClassInfo<TopicEntity> info = TopicEntityClassInfo.instance();
 
     public static TopicEntity TYPE;
+
+    /**
+     * The {@link WebsiteServlet#PATH_HOME} Topic.
+     */
+    public static Promise<TopicEntity> home( UnitOfWork uow ) {
+        return uow.query( TopicEntity.class )
+                .orderBy( TopicEntity.TYPE.order, Query.Order.ASC )
+                .executeCollect()
+                .map( topics -> topics.get( 0 ) );
+    }
 
     /**
      * Always creates a {@link TopicTemplateConfigEntity}.

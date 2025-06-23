@@ -17,18 +17,19 @@
     box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
+.TableCell.Expanded {
+    background-color: var(--basic-bg3-color);
+    font-weight: 500;
+}
 .TableCell.Clickable:hover {
     /* Mobil geht sonst der dunkle Hintegrund verloren*/
     filter: none;
-    /* color: white; */
 }
-.TableCell button {
-    /* no borders in List or Tree */
+.TableCell .Action {
     border: none;
     box-shadow: none;
     text-shadow: 1px 2px 3px rgb(0 0 0 / 20%);
-}
-.TableCell .Action {
+    background-color: transparent;
     color:#aaaaaa;
 }
 .TableCell .SecondLine {

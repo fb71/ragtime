@@ -34,7 +34,6 @@ import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Pageflow;
 import areca.ui.statenaction.State;
 import ragtime.cc.calendar.CalendarEventArticlePageEx;
-import ragtime.cc.insta.InstaService;
 import ragtime.cc.insta.InstaTopicPageEx;
 import ragtime.cc.model.ContentRepo;
 import ragtime.cc.model.MainRepo;
@@ -113,7 +112,7 @@ public class CCApp
                         //.putContext( new CCAppStatePageMapping( pageflow ), State.Context.DEFAULT_SCOPE )
                         .activate();
 
-                InstaService.start();
+                //InstaService.start();
 
                 ServerBrowserHistoryStrategy.start( pageflow );
 

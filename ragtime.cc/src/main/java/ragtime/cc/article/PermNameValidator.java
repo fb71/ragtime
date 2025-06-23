@@ -85,7 +85,7 @@ public class PermNameValidator
                 })
                 .map( rs -> {
                     count.add( rs.size() );
-                    LOG.info( "%s -> '%s' : %s (%s)", value, permName, count.getValue(), t );
+                    LOG.debug( "%s -> '%s' : %s (%s)", value, permName, count.getValue(), t );
                     return count.getValue() > 0
                             ? new ValidationResult( "URL existiert bereits: " + permName )
                             : null;

@@ -96,7 +96,7 @@ public class TextAutocomplete {
                         result.add( String.format( "![%s](%s)", media.name.get(), MediaContentProvider.PATH + "/" + media.id() ) );
                     }
 
-                    LOG.info( "autocomplete: %s [%s]", result.size(), t );
+                    LOG.debug( "autocomplete: %s [%s]", result.size(), t );
                     if (!tf.isDisposed()) {
                         tf.autocomplete.set( result );
                     }
