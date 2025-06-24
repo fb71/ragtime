@@ -164,10 +164,10 @@ public class ContentState
             // Article
             else if (item instanceof ArticleContent ac) {
                 return ac.article().medias.fetchCollect().map( rs -> {
-                    return new ArrayList<>() {{
-                        add( new ArticleContentEdit( ac.article() ) );
-                        addAll( rs.stream().map( m -> new MediaContent( m, ac.article() ) ).toList() );
-                    }};
+                    var result = new ArrayList<>();
+                    result.add( new ArticleContentEdit( ac.article() ) );
+                    result.addAll( rs.stream().map( m -> new MediaContent( m, ac.article() ) ).toList() );
+                    return result;
                 });
             }
             // Media
