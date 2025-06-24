@@ -100,7 +100,7 @@ class TopicCell
         }});
         // add article
         articleBtn = addAction( new Button() {{
-            icon.set( "add" );
+            icon.set( "note_add" );
             tooltip.set( "Neuen Beitrag anlegen im Topic '%s'".formatted( topic.title.get() ) );
             events.on( EventType.SELECT, ev -> {
                 var article = value.createNewArticle();

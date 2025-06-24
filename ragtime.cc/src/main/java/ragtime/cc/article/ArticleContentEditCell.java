@@ -30,6 +30,8 @@ import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
 import ragtime.cc.article.ContentState.ArticleContentEdit;
 import ragtime.cc.media.MediasSelectState;
+import ragtime.cc.model.Article;
+import ragtime.cc.Extensions;
 import ragtime.cc.article.ContentPage.ContentPageCell;
 
 /**
@@ -65,6 +67,12 @@ public class ArticleContentEditCell
             }
         });
 
+        // extensions
+        Extensions.ofType( ArticlePageExtension.class ).forEach( ex -> {
+            var site = new ArticlePageExtension.ExtensionSite( value.value, pageSite, form, ArticleContentEditCell.this );
+            ex.doExtendFormStart( site );
+        });
+
         add( new UIComposite() {{
             lc( RowConstraints.height( 35 ) );
             layout.set( RowLayout.filled().spacing( 15 ) );
@@ -87,14 +95,6 @@ public class ArticleContentEditCell
                     .lc( RowConstraints.width( 80 ) ) );
         }});
 
-//        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
-//                new AssociationModel<>( value.article().topic ) );
-//        add( form.newField()
-//                .viewer( new SelectViewer( topics.values(), "-Keinem Topic zugeordnet-" ) )
-//                .model( topics )
-//                .create()
-//                .tooltip.set( "Das Topic dieses Textes" ) );
-
         add( form.newField()
                 .model( new PropertyModel<>( value.article().content ) )
                 .viewer( new TextFieldViewer().configure( (TextField t) -> {
@@ -105,15 +105,22 @@ public class ArticleContentEditCell
                 .create()
                 .lc( RowConstraints.height( 300 ) ) );
 
-        // medias
+        // actions
         add( new UIComposite() {{
             layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
 
-            // add button
             add( new UIComposite() {{
                 lc( RowConstraints.height( 38 ) );
                 layout.set( RowLayout.filled().spacing( 15 ) );
                 add( new UIComposite() );
+
+                // extensions
+                Extensions.ofType( ArticlePageExtension.class ).forEach( ex -> {
+                    var site = new ArticlePageExtension.ExtensionSite( value.value, pageSite, form, this );
+                    ex.doExtendFormEnd( site );
+                });
+
+                // add media button
                 add( new Button() {{
                     lc( RowConstraints.width( 60 ) );
                     tooltip.set( format( "Bilder/Medien zum diesem Artikel hinzufügen", value.article().title.get() ) );

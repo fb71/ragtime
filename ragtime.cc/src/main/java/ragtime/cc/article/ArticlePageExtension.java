@@ -13,9 +13,12 @@
  */
 package ragtime.cc.article;
 
+import org.polymap.model2.runtime.UnitOfWork;
+
 import areca.ui.component2.UIComposite;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.viewer.form.Form;
+import ragtime.cc.model.Article;
 
 /**
  *
@@ -23,8 +26,18 @@ import areca.ui.viewer.form.Form;
  */
 public abstract class ArticlePageExtension {
 
-    public void doExtendFormStart( ArticleEditState state, ArticlePage page, PageSite pagesite, UIComposite formBody ) {};
+    /**
+     *
+     */
+    public static record ExtensionSite( Article article, PageSite pagesite, Form form, UIComposite formBody ) {
 
-    public void doExtendFormEnd( ArticleEditState state, ArticlePage page, PageSite pageSite, Form form, UIComposite formBody ) {};
+        public UnitOfWork uow() {
+            return article.context.getUnitOfWork();
+        }
+    }
+
+    public void doExtendFormStart( ExtensionSite site ) {};
+
+    public void doExtendFormEnd( ExtensionSite site ) {};
 
 }
