@@ -103,7 +103,7 @@ public class WebsiteEditPage {
             // IFrame msg
             EventManager.instance()
                     .subscribe( (IFrameMsgEvent ev) -> onIFrameEvent( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> skipWebsiteEditEvent.elapsedMillis() > 2000 ) //Pageflow.current().topPage() == WebsiteEditPage.this )
+                    .performIf( IFrameMsgEvent.class, ev -> skipWebsiteEditEvent.elapsedMillis() > 2500 ) //Pageflow.current().topPage() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> iframe.isDisposed() );
 
             // WebsiteEditEvent from ContentPage
