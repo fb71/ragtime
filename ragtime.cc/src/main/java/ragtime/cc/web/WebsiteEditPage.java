@@ -150,10 +150,6 @@ public class WebsiteEditPage {
         site.prefWidth.set( 800 ).minWidth.set( 550 );
         ui.init( parent ); //.title.set( "Bearbeiten" );
 
-        // IFrame
-        iframe = new IFrameWithEvents() {{
-            setSrc( WEBSITE_URL.formatted( state.account.permid.get(), "home" ) );
-        }};
         // check admin
         if (state.account.isAdmin.get()) {
             ui.body.layout.set( RowLayout.filled().margins( 50, 100 ) );
@@ -161,6 +157,9 @@ public class WebsiteEditPage {
                 type.set( Button.Type.NAVIGATE );
                 label.set( "Load..." );
                 events.on( EventType.SELECT, ev -> {
+                    iframe = new IFrameWithEvents() {{
+                        setSrc( WEBSITE_URL.formatted( state.account.permid.get(), "home" ) );
+                    }};
                     ui.body.components.disposeAll();
                     ui.body.layout.set( new BrowserLayout() );
                     ui.body.add( iframe.iframe );
@@ -172,6 +171,9 @@ public class WebsiteEditPage {
             }});
         }
         else {
+            iframe = new IFrameWithEvents() {{
+                setSrc( WEBSITE_URL.formatted( state.account.permid.get(), "home" ) );
+            }};
             ui.body.layout.set( new BrowserLayout() );
             ui.body.add( iframe.iframe );
         }
