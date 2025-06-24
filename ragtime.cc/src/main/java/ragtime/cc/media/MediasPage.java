@@ -189,7 +189,7 @@ public class MediasPage {
             }
             add( new Button() {{
                 lc( RowConstraints.width( 40 ));
-                icon.set( "close" ); // XXX UICommon.ICON_DELETE );
+                icon.set( UICommon.ICON_DELETE );
                 tooltip.set( "Löschen" );
                 events.on( EventType.SELECT, ev -> {
                     removeAction.run();

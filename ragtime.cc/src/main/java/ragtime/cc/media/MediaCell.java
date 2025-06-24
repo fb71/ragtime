@@ -64,7 +64,7 @@ public class MediaCell
                         .onSuccess( _topics -> {
                             if (!isDisposed()) {
                                 content.set( name + SECOND_LINE.formatted( mime
-                                        + " - Topic: " + _topics.size()
+                                        + " - Topics: " + _topics.size()
                                         + " - Beiträge: " + articles.getValue().size()
                                 ));
                             }

@@ -61,6 +61,15 @@ public class TopicEditState
     }
 
 
+    @State.Dispose
+    @Override
+    public void disposeAction() {
+        // XXX avoid interference with ContentState - by relying a Form not submitted
+        //uow.discard();
+        super.disposeAction();
+    }
+
+
     @State.Action
     public Promise<Submitted> deleteAction() {
         uow.removeEntity( topic );

@@ -87,18 +87,6 @@ public class MediasSelectState
     };
 
 
-    @State.Dispose
-    public void disposeAction() {
-        LOG.warn( "disposeAction(): page.isOpen=%s", pageflow.isOpen( page ) );
-        if (page != null && pageflow.isOpen( page )) {
-            pageflow.close( page );
-        }
-        // do not remove newly created medias - rely on calling state for submit/discard
-        //uow.discard();
-        site.dispose();
-    }
-
-
     @State.Action
     public void applyAction() {
         onApply.accept( selection.sequence().toList() );

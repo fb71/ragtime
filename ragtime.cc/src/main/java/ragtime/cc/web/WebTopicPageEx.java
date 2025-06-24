@@ -19,6 +19,7 @@ import areca.common.log.LogFactory.Log;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Label;
+import areca.ui.component2.Text;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
@@ -45,10 +46,16 @@ public class WebTopicPageEx
             // doExtendForm
             RConsumer<TopicTemplateConfigEntity> doExtendForm = config -> {
                 ctx.formBody().add( new UIComposite() {{
-                    lc( RowConstraints.height( 70 ) );
+                    //lc( RowConstraints.height( 70 ) );
                     layout.set( ctx.uic().vertical().fillHeight( false ) );
                     cssClasses.add( "MessageCard" );
                     addDecorator( new Label().content.set( "Website" ) );
+
+                    add( new Text() {{
+                        styles.add( CssStyle.of( "color", "#909090" ) );
+                        format.set( Format.HTML );
+                        content.set( "Layout der Beiträge auf der Übersichtsseite des Topics." );
+                    }});
 
                     add( ctx.form().newField()//.label( "Darstellung" )
                             .description( "Das Layout der Beiträge innerhalb dieses Topics" )

@@ -13,51 +13,79 @@
  */
 package ragtime.cc.article;
 
+import areca.common.Platform;
+import areca.common.event.EventManager;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
+import areca.ui.component2.Events.UIEvent;
 import areca.ui.component2.Text;
 import areca.ui.statenaction.State;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ContentPage.ExpandableCell;
-import ragtime.cc.model.TopicEntity;
+import ragtime.cc.article.ContentState.TopicContent;
+import ragtime.cc.model.Article;
+import ragtime.cc.model.EntityLifecycleEvent;
+import ragtime.cc.web.WebsiteEditPage.WebsiteEditEvent;
+import org.polymap.model2.runtime.Lifecycle;
 
 /**
  *
  * @author Falko Bräutigam
  */
 class TopicCell
-        extends ExpandableCell<TopicEntity> {
+        extends ExpandableCell<TopicContent> {
 
     private Button deleteBtn;
 
     private Button settingsBtn;
 
+    private Button articleBtn;
+
 
     @Override
     protected void create() {
+        var topic = value.topic();
         create( "topic", "#c96e5e", container -> {
-            container.tooltip.set( "Topic: " + value.title.get() );
+            container.tooltip.set( "Topic: " + topic.title.get() );
             container.add( new Text() {{
                 format.set( Format.HTML );
-                content.set( value.title.get() + "<br/>..." );
-                value.articles().executeCollect().onSuccess( articles -> {
-                    content.set( value.title.get() + SECOND_LINE.formatted( "Beiträge: " + articles.size() ) );
-                });
+                content.set( topic.title.get() + "<br/>..." );
+
+                Runnable update = () -> {
+                    topic.articles().executeCollect().onSuccess( articles -> {
+                        content.set( topic.title.get() + SECOND_LINE.formatted( "Beiträge: " + articles.size() ) );
+                    });
+                };
+                update.run();
+                EventManager.instance()
+                        .subscribe( ev -> update.run() )
+                        .performIf( EntityLifecycleEvent.class, ev ->
+                                ev.state == Lifecycle.State.AFTER_SUBMIT &&
+                                (ev.getSource() == topic || ev.getSource() instanceof Article a && a.topic.fetch().waitForResult().orNull() == topic))
+                        .unsubscribeIf( () -> isDisposed() );
             }});
         });
     }
 
 
     @Override
+    protected void onClick( UIEvent ev, boolean expanded ) {
+        // load null (home) if topic is collapsed
+        EventManager.instance().publish( new WebsiteEditEvent( page, expanded ? value.topic() : null ) );
+    }
+
+
+    @Override
     protected void onExpand() {
-        super.onExpand();
+        var topic = value.topic();
+
         // delete
         deleteBtn = addAction( new Button() {{
             //icon.set( "close" );
             icon.set( UICommon.ICON_DELETE );
-            tooltip.set( "Löschen" );
+            tooltip.set( "Topic Löschen" );
             events.on( EventType.SELECT, ev -> {
-                //removeAction.run();
+                value.delete();
             });
         }});
         // settings
@@ -66,8 +94,19 @@ class TopicCell
             tooltip.set( "Einstellungen bearbeiten" );
             events.on( EventType.SELECT, ev -> {
                 state.site.createState( new TopicEditState() )
-                        .putContext( value, State.Context.DEFAULT_SCOPE )
+                        .putContext( topic, State.Context.DEFAULT_SCOPE )
                         .activate();
+            });
+        }});
+        // add article
+        articleBtn = addAction( new Button() {{
+            icon.set( "add" );
+            tooltip.set( "Neuen Beitrag anlegen im Topic '%s'".formatted( topic.title.get() ) );
+            events.on( EventType.SELECT, ev -> {
+                var article = value.createNewArticle();
+                Platform.schedule( 2000, () -> {
+                    viewer.expand( state.contentType( article ) );
+                });
             });
         }});
 
@@ -85,6 +124,7 @@ class TopicCell
     protected void onCollapse() {
         removeAction( deleteBtn );
         removeAction( settingsBtn );
+        removeAction( articleBtn );
         super.onCollapse();
     }
 

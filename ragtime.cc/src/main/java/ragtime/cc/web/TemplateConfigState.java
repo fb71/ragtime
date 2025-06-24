@@ -56,10 +56,11 @@ public class TemplateConfigState
                 .open();
     };
 
-
-//    @State.Action
-//    public void addFooterNavItem() {
-//        config.footerNavItems.createElement( NavItem.defaults() );
-//    };
+    @State.Dispose
+    @Override
+    public void disposeAction() {
+        uow.discard();
+        super.disposeAction();
+    }
 
 }

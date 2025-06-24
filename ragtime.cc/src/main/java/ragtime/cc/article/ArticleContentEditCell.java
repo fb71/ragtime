@@ -25,16 +25,12 @@ import areca.ui.component2.TextField.Type;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.RowConstraints;
 import areca.ui.layout.RowLayout;
-import areca.ui.viewer.SelectViewer;
 import areca.ui.viewer.TextFieldViewer;
 import areca.ui.viewer.form.Form;
 import areca.ui.viewer.transform.Number2StringTransform;
-import ragtime.cc.AssociationModel;
-import ragtime.cc.EntityTransform;
 import ragtime.cc.article.ContentState.ArticleContentEdit;
 import ragtime.cc.media.MediasSelectState;
 import ragtime.cc.article.ContentPage.ContentPageCell;
-import ragtime.cc.model.TopicEntity;
 
 /**
  * Provides a tree cell for the {@link ContentPage} that allows to edit an
@@ -48,6 +44,8 @@ public class ArticleContentEditCell
     private static final Log LOG = LogFactory.getLog( ArticleContentEditCell.class );
 
     private Form form;
+
+    private Button deleteBtn;
 
     @Override
     protected void create() {
@@ -71,13 +69,14 @@ public class ArticleContentEditCell
             lc( RowConstraints.height( 35 ) );
             layout.set( RowLayout.filled().spacing( 15 ) );
 
-            var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
-                    new AssociationModel<>( value.article().topic ) );
-            add( form.newField()
-                    .viewer( new SelectViewer( topics.values(), "-Keinem Topic zugeordnet-" ) )
-                    .model( topics )
-                    .create()
-                    .tooltip.set( "Das Topic dieses Textes" ) );
+            add( form.newField().label( "Name" )
+                    .description( "Die interne, eindeutige Bezeichnung des Beitrags.\nACHTUNG: Beim Ändern, ändert sich auch die URL des Beitrages!" )
+                    .viewer( new TextFieldViewer() )
+                    .model( new PermNameValidator( value.article(),
+                            new PropertyModel<>( value.article().title ) ) )
+                    .create() );
+                    //.lc( RowConstraints.height( 35 ) ) );
+
 
             add( form.newField().label( "Position" )
                     .description( "Die Position dieses Beitrags im Topic\nBeiträge ohne Angabe werden nach Modifikationsdatum sortiert" )
@@ -88,13 +87,13 @@ public class ArticleContentEditCell
                     .lc( RowConstraints.width( 80 ) ) );
         }});
 
-        add( form.newField().label( "Name" )
-                .description( "Die interne, eindeutige Bezeichnung des Beitrags.\nACHTUNG: Beim Ändern, ändert sich auch die URL des Beitrages!" )
-                .viewer( new TextFieldViewer() )
-                .model( new PermNameValidator( value.article(),
-                        new PropertyModel<>( value.article().title ) ) )
-                .create()
-                .lc( RowConstraints.height( 35 ) ) );
+//        var topics = new EntityTransform<>( state.uow, TopicEntity.class, TopicEntity.TYPE.title,
+//                new AssociationModel<>( value.article().topic ) );
+//        add( form.newField()
+//                .viewer( new SelectViewer( topics.values(), "-Keinem Topic zugeordnet-" ) )
+//                .model( topics )
+//                .create()
+//                .tooltip.set( "Das Topic dieses Textes" ) );
 
         add( form.newField()
                 .model( new PropertyModel<>( value.article().content ) )
@@ -108,7 +107,6 @@ public class ArticleContentEditCell
 
         // medias
         add( new UIComposite() {{
-            //lc( RowConstraints.height( 100 ) );
             layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
 
             // add button

@@ -18,4 +18,10 @@
              </#list>
          </div>
      </#list>
+     
+     <#if params.edit == "true">
+        <script type="text/javascript">
+            window.top.postMessage( 'topic.${topic.id}:loaded', '*' );
+        </script>
+    </#if>
 </@page.layout>
