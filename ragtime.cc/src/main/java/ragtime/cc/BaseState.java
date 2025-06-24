@@ -96,9 +96,7 @@ public abstract class BaseState<P> {
         if (page != null && pageflow.isOpen( page )) {
             pageflow.close( page );
         }
-        uow.discard();
         site.dispose();
-        //return true;
     }
 
 

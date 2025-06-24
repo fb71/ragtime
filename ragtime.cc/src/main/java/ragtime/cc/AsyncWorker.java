@@ -17,8 +17,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import areca.common.Promise;
 import areca.common.Promise.Completable;
@@ -38,14 +40,30 @@ public class AsyncWorker<R>
 
     public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
-    private static ThreadPoolExecutor pool = new ThreadPoolExecutor( MAX_THREADS, MAX_THREADS,
+    private static final ThreadPoolExecutor pool = new ThreadPoolExecutor( MAX_THREADS, MAX_THREADS,
             30, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>( ) ) {{
+            new LinkedBlockingQueue<Runnable>(),
+            new AsyncWorkerThreadFactory() )
+            {{
                 //allowCoreThreadTimeOut( true );
             }};
 
+    private static class AsyncWorkerThreadFactory
+            implements ThreadFactory {
+        private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
+        private AtomicInteger poolThreadNumber = new AtomicInteger( 1 );
+        private String namePrefix = "AsyncWorker-pool" + poolNumber.getAndIncrement() + "-";
+        private ThreadGroup group = Thread.currentThread().getThreadGroup();
 
-    private class CallerBlocks
+        public Thread newThread( Runnable r ) {
+            var t = new Thread( group, r, namePrefix + poolThreadNumber.getAndIncrement() );
+            t.setDaemon( true );
+            t.setPriority( Thread.MIN_PRIORITY );
+            return t;
+        }
+    }
+
+    private static class CallerBlocks
             implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution( Runnable task, ThreadPoolExecutor executor ) {
@@ -98,6 +116,8 @@ public class AsyncWorker<R>
     }
 
 
+    private static final AtomicInteger threadNumber = new AtomicInteger( 1 );
+
     // instance *******************************************
 
     private Completable<R> promise = new Completable<>();
@@ -108,7 +128,7 @@ public class AsyncWorker<R>
 
 
     public AsyncWorker( Callable<R> work ) {
-        super( "AsyncWorker" );
+        super( "AsyncWorker-" + threadNumber.getAndIncrement() );
         setDaemon( true );
         this.work = work;
 

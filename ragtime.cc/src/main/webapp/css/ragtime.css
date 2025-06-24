@@ -1,3 +1,7 @@
+:root {
+    /*--basic-primary-color: #18825c;*/ /* XXX back to basc-dark.css */
+    --basic-primary-color: #45466c;
+}
 .RootWindow {
     /*background-color: #2e2e2e;*/
     background-color: #444140;
@@ -11,6 +15,26 @@
     border: 2px solid white;
     filter: blur(2px) saturate(50%) brightness(90%);
     box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.TableCell.Expanded {
+    background-color: var(--basic-bg3-color);
+    font-weight: 500;
+}
+.TableCell.Clickable:hover {
+    /* Mobil geht sonst der dunkle Hintegrund verloren*/
+    filter: none;
+}
+.TableCell .Action {
+    border: none;
+    box-shadow: none;
+    text-shadow: 1px 2px 3px rgb(0 0 0 / 20%);
+    background-color: transparent;
+    color:#aaaaaa;
+}
+.TableCell .SecondLine {
+    font-size:10px;
+    color:#8a8a8a;
 }
 
 .btn:hover {

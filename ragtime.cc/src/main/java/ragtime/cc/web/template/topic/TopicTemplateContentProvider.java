@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.polymap.model2.query.Expressions;
-import org.polymap.model2.query.Query;
-
 import areca.common.Promise;
 import areca.common.Scheduler.Priority;
 import areca.common.log.LogFactory;
@@ -78,13 +76,10 @@ public class TopicTemplateContentProvider
 
         // /home
         if (resName.equals( WebsiteServlet.PATH_HOME )) {
-            return request.uow.query( TopicEntity.class )
-                    .orderBy( TopicEntity.TYPE.order, Query.Order.ASC )
-                    .executeCollect()
-                    .map( topics -> {
-                        request.httpResponse.sendRedirect( topics.get( 0 ).permName.get() );
-                        return true;
-                    });
+            return TopicEntity.home( request.uow ).map( topic -> {
+                request.httpResponse.sendRedirect( topic.permName.get() );
+                return true;
+            });
         }
 
         // XXX filter topics without config

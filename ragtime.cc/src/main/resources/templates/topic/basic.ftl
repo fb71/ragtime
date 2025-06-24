@@ -14,4 +14,12 @@
             <hr/>
         </#if>
     </#list>
+    
+    <#if params.edit == "true">
+        <script type="text/javascript">
+            var msg = 'topic.${topic.id}:loaded';
+            window.console.log( "basic.ftl: loaded in edit mode..." );
+            window.top.postMessage( msg, '*' );
+        </script>
+    </#if>
 </@page.layout>

@@ -13,17 +13,23 @@
  */
 package ragtime.cc.web;
 
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.polymap.model2.runtime.Lifecycle.State.AFTER_SUBMIT;
 
+import java.util.EventObject;
+import java.util.regex.Pattern;
+
+import areca.common.MutableInt;
 import areca.common.Platform;
-import areca.common.base.Lazy.RLazy;
+import areca.common.Timer;
+import areca.common.base.Opt;
 import areca.common.base.Sequence;
 import areca.common.event.EventCollector;
 import areca.common.event.EventManager;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
+import areca.common.reflect.NoRuntimeInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
 import areca.ui.Position;
@@ -39,18 +45,14 @@ import areca.ui.layout.RowLayout;
 import areca.ui.pageflow.Page;
 import areca.ui.pageflow.Page.PageSite;
 import areca.ui.pageflow.PageContainer;
-import areca.ui.pageflow.Pageflow;
-import areca.ui.statenaction.State;
 import ragtime.cc.BaseState;
 import ragtime.cc.HelpPage;
 import ragtime.cc.UICommon;
 import ragtime.cc.admin.AccountsState;
-import ragtime.cc.article.ArticleEditState;
-import ragtime.cc.article.ArticlesState;
-import ragtime.cc.article.TopicEditState;
-import ragtime.cc.article.TopicsState;
+import ragtime.cc.article.ContentState;
 import ragtime.cc.media.MediasState;
 import ragtime.cc.model.Article;
+import ragtime.cc.model.Common;
 import ragtime.cc.model.EntityLifecycleEvent;
 import ragtime.cc.model.TopicEntity;
 
@@ -66,6 +68,11 @@ public class WebsiteEditPage {
 
     public static final ClassInfo<WebsiteEditPage> INFO = WebsiteEditPageClassInfo.instance();
 
+    public static final Pattern IFRAME_MSG_PATTERN = Pattern.compile( "([a-z]+)[.](-?[0-9a-z]+):?([a-z]*)" );
+
+    protected static final String WEBSITE_URL = "website/%s/%s?edit=true";
+
+
     @Page.Part
     protected PageContainer     ui;
 
@@ -80,21 +87,30 @@ public class WebsiteEditPage {
 
     private BaseState<?>        disposableChildState;
 
+    private IFrameWithEvents    iframe;
 
-    @Page.CreateUI
-    public UIComponent createUI( UIComposite parent ) {
-        site.prefWidth.set( 800 ).minWidth.set( 550 );
-        ui.init( parent ); //.title.set( "Bearbeiten" );
+    /**
+     *
+     */
+    protected class IFrameWithEvents {
 
-        // IFrame
-        RLazy<IFrame> iframe = new RLazy<>( () -> new IFrame() {{
-            src.set( String.format( "website/%s/home?edit=true", state.account.permid.get() ) );
+        @SuppressWarnings( "hiding" )
+        protected IFrame    iframe = new IFrame();
 
+        protected Timer     skipWebsiteEditEvent = Timer.start();
+
+        public IFrameWithEvents() {
             // IFrame msg
             EventManager.instance()
-                    .subscribe( (IFrameMsgEvent ev) -> onEditableClick( ev ) )
-                    .performIf( IFrameMsgEvent.class, ev -> true ) //ev -> Pageflow.current().topPage() == WebsiteEditPage.this )
-                    .unsubscribeIf( () -> isDisposed() );
+                    .subscribe( (IFrameMsgEvent ev) -> onIFrameEvent( ev ) )
+                    .performIf( IFrameMsgEvent.class, ev -> skipWebsiteEditEvent.elapsedMillis() > 2500 ) //Pageflow.current().topPage() == WebsiteEditPage.this )
+                    .unsubscribeIf( () -> iframe.isDisposed() );
+
+            // WebsiteEditEvent from ContentPage
+            EventManager.instance()
+                    .subscribe( (WebsiteEditEvent ev) -> onContentPageTree( ev ) )
+                    .performIf( WebsiteEditEvent.class, ev -> ev.getSource() != WebsiteEditPage.this )
+                    .unsubscribeIf( () -> site.isClosed() );
 
             // Entity submitted -> reload
             var throttle = new EventCollector<>( 100 );
@@ -104,18 +120,40 @@ public class WebsiteEditPage {
                         throttle.collect( ev, evs -> {
                             reload();
 
-                            Platform.schedule( 500, () -> {
-                                if (disposableChildState != null
-                                        && !disposableChildState.isDisposed()
-                                        && disposableChildState.page().orNull() == Pageflow.current().topPage()) {
-                                    disposableChildState.disposeAction();
-                                }
-                            });
+//                            Platform.schedule( 500, () -> {
+//                                if (disposableChildState != null
+//                                        && !disposableChildState.isDisposed()
+//                                        && disposableChildState.page().orNull() == Pageflow.current().topPage()) {
+//                                    disposableChildState.disposeAction();
+//                                }
+//                            });
                         });
                     })
                     .performIf( EntityLifecycleEvent.class, ev -> ev.state == AFTER_SUBMIT )
-                    .unsubscribeIf( () -> isDisposed() );
-        }});
+                    .unsubscribeIf( () -> iframe.isDisposed() );
+        }
+
+        public void reload() {
+            skipWebsiteEditEvent.restart();
+            iframe.reload();
+        }
+
+        public void setSrc( String url ) {
+            skipWebsiteEditEvent.restart();
+            iframe.src.set( url );
+        }
+    }
+
+
+    @Page.CreateUI
+    public UIComponent createUI( UIComposite parent ) {
+        site.prefWidth.set( 800 ).minWidth.set( 550 );
+        ui.init( parent ); //.title.set( "Bearbeiten" );
+
+        // IFrame
+        iframe = new IFrameWithEvents() {{
+            setSrc( WEBSITE_URL.formatted( state.account.permid.get(), "home" ) );
+        }};
         // check admin
         if (state.account.isAdmin.get()) {
             ui.body.layout.set( RowLayout.filled().margins( 50, 100 ) );
@@ -125,7 +163,7 @@ public class WebsiteEditPage {
                 events.on( EventType.SELECT, ev -> {
                     ui.body.components.disposeAll();
                     ui.body.layout.set( new BrowserLayout() );
-                    ui.body.add( iframe.supply() );
+                    ui.body.add( iframe.iframe );
                     ui.body.layout();
 
                     // XXX attempt to hide Page header and/or browser bar
@@ -135,14 +173,14 @@ public class WebsiteEditPage {
         }
         else {
             ui.body.layout.set( new BrowserLayout() );
-            ui.body.add( iframe.supply() );
+            ui.body.add( iframe.iframe );
         }
 
         // action: articles
         site.actions.add( new Action() {{
             icon.set( "article" );
-            description.set( "Beiträge" );
-            handler.set( ev -> state.site.createState( new ArticlesState() ).activate() );
+            description.set( "Inhalte" );
+            handler.set( ev -> state.site.createState( new ContentState() ).activate() );
         }});
         // action: medias
         site.actions.add( new Action() {{
@@ -150,12 +188,12 @@ public class WebsiteEditPage {
             description.set( "Bilder und Medien" );
             handler.set( ev -> state.site.createState( new MediasState() ).activate() );
         }});
-        // action: topics
-        site.actions.add( new Action() {{
-            icon.set( "topic" );
-            description.set( "Topics" );
-            handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
-        }});
+//        // action: topics
+//        site.actions.add( new Action() {{
+//            icon.set( "topic" );
+//            description.set( "Topics" );
+//            handler.set( ev -> state.site.createState( new TopicsState() ).activate() );
+//        }});
         // action: settings
         site.actions.add( new Action() {{
             //order.set( 10 );
@@ -167,7 +205,7 @@ public class WebsiteEditPage {
         site.actions.add( new Action() {{
             icon.set( "refresh" );
             description.set( "Web-Seite neu laden" );
-            handler.set( ev -> iframe.ifInitialized( IFrame::reload ) );
+            handler.set( ev -> iframe.reload() );
         }});
         // help
         HelpPage.addAction( WebsiteEditPage.class, site );
@@ -184,31 +222,108 @@ public class WebsiteEditPage {
     }
 
 
-    protected void onEditableClick( IFrameMsgEvent ev ) {
-        LOG.info( "IFrame: %s (%s)", ev.msg, state.account.email.get() );
-        var id = substringAfter( ev.msg, "." );
+    @NoRuntimeInfo
+    protected void onContentPageTree( WebsiteEditEvent ev ) {
+        var permName = "";
+        if (ev.edited == null) {
+            permName = "home";
+        }
+        else if (ev.edited instanceof TopicEntity topic) {
+            permName = topic.permName.get();
+        }
+        else if (ev.edited instanceof Article article) {
+            permName = article.permName.get();
+        }
+        else {
+            throw new RuntimeException( "Unhandled WebsiteEditEvent: " + ev );
+        }
+        var _permName = permName;
+        Platform.schedule( 1250, () -> {
+            iframe.setSrc( WEBSITE_URL.formatted( state.account.permid.get(), _permName ) );
+        });
+    }
+
+
+    @NoRuntimeInfo
+    protected void onIFrameEvent( IFrameMsgEvent ev ) {
+        LOG.info( "IFrame: '%s' (%s)", ev.msg, state.account.email.get() );
+        var match = IFRAME_MSG_PATTERN.matcher( ev.msg );
+        match.matches();
+        var type = match.group( 1 );
+        var id = match.group( 2 );
+        var action = defaultIfEmpty( match.group( 3 ), "clicked" );
+
+        var delay = MutableInt.of( 0 );
+        if (action.equals( "clicked" ) && (disposableChildState == null || disposableChildState.isDisposed())) {
+            disposableChildState = state.site.createState( new ContentState() ).activate();
+            delay.set( 2000 );
+        }
+        else if (action.equals( "clicked" )) {
+            delay.set( 0 ); // clicked and ContentPage already present
+        }
+        else if (action.equals( "loaded" )) {
+            delay.set( 500 );
+        }
+
         // article
-        if (ev.msg.startsWith( "article." )) {
+        if (type.equals( "article" )) {
+            var t = Timer.start();
             state.uow.entity( Article.class, id ).onSuccess( article -> {
-                disposableChildState = state.site.createState( new ArticleEditState() )
-                        .putContext( article, State.Context.DEFAULT_SCOPE )
-                        .activate();
+                Platform.schedule( t.remainingMillis( delay.get() ), () -> {
+                    EventManager.instance().publish( new WebsiteEditEvent( WebsiteEditPage.this, article ) );
+                });
+            });
+        }
+        // topic
+        else if (type.equals( "topic" )) {
+            var t = Timer.start();
+            state.uow.entity( TopicEntity.class, id ).onSuccess( topic -> {
+                Platform.schedule( t.remainingMillis( delay.get() ), () -> {
+                    EventManager.instance().publish( new WebsiteEditEvent( WebsiteEditPage.this, topic ) );
+                });
             });
         }
         // page.title -> settings
         else if (ev.msg.startsWith( "page." )) {
             disposableChildState = state.site.createState( new TemplateConfigState() ).activate();
         }
-        // topic
-        else if (ev.msg.startsWith( "topic." )) {
-            state.uow.entity( TopicEntity.class, id ).onSuccess( topic -> {
-                disposableChildState = state.site.createState( new TopicEditState() )
-                        .putContext( topic, State.Context.DEFAULT_SCOPE )
-                        .activate();
-            });
-        }
         else {
             LOG.warn( "Unhandled msg: %s", ev.msg );
+        }
+
+    }
+
+
+    /**
+     *
+     */
+    public static class WebsiteEditEvent
+            extends EventObject {
+
+        public Common    edited;
+
+        /**
+         *
+         * @param source The {@link Page} that fired the event.
+         * @param edited The object that is edited/navigated to.
+         */
+        public WebsiteEditEvent( Object source, Common edited ) {
+            super( source );
+            this.edited = edited;
+        }
+
+        @SuppressWarnings( "unchecked" )
+        public <R> Opt<R> sourceOfType( Class<R> type ) {
+            return type.isAssignableFrom( source.getClass() ) ? Opt.of( (R)source ) : Opt.absent();
+        }
+
+
+        public Opt<Article> article() {
+            return Opt.of( edited instanceof Article article ? article : null );
+        }
+
+        public Opt<TopicEntity> topic() {
+            return edited instanceof TopicEntity topic ?  Opt.of( topic ): Opt.absent();
         }
     }
 
@@ -216,7 +331,7 @@ public class WebsiteEditPage {
      *
      */
     public static class BrowserLayout
-                extends AbsoluteLayout {
+            extends AbsoluteLayout {
 
         @Override
         public void layout( UIComposite composite ) {

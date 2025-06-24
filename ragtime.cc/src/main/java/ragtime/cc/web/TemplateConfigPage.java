@@ -22,6 +22,7 @@ import areca.ui.Action;
 import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Label;
+import areca.ui.component2.Link;
 import areca.ui.component2.ScrollableComposite;
 import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
@@ -44,6 +45,7 @@ import ragtime.cc.UICommon;
 import ragtime.cc.article.EntityAssocModel;
 import ragtime.cc.article.EntityCompositeListModel;
 import ragtime.cc.article.PropertyModel;
+import ragtime.cc.web.http.WebsiteServlet;
 import ragtime.cc.web.model.NavItem;
 import ragtime.cc.web.model.TemplateConfigEntity;
 import ragtime.cc.web.template.TemplateInfo;
@@ -91,7 +93,7 @@ public class TemplateConfigPage {
             state.config.onSuccess( config -> {
                 // Template
                 add( new UIComposite() {{
-                    layout.set( uic.verticalL().fillHeight( false ) );
+                    layout.set( uic.vertical().fillHeight( false ) );
                     cssClasses.add( "MessageCard" );
                     addDecorator( new Label().content.set( "Design-Vorlage" ) );
 
@@ -106,6 +108,19 @@ public class TemplateConfigPage {
                             .viewer( new SelectViewer( templates ) )
                             .model( new PropertyModel<>( config.templateName ) )
                             .create() );
+
+                    // website link
+                    add( new UIComposite() {{
+                        lc( RowConstraints.height( 20 ) );
+                        layout.set( RowLayout.filled().spacing( 20 ) );
+                        add( new UIComposite() );
+                        add( new Link() {{
+                            lc( RowConstraints.width( 140 ) );
+                            content.set( "Web-Seite ansehen..." );
+                            tooltip.set( "Die Web-Seite in einem neuen Browser-Fenster öffnen" );
+                            href.set( String.format( "website/%s/%s", state.account.permid.get(), WebsiteServlet.PATH_HOME ) );
+                        }});
+                    }});
                 }});
 
                 // PageConfig

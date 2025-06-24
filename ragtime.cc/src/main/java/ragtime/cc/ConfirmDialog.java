@@ -98,6 +98,19 @@ public class ConfirmDialog
     }
 
 
+    public ConfirmDialog addNoAction( Runnable task ) {
+        actions.add( new Button() {{
+            label.set( "Nein" );
+            //type.set( Button.Type.SUBMIT );
+            events.on( EventType.SELECT, ev -> {
+                pageSite.close();
+                task.run();
+            });
+        }});
+        return this;
+    }
+
+
     public ConfirmDialog addCancelAction( Runnable task ) {
         actions.add( new Button() {{
             label.set( "Abbrechen" );
