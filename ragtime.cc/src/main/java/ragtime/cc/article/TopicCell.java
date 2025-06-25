@@ -81,7 +81,7 @@ class TopicCell
 
         // delete
         deleteBtn = addAction( new Button() {{
-            //icon.set( "close" );
+            iconStyle.set( IconStyle.OUTLINED );
             icon.set( UICommon.ICON_DELETE );
             tooltip.set( "Topic Löschen" );
             events.on( EventType.SELECT, ev -> {
@@ -90,7 +90,8 @@ class TopicCell
         }});
         // settings
         settingsBtn = addAction( new Button() {{
-            icon.set( "settings" );
+            iconStyle.set( IconStyle.OUTLINED );
+            icon.set( "view_agenda" );
             tooltip.set( "Einstellungen bearbeiten" );
             events.on( EventType.SELECT, ev -> {
                 state.site.createState( new TopicEditState() )
@@ -100,6 +101,7 @@ class TopicCell
         }});
         // add article
         articleBtn = addAction( new Button() {{
+            iconStyle.set( IconStyle.OUTLINED );
             icon.set( "note_add" );
             tooltip.set( "Neuen Beitrag anlegen im Topic '%s'".formatted( topic.title.get() ) );
             events.on( EventType.SELECT, ev -> {

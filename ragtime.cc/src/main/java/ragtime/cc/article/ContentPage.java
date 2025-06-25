@@ -35,7 +35,6 @@ import areca.ui.component2.Button;
 import areca.ui.component2.Events.EventType;
 import areca.ui.component2.Events.UIEvent;
 import areca.ui.component2.ScrollableComposite;
-import areca.ui.component2.Text;
 import areca.ui.component2.UIComponent;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.FillLayout;
@@ -170,7 +169,7 @@ public class ContentPage
         }});
         // action: new
         site.actions.add( new Action() {{
-            icon.set( "add" );
+            icon.set( "create_new_folder" );
             description.set( "Neues Topic anlegen" );
             handler.set( ev -> {
                 state.createNewTopic();
@@ -347,7 +346,7 @@ public class ContentPage
 
         public static final String  SECOND_LINE = "<br/><span class=\"SecondLine\">%s</span>";
 
-        static final RowConstraints RC = RowConstraints.height( HEIGHT ).width.set( HEIGHT );
+        static final RowConstraints RC = RowConstraints.height( HEIGHT ).width.set( HEIGHT-5 );
 
         protected Button        icon, handle;
 
@@ -357,7 +356,7 @@ public class ContentPage
 
         protected void create( String _icon, String c, RConsumer<UIComposite> contentBuilder ) {
             lc( RowConstraints.height( HEIGHT ));
-            lm( RowLayout.defaults().fillWidth( true ).margins( 5, -1 ).spacing( 5 ) );
+            lm( RowLayout.defaults().fillWidth( true ).margins( 5, -1 ).spacing( 0 ) );
 
             // icon
             icon = add( new Button() {{
@@ -436,43 +435,5 @@ public class ContentPage
             //Assert.that( components.remove( btn ).isPresent() );
         }
     }
-
-
-    /**
-     *
-     */
-    protected class TopicContentCell
-            extends ExpandableCell<TopicContent> {
-
-        @Override
-        protected void create() {
-            create( "edit", "#c96e5e", container -> {
-                container.add( new Text() {{
-                    format.set( Format.HTML );
-                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Topic '" + value.topic().title.get() + "' bearbeiten..." ) );
-//                    content.set( "Inhalt bearbeiten...<br/>" +
-//                            "<span style=\"font-size:10px; color:#808080;\">" + abbreviate( tc.topic.description.get(), 50 ) + "</span>" );
-                }});
-            });
-        }
-    }
-
-
-//    /**
-//     *
-//     */
-//    protected class ArticleContentCell
-//            extends ExpandableCell<ArticleContent> {
-//
-//        @Override
-//        protected void create() {
-//            create( "edit", "#5a88b9", container -> {
-//                container.add( new Text() {{
-//                    format.set( Format.HTML );
-//                    content.set( "Bearbeiten" + SECOND_LINE.formatted( "Artikel '" + value.article().title.get() + "' bearbeiten..." ) );
-//                }});
-//            });
-//        }
-//    }
 
 }

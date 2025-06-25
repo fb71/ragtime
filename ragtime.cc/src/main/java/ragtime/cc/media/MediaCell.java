@@ -74,15 +74,13 @@ public class MediaCell
         // thumbnail
         icon.styles.add( CssStyle.of( "opacity", "0" ) );
         if (mime.startsWith( "image" )) {
-//            Platform.schedule( 0, () -> {
-                media.thumbnail().size( 50, 50 ).outputFormat( "png" ).createBase64().onSuccess( base64 -> {
-                    if (!isDisposed()) {
-                        icon.icon.set( null );
-                        icon.bgImage.set( base64 );
-                        icon.styles.add( CssStyle.of( "background-origin", "content-box" ) );
-                        icon.styles.remove( CssStyle.of( "opacity", "0" ) );
-                    }
-//                });
+            media.thumbnail().size( 50, 50 ).outputFormat( "png" ).createBase64().onSuccess( base64 -> {
+                if (!isDisposed()) {
+                    icon.icon.set( null );
+                    icon.bgImage.set( base64 );
+                    icon.styles.add( CssStyle.of( "background-origin", "content-box" ) );
+                    icon.styles.remove( CssStyle.of( "opacity", "0" ) );
+                }
             });
 
 //            add( new Image() {{
@@ -98,7 +96,7 @@ public class MediaCell
         }
         // delete
         addAction( new Button() {{
-            //icon.set( "close" );
+            iconStyle.set( IconStyle.OUTLINED );
             icon.set( UICommon.ICON_DELETE );
             tooltip.set( "Löschen" );
             events.on( EventType.SELECT, ev -> {

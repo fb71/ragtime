@@ -85,6 +85,7 @@ class ArticleCell
 
         // delete
         deleteBtn = addAction( new Button() {{
+            iconStyle.set( IconStyle.OUTLINED );
             icon.set( UICommon.ICON_DELETE );
             tooltip.set( "Beitrag löschen" );
             events.on( EventType.SELECT, ev -> {
@@ -93,6 +94,7 @@ class ArticleCell
         }});
         // move topic
         topicBtn = addAction( new Button() {{
+            iconStyle.set( IconStyle.OUTLINED );
             icon.set( "drive_file_move" );
             tooltip.set( "Beitrag in ein anderes Topic verschieben" );
             events.on( EventType.SELECT, ev -> {

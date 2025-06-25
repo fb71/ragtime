@@ -20,7 +20,6 @@ import java.util.Date;
 import areca.common.base.Consumer.RConsumer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
-import areca.ui.Action;
 import areca.ui.component2.Button;
 import areca.ui.component2.DatePicker.DateTime;
 import areca.ui.layout.RowConstraints;
@@ -50,7 +49,7 @@ public class CalendarEventArticlePageEx
                         .model( new Date2StringTransform( DateTime.DATETIME,
                                 new PropertyModel<>( ce.start ) ) )
                         .create()
-                        .lc( RowConstraints.height( 35 ) ) );
+                        .lc( RowConstraints.width( 220 ) ) );
 
                 site.form().load();
                 site.formBody().layout();
@@ -59,7 +58,6 @@ public class CalendarEventArticlePageEx
             // absent: action add
             opt.ifAbsent( () -> {
                 site.formBody().components.add( 1, new Button() {{
-                    //lc( RowConstraints.height( 35 ) );
                     lc( RowConstraints.width( 60 ) );
 
                     tooltip.set( "Diesen Beitrag zu einem Termin machen" );
@@ -82,10 +80,11 @@ public class CalendarEventArticlePageEx
                 doExtendForm.accept( ce );
 
                 // action: remove
-                site.pagesite().actions.add( new Action() {{
-                    description.set( "Termin vom Beitrag entfernen\nDer Beitrag selber bleibt bestehen" );
+                site.formBody().components.add( 2, new Button() {{
+                    lc( RowConstraints.width( 60 ) );
+                    tooltip.set( "Termin vom Beitrag entfernen\nDer Beitrag selber bleibt bestehen" );
                     icon.set( "event_busy" );
-                    handler.set( ev -> {
+                    events.on( SELECT, ev -> {
                         enabled.set( false );
                         site.uow().removeEntity( ce );
                         site.uow().submit().onSuccess( __ -> {
@@ -93,6 +92,7 @@ public class CalendarEventArticlePageEx
                         });
                     });
                 }});
+                site.formBody().layout();
             });
         });
     }
