@@ -13,8 +13,8 @@
  */
 package ragtime.cc;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -40,14 +40,17 @@ public class AsyncWorker<R>
 
     public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
+    /** Pool */
     private static final ThreadPoolExecutor pool = new ThreadPoolExecutor( MAX_THREADS, MAX_THREADS,
             30, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new AsyncWorkerThreadFactory() )
+            new ArrayBlockingQueue<Runnable>( MAX_THREADS * 100 ),
+            new AsyncWorkerThreadFactory(),
+            new CallerBlocks() )
             {{
                 //allowCoreThreadTimeOut( true );
             }};
 
+    /** Thread factory */
     private static class AsyncWorkerThreadFactory
             implements ThreadFactory {
         private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
@@ -63,11 +66,12 @@ public class AsyncWorker<R>
         }
     }
 
+    /** Reject handler */
     private static class CallerBlocks
             implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution( Runnable task, ThreadPoolExecutor executor ) {
-            // this will block if the queue is full
+            // block if the queue is full
             try { executor.getQueue().put( task ); } catch (InterruptedException e) {}
             if (executor.isShutdown()) {
                throw new RejectedExecutionException( "Task " + task + " rejected from " + executor );
