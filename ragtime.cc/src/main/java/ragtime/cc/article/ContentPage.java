@@ -356,7 +356,7 @@ public class ContentPage
 
         protected void create( String _icon, String c, RConsumer<UIComposite> contentBuilder ) {
             lc( RowConstraints.height( HEIGHT ));
-            lm( RowLayout.defaults().fillWidth( true ).margins( 5, -1 ).spacing( 0 ) );
+            lm( RowLayout.defaults().fillWidth( true ).margins( 8, -1 ).spacing( 0 ) );
 
             // icon
             icon = add( new Button() {{

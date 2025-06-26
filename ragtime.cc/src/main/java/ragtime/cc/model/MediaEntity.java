@@ -101,8 +101,8 @@ public class MediaEntity
     }
 
     /** Cache */
-    private static Map<String,Promise<byte[]>> thumbnails = new ConcurrentReferenceHashMap<>(
-            128, 0.75f, AsyncWorker.MAX_THREADS, SOFT, SOFT, null );
+    private static final Map<String,Promise<byte[]>> THUMBNAIL_CACHE = new ConcurrentReferenceHashMap<>(
+            256, 0.75f, AsyncWorker.MAX_THREADS, SOFT, SOFT, null );
 
 
     // instance *******************************************
@@ -208,7 +208,7 @@ public class MediaEntity
             Assert.notNull( size, "No 'size' specified for thumbnail" );
             Assert.notNull( outputFormat, "No 'imageType' specified for thumbnail" );
 
-            return thumbnails.computeIfAbsent( cacheKey(), cacheKey -> {
+            return THUMBNAIL_CACHE.computeIfAbsent( cacheKey(), cacheKey -> {
                 return AsyncWorker.pool( () -> {
                     var t = Timer.start();
                     try (var in = IOUtils.buffer( in() )) {
@@ -241,7 +241,7 @@ public class MediaEntity
             var f = f();
             if (f.exists()) {
                 LOG.warn( "Overwrite: " + name.get() + " -> FLUSHING CACHE!" );
-                thumbnails.clear();
+                THUMBNAIL_CACHE.clear();
             }
             return /*new BufferedOutputStream(*/ new FileOutputStream( f );
         }
