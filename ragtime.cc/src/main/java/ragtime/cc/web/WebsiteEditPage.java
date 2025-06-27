@@ -32,6 +32,7 @@ import areca.common.reflect.ClassInfo;
 import areca.common.reflect.NoRuntimeInfo;
 import areca.common.reflect.RuntimeInfo;
 import areca.ui.Action;
+import areca.ui.Color;
 import areca.ui.Position;
 import areca.ui.Size;
 import areca.ui.component2.Button;
@@ -56,6 +57,7 @@ import ragtime.cc.model.Article;
 import ragtime.cc.model.Common;
 import ragtime.cc.model.EntityLifecycleEvent;
 import ragtime.cc.model.TopicEntity;
+import ragtime.cc.web.model.TemplateConfigEntity;
 
 /**
  * In-place editing of content and website/template config.
@@ -178,6 +180,11 @@ public class WebsiteEditPage {
             ui.body.layout.set( new BrowserLayout() );
             ui.body.add( iframe.iframe );
         }
+
+        // set background for reload transition/blending
+        state.uow.query( TemplateConfigEntity.class ).singleResult().onSuccess( config -> {
+            ui.body.bgColor.set( Color.ofHex( config.colors.get().pageBackground.get() ) );
+        });
 
         // action: articles
         site.actions.add( new Action() {{
