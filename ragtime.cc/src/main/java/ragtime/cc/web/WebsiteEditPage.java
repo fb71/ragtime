@@ -39,6 +39,7 @@ import areca.ui.component2.Events.EventType;
 import areca.ui.component2.IFrame;
 import areca.ui.component2.IFrame.IFrameMsgEvent;
 import areca.ui.component2.UIComponent;
+import areca.ui.component2.UIComponent.CssStyle;
 import areca.ui.component2.UIComposite;
 import areca.ui.layout.AbsoluteLayout;
 import areca.ui.layout.RowLayout;
@@ -240,8 +241,13 @@ public class WebsiteEditPage {
             throw new RuntimeException( "Unhandled WebsiteEditEvent: " + ev );
         }
         var _permName = permName;
+        iframe.iframe.styles.add( CssStyle.of( "transition", "all 0.3s" ) );
         Platform.schedule( 1250, () -> {
+            iframe.iframe.opacity.set( 0f );
             iframe.setSrc( WEBSITE_URL.formatted( state.account.permid.get(), _permName ) );
+            Platform.schedule( 500, () -> {
+                iframe.iframe.opacity.set( 1f );
+            });
         });
     }
 
