@@ -384,7 +384,8 @@ public class ContentPage
                 type.set( Type.NAVIGATE );
                 cssClasses.add( "Action" );
                 if (expandable) {
-                    icon.set( "keyboard_arrow_down" );
+                    icon.set( "unfold_more" );
+                    tooltip.set( "Dieses Element öffnen");
                     events.on( EventType.SELECT, ev -> {
                         viewer.toggle( value ).onSuccess( expanded -> {
                             onClick( ev, expanded );
@@ -404,12 +405,14 @@ public class ContentPage
         public void updateExpand( boolean expanded ) {
             if (expanded) {
                 cssClasses.add( "Expanded" );
-                handle.icon.set( "keyboard_arrow_down" );
+                handle.icon.set( "unfold_less" );
+                handle.tooltip.set( "Element öffnen");
                 onExpand();
             }
             else {
                 cssClasses.remove( "Expanded" );
-                handle.icon.set( "keyboard_arrow_up" );
+                handle.icon.set( "unfold_more" );
+                handle.tooltip.set( "Element schliessen");
                 onCollapse();
             }
         }
@@ -425,6 +428,7 @@ public class ContentPage
             btn.lc( RC );
             btn.type.set( Button.Type.NAVIGATE );
             btn.cssClasses.add( "Action" );
+            //btn.position.set( Position.of( 300, 0 ) );
             components.add( 2, btn ).orElseError();
             return btn;
         }
