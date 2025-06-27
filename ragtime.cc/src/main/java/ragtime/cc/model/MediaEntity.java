@@ -280,6 +280,13 @@ public class MediaEntity
                 .map( buf -> buf.toByteArray() );
     }
 
+    /**
+     * The size of this media as a file in the filesystem.
+     */
+    public Promise<Long> size() {
+        return AsyncWorker.pool( () -> f().length() );
+    }
+
     protected File f() {
         var workspace = Workspace.of( permid.get() );
         //var workspace = Workspace.of( cpermid.get() );

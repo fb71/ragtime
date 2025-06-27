@@ -21,7 +21,10 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.io.FileUtils;
+
 import areca.common.Platform;
+import areca.common.Timer;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
 import areca.common.reflect.ClassInfo;
@@ -85,7 +88,7 @@ public class MediasPage {
     public UIComponent create( UIComposite parent ) {
         ui.init( parent ).title.set( "Medien" );
 
-        ui.body.layout.set( uic.verticalL() );
+        ui.body.layout.set( uic.vertical() );
         ui.body.add( new UIComposite() {{
             layout.set( RowLayout.filled().vertical().spacing( uic.space ) );
 
@@ -160,26 +163,34 @@ public class MediasPage {
             add( new Text() {{
                 tooltip.set( media.name.get() );
                 format.set( Format.HTML );
-//                content.set( StringUtils.abbreviate( media.name.get(), 35 ) + "<br/>" +
-//                        "<span style=\"font-size:10px; color:#808080;\">" + mime + "</span>" );
 
-                var s =  "%s<br/><span style=\"font-size:10px; color:#808080;\">%s - Beiträge: %s</span>";
-                var name = abbreviate( media.name.get(), 35 );
-                content.set( String.format( s, name, mime, "?" ) );
+                var s =  new StringBuilder( 256 )
+                        .append( abbreviate( media.name.get(), 35 ) )
+                        .append( "<br/><span style=\"font-size:10px; color:#808080;\">" ).append( mime );
+                content.set( s.toString() );
 
-                Platform.schedule( 1000, () -> {
-                    media.articles().onSuccess( articles -> {
-                        if (!isDisposed()) {
-                            content.set( String.format( s, name, mime, articles.size() ) );
-                        }
-                    });
-                });
+                media.size()
+                        .then( filesize -> {
+                            s.append( " - " ).append( FileUtils.byteCountToDisplaySize( filesize ) );
+                            return media.articles();
+                        })
+                        .then( articles -> {
+                            s.append( " - Beiträge: " ).append( articles.size() );
+                            return media.topics();
+                        })
+                        .onSuccess( topics -> {
+                            s.append( " - Topics: " ).append( topics.size() );
+                            if (!isDisposed()) {
+                                content.set( s.append( "</span>" ).toString() );
+                            }
+                        });
             }});
             if (mime.startsWith( "image" )) {
                 add( new Image() {{
                     lc( RowConstraints.width( 40 ));
-                    Platform.schedule( 1000, () -> {
-                        media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                    var t = Timer.start();
+                    media.thumbnail().size( 40, 34 ).outputFormat( "png" ).create().onSuccess( bytes -> {
+                        Platform.schedule( t.remainingMillis( 1000 ), () -> {
                             if (!isDisposed()) {
                                 setData( bytes );
                             }
@@ -189,6 +200,7 @@ public class MediasPage {
             }
             add( new Button() {{
                 lc( RowConstraints.width( 40 ));
+                iconStyle.set( IconStyle.OUTLINED );
                 icon.set( UICommon.ICON_DELETE );
                 tooltip.set( "Löschen" );
                 events.on( EventType.SELECT, ev -> {

@@ -15,10 +15,7 @@ package ragtime.cc.media;
 
 import static org.apache.commons.lang3.StringUtils.abbreviate;
 
-import java.util.List;
-
-import org.apache.commons.lang3.mutable.MutableObject;
-
+import org.apache.commons.io.FileUtils;
 import areca.common.MutableInt;
 import areca.common.log.LogFactory;
 import areca.common.log.LogFactory.Log;
@@ -30,7 +27,6 @@ import ragtime.cc.ConfirmDialog;
 import ragtime.cc.UICommon;
 import ragtime.cc.article.ContentPage.ExpandableCell;
 import ragtime.cc.article.ContentState.MediaContent;
-import ragtime.cc.model.Article;
 
 /**
  *
@@ -55,18 +51,20 @@ public class MediaCell
                 var name = abbreviate( media.name.get(), 35 );
                 content.set( name + SECOND_LINE.formatted( "..." ) );
 
-                var articles = new MutableObject<List<Article>>();
-                media.articles()
-                        .then( _articles -> {
-                            articles.setValue( _articles );
+                var s =  new StringBuilder( 256 ).append( mime );
+                media.size()
+                        .then( filesize -> {
+                            s.append( " - " ).append( FileUtils.byteCountToDisplaySize( filesize ) );
+                            return media.articles();
+                        })
+                        .then( articles -> {
+                            s.append( " - Beiträge: " ).append( articles.size() );
                             return media.topics();
                         })
-                        .onSuccess( _topics -> {
+                        .onSuccess( topics -> {
+                            s.append( " - Topics: " ).append( topics.size() );
                             if (!isDisposed()) {
-                                content.set( name + SECOND_LINE.formatted( mime
-                                        + " - Topics: " + _topics.size()
-                                        + " - Beiträge: " + articles.getValue().size()
-                                ));
+                                content.set( name + SECOND_LINE.formatted( s.toString() ) );
                             }
                         });
             }});
