@@ -109,6 +109,11 @@ public class WebsiteEditPage {
                     .performIf( IFrameMsgEvent.class, ev -> skipWebsiteEditEvent.elapsedMillis() > 2500 ) //Pageflow.current().topPage() == WebsiteEditPage.this )
                     .unsubscribeIf( () -> iframe.isDisposed() );
 
+            EventManager.instance()
+                    .subscribe( (IFrameMsgEvent ev) -> LOG.info( "Website RELOAD: %s", skipWebsiteEditEvent ) )
+                    .performIf( IFrameMsgEvent.class, ev -> skipWebsiteEditEvent.elapsedMillis() < 2500 )
+                    .unsubscribeIf( () -> iframe.isDisposed() );
+
             // WebsiteEditEvent from ContentPage
             EventManager.instance()
                     .subscribe( (WebsiteEditEvent ev) -> onContentPageTree( ev ) )

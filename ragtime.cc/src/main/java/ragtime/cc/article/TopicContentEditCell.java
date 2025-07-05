@@ -59,7 +59,9 @@ class TopicContentEditCell
 
 
     protected void create() {
-        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ) );
+        lc( RowConstraints.height( 300, 42 ) );
+
+        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ).fillHeight( true ) );
 
         form = new Form();
 
@@ -97,27 +99,21 @@ class TopicContentEditCell
                     t.type.set( Type.MARKDOWN );
                     TextAutocomplete.process( t, state.uow );
                 }))
-                .create()
-                .lc( RowConstraints.height( 150 ) ) );
+                .create() );
+                //.lc( RowConstraints.height( 150 ) ) );
 
-        // medias
+        // add media
         add( new UIComposite() {{
-            //lc( RowConstraints.height( 100 ) );
-            layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
-
-            // add button
-            add( new UIComposite() {{
-                lc( RowConstraints.height( 38 ) );
-                layout.set( RowLayout.filled().spacing( 15 ) );
-                add( new UIComposite() );
-                add( new Button() {{
-                    lc( RowConstraints.width( 60 ) );
-                    tooltip.set( format( "Bilder/Medien zum diesem Topic hinzufügen", topic.title.get() ) );
-                    icon.set( "add_photo_alternate" );
-                    events.on( EventType.SELECT, ev -> {
-                        state.site.createState( new MediasSelectState( sel -> tc.addMedias( sel ) ) ).activate();
-                    });
-                }});
+            lc( RowConstraints.height( 38 ) );
+            layout.set( RowLayout.filled().spacing( 15 ) );
+            add( new UIComposite() );
+            add( new Button() {{
+                lc( RowConstraints.width( 60 ) );
+                tooltip.set( format( "Bilder/Medien zum diesem Topic hinzufügen", topic.title.get() ) );
+                icon.set( "add_photo_alternate" );
+                events.on( EventType.SELECT, ev -> {
+                    state.site.createState( new MediasSelectState( sel -> tc.addMedias( sel ) ) ).activate();
+                });
             }});
         }});
 

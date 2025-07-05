@@ -51,7 +51,8 @@ public class ArticleContentEditCell
 
     @Override
     protected void create() {
-        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ) );
+        lc( RowConstraints.height( 450, 68 ) );
+        layout.set( RowLayout.verticals().margins( 15, 22 ).spacing( 15 ).fillWidth( true ).fillHeight( true ) );
 
         form = new Form();
 
@@ -102,11 +103,12 @@ public class ArticleContentEditCell
                     t.type.set( Type.MARKDOWN );
                     TextAutocomplete.process( t, state.uow );
                 }))
-                .create()
-                .lc( RowConstraints.height( 300 ) ) );
+                .create() );
+                //.lc( RowConstraints.height( 300 ) ) );
 
         // actions
         add( new UIComposite() {{
+            lc( RowConstraints.height( 35 ) );
             layout.set( RowLayout.verticals().fillWidth( true ).spacing( 5 ) );
 
             add( new UIComposite() {{
