@@ -211,7 +211,13 @@ public class ContentPage
         // article
         ev.article().ifPresent( article -> {
             article.topic.fetch().onSuccess( topic -> {
-                tree.expandPath( state.contentType( topic ), state.contentType( article ) );
+                if (topic != null) {
+                    tree.expandPath( state.contentType( topic ), state.contentType( article ) );
+                }
+                else {
+                    // old templates without topics
+                    tree.expandPath( state.contentType( article ) );
+                }
             });
         });
     }
